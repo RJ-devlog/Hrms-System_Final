@@ -1,0 +1,91 @@
+﻿@page
+@model HRMS_System.Pages.Dashboard.AttendanceTracking.AttendanceTrackingPageModel
+@{
+    ViewData["Title"] = "Attendance Tracking";
+    Layout = "/Pages/Dashboard/_DashboardLayout.cshtml";
+}
+
+<div class="dashboard-page">
+
+    <h1 class="page-title">Attendance Tracking</h1>
+    <div class="title-line"></div>
+
+    <!-- TOP BAR -->
+    <div class="attendance-topbar">
+        <div class="attendance-tabs">
+            <div class="attendance-tab active">Time In</div>
+            <div class="attendance-tab">Time Out</div>
+            <div class="attendance-tab">Attendance Summary</div>
+        </div>
+
+        <input type="text"
+               class="attendance-search"
+               placeholder="Search Employee" />
+    </div>
+
+    <!-- TIME IN / TIME OUT BOX -->
+    <div class="attendance-box">
+        <table class="attendance-table">
+            <thead>
+                <tr>
+                    <th>ID No.</th>
+                    <th>Name</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var emp in Model.Employees)
+                {
+                    <tr>
+                        <td>@emp.UserIdNumber</td>       
+                        <td>@emp.FirstName @emp.LastName</td>
+                        <td>-</td>
+                        <td>-</td>
+                    </tr>
+                } 
+            </tbody>
+        </table>
+    </div>
+
+
+    <!-- ATTENDANCE SUMMARY BOX -->
+    <div class="attendance-summary-box">
+
+        <!-- SUMMARY HEADER -->
+        <div class="attendance-summary-header">
+            <div class="summary-month">
+                <strong>June 2025</strong>
+                <i class="bi bi-calendar3"></i>
+            </div>
+
+            <div class="summary-days">
+                Total Work Days: <strong>30</strong>
+            </div>
+        </div>
+
+        <!-- SUMMARY TABLE -->
+        <table class="attendance-table">
+            <thead>
+                <tr>
+                    <th>ID No.</th>
+                    <th>Name</th>
+                    <th>On-Time</th>
+                    <th>Late</th>
+                    <th>Absent</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>011</td>
+                    <td>Ma. Kharen Caballero</td>
+                    <td class="text-green">22</td>
+                    <td class="text-orange">7</td>
+                    <td class="text-red">1</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div> 
+</div>

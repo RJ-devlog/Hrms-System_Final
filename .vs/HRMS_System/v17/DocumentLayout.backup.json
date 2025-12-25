@@ -1,0 +1,189 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\rieln\\OneDrive\\Desktop\\THE NEW HRMSSSS\\HRMS_System\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A6D874A2-5BD0-4059-B0C3-D92333EE7313}|HRMS_System\\HRMS_System.csproj|c:\\users\\rieln\\onedrive\\desktop\\the new hrmssss\\hrms_system\\hrms_system\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{A6D874A2-5BD0-4059-B0C3-D92333EE7313}|HRMS_System\\HRMS_System.csproj|solutionrelative:hrms_system\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A6D874A2-5BD0-4059-B0C3-D92333EE7313}|HRMS_System\\HRMS_System.csproj|c:\\users\\rieln\\onedrive\\desktop\\the new hrmssss\\hrms_system\\hrms_system\\pages\\account\\loginpage.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A6D874A2-5BD0-4059-B0C3-D92333EE7313}|HRMS_System\\HRMS_System.csproj|solutionrelative:hrms_system\\pages\\account\\loginpage.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A6D874A2-5BD0-4059-B0C3-D92333EE7313}|HRMS_System\\HRMS_System.csproj|c:\\users\\rieln\\onedrive\\desktop\\the new hrmssss\\hrms_system\\hrms_system\\pages\\dashboard\\employeemanagement.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A6D874A2-5BD0-4059-B0C3-D92333EE7313}|HRMS_System\\HRMS_System.csproj|solutionrelative:hrms_system\\pages\\dashboard\\employeemanagement.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A6D874A2-5BD0-4059-B0C3-D92333EE7313}|HRMS_System\\HRMS_System.csproj|c:\\users\\rieln\\onedrive\\desktop\\the new hrmssss\\hrms_system\\hrms_system\\pages\\dashboard\\addemployee.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A6D874A2-5BD0-4059-B0C3-D92333EE7313}|HRMS_System\\HRMS_System.csproj|solutionrelative:hrms_system\\pages\\dashboard\\addemployee.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A6D874A2-5BD0-4059-B0C3-D92333EE7313}|HRMS_System\\HRMS_System.csproj|c:\\users\\rieln\\onedrive\\desktop\\the new hrmssss\\hrms_system\\hrms_system\\pages\\dashboard\\employeemanagement.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A6D874A2-5BD0-4059-B0C3-D92333EE7313}|HRMS_System\\HRMS_System.csproj|solutionrelative:hrms_system\\pages\\dashboard\\employeemanagement.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A6D874A2-5BD0-4059-B0C3-D92333EE7313}|HRMS_System\\HRMS_System.csproj|c:\\users\\rieln\\onedrive\\desktop\\the new hrmssss\\hrms_system\\hrms_system\\pages\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A6D874A2-5BD0-4059-B0C3-D92333EE7313}|HRMS_System\\HRMS_System.csproj|solutionrelative:hrms_system\\pages\\index.cshtml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A6D874A2-5BD0-4059-B0C3-D92333EE7313}|HRMS_System\\HRMS_System.csproj|c:\\users\\rieln\\onedrive\\desktop\\the new hrmssss\\hrms_system\\hrms_system\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A6D874A2-5BD0-4059-B0C3-D92333EE7313}|HRMS_System\\HRMS_System.csproj|solutionrelative:hrms_system\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A6D874A2-5BD0-4059-B0C3-D92333EE7313}|HRMS_System\\HRMS_System.csproj|c:\\users\\rieln\\onedrive\\desktop\\the new hrmssss\\hrms_system\\hrms_system\\pages\\dashboard\\addemployee.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{A6D874A2-5BD0-4059-B0C3-D92333EE7313}|HRMS_System\\HRMS_System.csproj|solutionrelative:hrms_system\\pages\\dashboard\\addemployee.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A6D874A2-5BD0-4059-B0C3-D92333EE7313}|HRMS_System\\HRMS_System.csproj|c:\\users\\rieln\\onedrive\\desktop\\the new hrmssss\\hrms_system\\hrms_system\\models\\userinformationmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A6D874A2-5BD0-4059-B0C3-D92333EE7313}|HRMS_System\\HRMS_System.csproj|solutionrelative:hrms_system\\models\\userinformationmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A6D874A2-5BD0-4059-B0C3-D92333EE7313}|HRMS_System\\HRMS_System.csproj|c:\\users\\rieln\\onedrive\\desktop\\the new hrmssss\\hrms_system\\hrms_system\\models\\loginmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A6D874A2-5BD0-4059-B0C3-D92333EE7313}|HRMS_System\\HRMS_System.csproj|solutionrelative:hrms_system\\models\\loginmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 5,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "EmployeeManagement.cshtml",
+              "DocumentMoniker": "C:\\Users\\rieln\\OneDrive\\Desktop\\THE NEW HRMSSSS\\HRMS_System\\HRMS_System\\Pages\\Dashboard\\EmployeeManagement.cshtml",
+              "RelativeDocumentMoniker": "HRMS_System\\Pages\\Dashboard\\EmployeeManagement.cshtml",
+              "ToolTip": "C:\\Users\\rieln\\OneDrive\\Desktop\\THE NEW HRMSSSS\\HRMS_System\\HRMS_System\\Pages\\Dashboard\\EmployeeManagement.cshtml",
+              "RelativeToolTip": "HRMS_System\\Pages\\Dashboard\\EmployeeManagement.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB0AAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-12-15T08:54:42.546Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "AddEmployee.cshtml",
+              "DocumentMoniker": "C:\\Users\\rieln\\OneDrive\\Desktop\\THE NEW HRMSSSS\\HRMS_System\\HRMS_System\\Pages\\Dashboard\\AddEmployee.cshtml",
+              "RelativeDocumentMoniker": "HRMS_System\\Pages\\Dashboard\\AddEmployee.cshtml",
+              "ToolTip": "C:\\Users\\rieln\\OneDrive\\Desktop\\THE NEW HRMSSSS\\HRMS_System\\HRMS_System\\Pages\\Dashboard\\AddEmployee.cshtml",
+              "RelativeToolTip": "HRMS_System\\Pages\\Dashboard\\AddEmployee.cshtml",
+              "ViewState": "AgIAABgAAAAAAAAAAAAAAAMAAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-12-15T23:51:26.199Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Index.cshtml.cs",
+              "DocumentMoniker": "C:\\Users\\rieln\\OneDrive\\Desktop\\THE NEW HRMSSSS\\HRMS_System\\HRMS_System\\Pages\\Index.cshtml.cs",
+              "RelativeDocumentMoniker": "HRMS_System\\Pages\\Index.cshtml.cs",
+              "ToolTip": "C:\\Users\\rieln\\OneDrive\\Desktop\\THE NEW HRMSSSS\\HRMS_System\\HRMS_System\\Pages\\Index.cshtml.cs",
+              "RelativeToolTip": "HRMS_System\\Pages\\Index.cshtml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-15T23:52:14.204Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\rieln\\OneDrive\\Desktop\\THE NEW HRMSSSS\\HRMS_System\\HRMS_System\\appsettings.json",
+              "RelativeDocumentMoniker": "HRMS_System\\appsettings.json",
+              "ToolTip": "C:\\Users\\rieln\\OneDrive\\Desktop\\THE NEW HRMSSSS\\HRMS_System\\HRMS_System\\appsettings.json",
+              "RelativeToolTip": "HRMS_System\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-12-15T23:52:00.429Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "AddEmployee.cshtml.cs",
+              "DocumentMoniker": "C:\\Users\\rieln\\OneDrive\\Desktop\\THE NEW HRMSSSS\\HRMS_System\\HRMS_System\\Pages\\Dashboard\\AddEmployee.cshtml.cs",
+              "RelativeDocumentMoniker": "HRMS_System\\Pages\\Dashboard\\AddEmployee.cshtml.cs",
+              "ToolTip": "C:\\Users\\rieln\\OneDrive\\Desktop\\THE NEW HRMSSSS\\HRMS_System\\HRMS_System\\Pages\\Dashboard\\AddEmployee.cshtml.cs",
+              "RelativeToolTip": "HRMS_System\\Pages\\Dashboard\\AddEmployee.cshtml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-15T23:51:33.428Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "LoginPage.cshtml.cs",
+              "DocumentMoniker": "C:\\Users\\rieln\\OneDrive\\Desktop\\THE NEW HRMSSSS\\HRMS_System\\HRMS_System\\Pages\\Account\\LoginPage.cshtml.cs",
+              "RelativeDocumentMoniker": "HRMS_System\\Pages\\Account\\LoginPage.cshtml.cs",
+              "ToolTip": "C:\\Users\\rieln\\OneDrive\\Desktop\\THE NEW HRMSSSS\\HRMS_System\\HRMS_System\\Pages\\Account\\LoginPage.cshtml.cs",
+              "RelativeToolTip": "HRMS_System\\Pages\\Account\\LoginPage.cshtml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-15T23:55:32.446Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "EmployeeManagement.cshtml.cs",
+              "DocumentMoniker": "C:\\Users\\rieln\\OneDrive\\Desktop\\THE NEW HRMSSSS\\HRMS_System\\HRMS_System\\Pages\\Dashboard\\EmployeeManagement.cshtml.cs",
+              "RelativeDocumentMoniker": "HRMS_System\\Pages\\Dashboard\\EmployeeManagement.cshtml.cs",
+              "ToolTip": "C:\\Users\\rieln\\OneDrive\\Desktop\\THE NEW HRMSSSS\\HRMS_System\\HRMS_System\\Pages\\Dashboard\\EmployeeManagement.cshtml.cs",
+              "RelativeToolTip": "HRMS_System\\Pages\\Dashboard\\EmployeeManagement.cshtml.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-16T00:04:03.58Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "ApplicationDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\rieln\\OneDrive\\Desktop\\THE NEW HRMSSSS\\HRMS_System\\HRMS_System\\Data\\ApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "HRMS_System\\Data\\ApplicationDbContext.cs",
+              "ToolTip": "C:\\Users\\rieln\\OneDrive\\Desktop\\THE NEW HRMSSSS\\HRMS_System\\HRMS_System\\Data\\ApplicationDbContext.cs",
+              "RelativeToolTip": "HRMS_System\\Data\\ApplicationDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-16T00:51:50.563Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "UserInformationModel.cs",
+              "DocumentMoniker": "C:\\Users\\rieln\\OneDrive\\Desktop\\THE NEW HRMSSSS\\HRMS_System\\HRMS_System\\Models\\UserInformationModel.cs",
+              "RelativeDocumentMoniker": "HRMS_System\\Models\\UserInformationModel.cs",
+              "ToolTip": "C:\\Users\\rieln\\OneDrive\\Desktop\\THE NEW HRMSSSS\\HRMS_System\\HRMS_System\\Models\\UserInformationModel.cs",
+              "RelativeToolTip": "HRMS_System\\Models\\UserInformationModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-16T00:04:16.012Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "LoginModel.cs",
+              "DocumentMoniker": "C:\\Users\\rieln\\OneDrive\\Desktop\\THE NEW HRMSSSS\\HRMS_System\\HRMS_System\\Models\\LoginModel.cs",
+              "RelativeDocumentMoniker": "HRMS_System\\Models\\LoginModel.cs",
+              "ToolTip": "C:\\Users\\rieln\\OneDrive\\Desktop\\THE NEW HRMSSSS\\HRMS_System\\HRMS_System\\Models\\LoginModel.cs",
+              "RelativeToolTip": "HRMS_System\\Models\\LoginModel.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-12-16T00:04:16.884Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

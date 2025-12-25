@@ -1,0 +1,79 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - HRMS</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+</head>
+<body>
+
+    <div class="app-container">
+
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="sidebar-logo">
+                <img src="~/Icons/Logo.png" />
+            </div>
+
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <a asp-page="/HRMS/EmployeeManagement/Index">
+                        <i class="bi bi-person"></i>
+                        <span>Employee Management</span>
+                    </a>
+                </li>
+
+                <li class="menu-item">
+                    <a asp-page="/HRMS/AttendanceTracking/Index">
+                        <i class="bi bi-clock-history"></i>
+                        <span>Attendance Tracking</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a asp-page="/HRMS/Evaluation/Index">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span>Evaluation</span>
+                    </a>
+                </li>
+
+                <li class="menu-item">
+                    <a asp-page="/HRMS/Training/Index">
+                        <i class="bi bi-mortarboard"></i>
+                        <span>Training & Seminars</span>
+                    </a>
+                </li>
+
+                <li class="menu-item">
+                    <a asp-page="/HRMS/Promotion/Index">
+                        <i class="bi bi-arrow-up-right-circle"></i>
+                        <span>Promotion Management</span>
+                    </a>
+                </li>
+
+                <li class="menu-item">
+                    <a asp-page="/Dashboard/Notification/Index">
+                        <i class="bi bi-bell"></i>
+                        <span>Notification</span>
+                    </a>
+                </li>
+
+            </ul>
+
+            <div class="sidebar-footer">
+                <i class="bi bi-person-circle"></i>
+                <span>Admin</span>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            @RenderBody()
+        </div>
+
+    </div>
+
+</body>
+</html>

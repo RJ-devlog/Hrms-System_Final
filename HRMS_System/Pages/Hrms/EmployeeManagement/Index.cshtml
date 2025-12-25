@@ -1,0 +1,283 @@
+﻿@page
+@model HRMS_System.Pages.Dashboard.EmployeeManagement.EmployeeManagementModel
+@{
+    ViewData["Title"] = "Employee Management";
+    Layout = "/Pages/Hrms/_DashboardLayout.cshtml";
+}
+<div class="dashboard-page">
+
+    <h1 class="page-title">Employee Management</h1>
+    <div class="title-line"></div>
+
+    <div class="records-header">
+        <div>Employee Records</div>
+        <a asp-page="/Dashboard/EmployeeManagement/AddEmployee">
+            Add New Employee
+        </a>
+    </div>
+    <div class="input-group nb-3">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search Employee (ID, name, email...)" aria-label="Search Employee" aria-describedby="button-addon2" />
+        <button class="btn btn-outline-secondary" type="button" onclick="searchBtn()">Search</button>
+    </div>
+    <br/>
+
+    <div class="records-box">
+        <table class="table-fixed">
+            <thead>
+                <tr>
+                    <th>ID No.</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th style="width: 80px;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var emp in Model.employeeInfo)
+                {
+                    <tr>
+                        <td>@emp.UserIdNumber</td>
+                        <td>@emp.FirstName @emp.LastName</td>
+                        <td>@emp.PhoneNumber</td>
+                        <td>@emp.Email</td>
+                        <td style="position: relative; text-align: center;">
+                            <i class="bi bi-three-dots-vertical table-options"></i>
+
+                            <div class="table-dropdown">
+                                <!-- VIEW -->
+                                <a href="javascript:void(0)"
+                                   onclick="openProfile(@emp.id)">
+                                    View
+                                </a>
+                                <!-- EDIT -->
+                                <a asp-page="/Dashboard/EmployeeManagement/EditEmployeeInformation"
+                                   asp-route-id="@emp.id">
+                                    Edit
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- Overlay -->
+<div id="overlay" onclick="closeProfile()"></div>
+
+<!-- Profile Panel -->
+<div id="profilePanel" class="profile-panel">
+
+    <!-- Header -->
+    <div class="profile-header">
+
+        <i class="bi bi-arrow-left back-icon" onclick="closeProfile()"></i>
+
+        <div class="profile-header-row">
+            <!-- Avatar -->
+            <img id="empAvatar"
+                 class="profile-avatar"
+                 src="/Icons/default-avatar.png" />
+
+            <!-- Text -->
+            <div class="profile-header-text">
+                <h2 id="empName" class="profile-name"></h2>
+
+                <div class="profile-meta">
+                    <div>
+                        <span>Status</span>
+                        <strong id="empStatus" class="status-active"></strong>
+                    </div>
+                    <div>
+                        <span>Start Date</span>
+                        <strong id="empStartDate"></strong>
+                    </div>
+                    <div>
+                        <span>Tenure</span>
+                        <strong id="empTenure">11 months</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Body -->
+    <div class="profile-body">
+
+        <!-- Working Info -->
+        <h4 class="section-title">Working Information</h4>
+
+        <div class="info-list">
+            <div class="info-item">
+                <i class="bi bi-credit-card"></i>
+                <span>ID No.</span>
+                <strong id="empId"></strong>
+            </div>
+
+            <div class="info-item">
+                <i class="bi bi-briefcase"></i>
+                <span>Job Role</span>
+                <strong id="empJobRole"></strong>
+            </div>
+
+            <div class="info-item">
+                <i class="bi bi-clock"></i>
+                <span>Hours</span>
+                <strong id="empHours"></strong>
+            </div>
+
+            <div class="info-item">
+                <i class="bi bi-calendar-week"></i>
+                <span>Schedule</span>
+                <strong id="empSchedule"></strong>
+            </div>
+
+            <div class="info-item">
+                <i class="bi bi-diagram-3"></i>
+                <span>Department</span>
+                <strong id="empDepartment"></strong>
+            </div>
+
+            <div class="info-item">
+                <i class="bi bi-person-badge"></i>
+                <span>Emp Status</span>
+                <strong id="empType"></strong>
+            </div>
+        </div>
+
+        <!-- Personal Info -->
+        <h4 class="section-title">Personal Information</h4>
+
+        <div class="info-list">
+            <div class="info-item">
+                <i class="bi bi-gender-female"></i>
+                <span>Gender</span>
+                <strong id="empGender"></strong>
+            </div>
+
+            <div class="info-item">
+                <i class="bi bi-heart"></i>
+                <span>Civil Status</span>
+                <strong id="empCivil"></strong>
+            </div>
+
+            <div class="info-item">
+                <i class="bi bi-envelope"></i>
+                <span>Email</span>
+                <strong id="empEmail"></strong>
+            </div>
+
+            <div class="info-item">
+                <i class="bi bi-telephone"></i>
+                <span>Phone</span>
+                <strong id="empPhone"></strong>
+            </div>
+
+            <div class="info-item">
+                <i class="bi bi-geo-alt"></i>
+                <span>Address</span>
+                <strong id="empAddress"></strong>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        document.querySelectorAll(".table-options").forEach(icon => {
+            icon.addEventListener("click", function (e) {
+                e.stopPropagation();
+
+                const dropdown = this.nextElementSibling;
+                if (!dropdown) return;
+
+                document.querySelectorAll(".table-dropdown").forEach(d => {
+                    if (d !== dropdown) d.classList.remove("show");
+                });
+
+                dropdown.classList.toggle("show");
+            });
+        });
+
+        document.addEventListener("click", function () {
+            document.querySelectorAll(".table-dropdown").forEach(d => {
+                d.classList.remove("show");
+            });
+        });
+
+    });
+
+    function openProfile(empId) {
+        fetch(`/Dashboard/EmployeeManagement?handler=EmployeeProfile&id=${empId}`)
+            .then(res => {
+                if (!res.ok) throw new Error("Employee not found");
+                return res.json();
+            })
+            .then(emp => {
+
+                // Avatar + basic info
+                document.getElementById("empAvatar").src =
+                    emp.profileImagePath || "/Icons/default-avatar.png";
+
+                document.getElementById("empName").innerText = emp.fullName;
+                document.getElementById("empStatus").innerText = emp.status;
+                document.getElementById("empStartDate").innerText =
+                    new Date(emp.startDate).toLocaleDateString();
+
+                // Working information
+                document.getElementById("empId").innerText = emp.UserIdNumber;
+                document.getElementById("empJobRole").innerText = emp.jobRole;
+                document.getElementById("empHours").innerText = emp.workHoursType;
+                document.getElementById("empSchedule").innerText = emp.schedule;
+                document.getElementById("empDepartment").innerText = emp.department;
+                document.getElementById("empType").innerText = emp.employeeType;
+
+                // Personal information
+                document.getElementById("empGender").innerText = emp.gender;
+                document.getElementById("empCivil").innerText = emp.civilStatus;
+                document.getElementById("empEmail").innerText = emp.email;
+                document.getElementById("empPhone").innerText = emp.phoneNumber;
+                document.getElementById("empAddress").innerText = emp.address;
+
+                // Open panel
+                document.getElementById("profilePanel").classList.add("active");
+                document.getElementById("overlay").classList.add("active");
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Failed to load employee profile");
+            });
+    }
+        function closeProfile() {
+        document.getElementById("profilePanel").classList.remove("active");
+        document.getElementById("overlay").classList.remove("active");
+    }
+
+
+        function searchBtn() {
+        const value = document.getElementById("searchInput").value.trim();
+
+        const url = new URL(window.location.href);
+
+        if (value) {
+            url.searchParams.set("SearchTerm", value);
+        } else {
+            url.searchParams.delete("SearchTerm");
+        }
+
+        window.location.href = url.toString();
+    }
+        document.getElementById("searchInput").addEventListener("keydown", function (e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            searchBtn();
+        }
+    });
+
+
+</script>
+
+
