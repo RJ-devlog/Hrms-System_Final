@@ -85,14 +85,11 @@ namespace HRMS_System.Models
         [StringLength(150)]
         public string? Address { get; set; }
 
-        /* ===================== OPTIONAL / UI SUPPORT ===================== */
+        [Range(0, 600)]
+        public int? TenureMonths { get; set; }
 
-        // Used to display avatar image in profile panel
         [StringLength(255)]
         public string? ProfileImagePath { get; set; }
 
-        // Cached tenure in months (optional)
-        [Range(0, 600)]
-        public int? TenureMonths { get; set; }
     }
 }

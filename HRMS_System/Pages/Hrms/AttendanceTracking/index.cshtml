@@ -2,8 +2,37 @@
 @model HRMS_System.Pages.Dashboard.AttendanceTracking.AttendanceTrackingPageModel
 @{
     ViewData["Title"] = "Attendance Tracking";
-    Layout = "/Pages/Dashboard/_DashboardLayout.cshtml";
+    Layout = "/Pages/Hrms/_DashboardLayout.cshtml";
 }
+@functions {
+    string GetAttendanceStatus(DateTime? timeIn, DateTime? timeOut)
+    {
+        if (!timeIn.HasValue)
+            return "Absent";
+
+        if (!timeOut.HasValue)
+            return "Incomplete";
+
+        var lateCutoff = new TimeSpan(8, 0, 0); // 8:00 AM
+        if (timeIn.Value.TimeOfDay > lateCutoff)
+            return "Late";
+
+        return "On-Time";
+    }
+
+    string GetStatusClass(string status)
+    {
+        return status switch
+        {
+            "On-Time" => "status-ontime",
+            "Late" => "status-late",
+            "Absent" => "status-absent",
+            "Incomplete" => "status-incomplete",
+            _ => ""
+        };
+    }
+}
+
 
 <div class="dashboard-page">
 
@@ -13,79 +42,492 @@
     <!-- TOP BAR -->
     <div class="attendance-topbar">
         <div class="attendance-tabs">
-            <div class="attendance-tab active">Time In</div>
-            <div class="attendance-tab">Time Out</div>
-            <div class="attendance-tab">Attendance Summary</div>
+            <div class="attendance-tab active" data-tab="time">Time In/Out</div>
+            <div class="attendance-tab" data-tab="date">Date Tracking</div>
+            <div class="attendance-tab" data-tab="summary">Attendance Summary</div>
         </div>
 
         <input type="text"
                class="attendance-search"
+               id="attendanceSearch"
                placeholder="Search Employee" />
     </div>
 
-    <!-- TIME IN / TIME OUT BOX -->
-    <div class="attendance-box">
-        <table class="attendance-table">
-            <thead>
-                <tr>
-                    <th>ID No.</th>
-                    <th>Name</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                </tr>
-            </thead>
-            <tbody>
+    <!-- TAB CONTENT WRAPPER (same border container like screenshot) -->
+    <div class="attendance-content-wrapper">
 
-                @foreach (var emp in Model.Employees)
-                {
+        <!-- TIME IN / TIME OUT VIEW -->
+        <div class="tab-content active" id="tab-time">
+            <table class="attendance-table">
+                <thead>
                     <tr>
-                        <td>@emp.UserIdNumber</td>       
-                        <td>@emp.FirstName @emp.LastName</td>
-                        <td>-</td>
-                        <td>-</td>
+                        <th>ID No.</th>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Time In</th>
+                        <th>Time Out</th>
+                        <th>Status</th>
                     </tr>
-                } 
-            </tbody>
-        </table>
+                </thead>
+                <tbody id="timeTbody">
+                    @{
+                        var todayKey = DateTime.Today.ToString("yyyy-MM-dd");
+                    }
+                    @foreach (var emp in Model.Employees)
+                    {
+                        var att = Model.DateRangeAttendance
+                        .Where(a => a.UserId == emp.id)
+                        .OrderByDescending(a => a.AttendanceDate)
+                        .ThenByDescending(a => a.TimeIn)
+                        .FirstOrDefault();
+                        var status = GetAttendanceStatus(att?.TimeIn, att?.TimeOut);
+                        <tr>
+                            <td>@emp.UserIdNumber</td>
+                            <td>@emp.FirstName @emp.LastName</td>
+                            <td>@(att?.AttendanceDate.ToString("MMMM d, yyyy") ?? DateTime.Today.ToString("MMMM d, yyyy"))</td>
+                            <td>@(att?.TimeIn?.ToString("hh:mm tt") ?? "-")</td>
+                            <td>@(att?.TimeOut?.ToString("hh:mm tt") ?? "-")</td>
+                            <td>
+                                <span class="status-badge @GetStatusClass(status)">
+                                    @status
+                                </span>
+                            </td>
+                        </tr>
+                    }
+
+
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ATTENDANCE SUMMARY VIEW -->
+        <div class="tab-content" id="tab-summary">
+
+            <!-- SUMMARY HEADER (must be inside the box) -->
+            <div class="attendance-summary-header">
+                <div class="summary-month">
+                    <!-- Visible UI (matches your design) -->
+                    <button type="button" class="summary-month-btn" id="summaryMonthBtn">
+                        <strong id="summaryMonthText">@Model.SummaryMonth.ToString("MMMM yyyy")</strong>
+                        <span class="summary-cal-icon">
+                            <i class="bi bi-calendar3"></i>
+                        </span>
+                    </button>
+
+                    <!-- Real picker (invisible but clickable via JS) -->
+                    <input type="month"
+                           id="summaryMonthInput"
+                           class="summary-month-input"
+                           value="@Model.SummaryMonth.ToString("yyyy-MM")"
+                           min="2000-01"
+                           max="2100-12" />
+                </div>
+
+                <div class="summary-days">
+                    Total Work Days: <strong>@Model.TotalWorkDays</strong>
+                </div>
+            </div>
+
+
+            <!-- SUMMARY TABLE -->
+            <table class="attendance-table">
+                <thead>
+                    <tr>
+                        <th>ID No.</th>
+                        <th>Name</th>
+                        <th>On-Time</th>
+                        <th>Late</th>
+                        <th>Absent</th>
+                    </tr>
+                </thead>
+                <tbody id="summaryTbody">
+                    @foreach (var s in Model.AttendanceSummary)
+                    {
+                        <tr>
+                            <td>@s.UserIdNumber</td>
+                            <td>@s.FullName</td>
+                            <td class="text-green">@s.OnTime</td>
+                            <td class="text-orange">@s.Late</td>
+                            <td class="text-red">@s.Absent</td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <!-- DATE TRACKING VIEW -->
+        <div class="tab-content" id="tab-date">
+
+            <!-- FILTER BAR -->
+            <div class="date-tracking-bar">
+                <div class="date-field">
+                    <label for="dateFrom">Date From</label>
+                    <input type="date" id="dateFrom" class="date-input" />
+                </div>
+
+                <div class="date-field">
+                    <label for="dateTo">Date To</label>
+                    <input type="date" id="dateTo" class="date-input" />
+                </div>
+
+                <button type="button" class="date-filter-btn" id="applyDateFilter">
+                    Filter
+                </button>
+            </div>
+
+            <!-- TABLE -->
+            <table class="attendance-table">
+                <thead>
+                    <tr>
+                        <th>ID No.</th>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Time In</th>
+                        <th>Time Out</th>
+                        <th>Status</th> 
+                        <th>Attendance Log</th> 
+                    </tr>
+                </thead>
+
+                <tbody id="dateTbody">
+                    @foreach (var a in Model.DateRangeAttendance)
+                    {
+                        var status = GetAttendanceStatus(a.TimeIn, a.TimeOut);
+
+                        <tr data-date="@a.AttendanceDate.ToString("yyyy-MM-dd")">
+                            <td>@a.User.UserIdNumber</td>
+                            <td>@a.User.FirstName @a.User.LastName</td>
+                            <td>@a.AttendanceDate.ToString("MMMM d, yyyy")</td>
+                            <td>@(a.TimeIn?.ToString("hh:mm tt") ?? "-")</td>
+                            <td>@(a.TimeOut?.ToString("hh:mm tt") ?? "-")</td>
+                             
+                            <!-- ✅ STATUS LABEL -->
+                            <td>
+                                <span class="status-badge @GetStatusClass(status)">
+                                    @status
+                                </span>
+                            </td>
+
+                            <!-- Date Range / Actions -->
+                            <td style="position: relative; text-align: center;">
+                                <i class="bi bi-three-dots-vertical table-options"></i>
+
+                                <div class="table-dropdown">
+                                    <a href="javascript:void(0)" onclick="openLog(@a.UserId)">
+                                        View Log
+                                    </a>
+
+                                </div>
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+
+        </div>
+
+
+    </div>
+</div>
+<!-- LOG MODAL OVERLAY -->
+<!-- LOG MODAL OVERLAY -->
+<div id="logOverlay" class="log-overlay" onclick="closeLog()"></div>
+
+<!-- LOG MODAL -->
+<div id="logModal" class="log-modal">
+    <div class="log-modal-header">
+        <div>
+            <h3 id="empName" style="margin:0;"></h3>
+            <div id="employeeID" style="color:#6b7280;font-size:13px;"></div>
+        </div>
+        <button type="button" class="log-close-btn" onclick="closeLog()">×</button>
     </div>
 
 
-    <!-- ATTENDANCE SUMMARY BOX -->
-    <div class="attendance-summary-box">
+    <div class="log-modal-body">
 
-        <!-- SUMMARY HEADER -->
-        <div class="attendance-summary-header">
-            <div class="summary-month">
-                <strong>June 2025</strong>
-                <i class="bi bi-calendar3"></i>
+        <!-- FILTER BAR (same clean style) -->
+        <div class="log-filter-row">
+            <div class="log-field">
+                <label for="logDateFrom">Date From</label>
+                <input type="date" id="logDateFrom" class="log-date-input" />
             </div>
 
-            <div class="summary-days">
-                Total Work Days: <strong>30</strong>
+            <div class="log-field">
+                <label for="logDateTo">Date To</label>
+                <input type="date" id="logDateTo" class="log-date-input" />
             </div>
+
+            <button type="button" class="log-filter-btn" onclick="applyLogFilter()">
+                Filter
+            </button>
         </div>
 
-        <!-- SUMMARY TABLE -->
         <table class="attendance-table">
             <thead>
                 <tr>
-                    <th>ID No.</th>
-                    <th>Name</th>
-                    <th>On-Time</th>
-                    <th>Late</th>
-                    <th>Absent</th>
+                    <th>Date</th>
+                    <th>Time In</th>
+                    <th>Time Out</th>
+                    <th>Status</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>011</td>
-                    <td>Ma. Kharen Caballero</td>
-                    <td class="text-green">22</td>
-                    <td class="text-orange">7</td>
-                    <td class="text-red">1</td>
-                </tr>
+            <tbody id="logTbody">
+                <tr><td colspan="4">Loading...</td></tr>
             </tbody>
         </table>
-
-    </div> 
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        let currentLogUserId = null;
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // Tabs
+            const tabs = document.querySelectorAll(".attendance-tab");
+            const contents = {
+                time: document.getElementById("tab-time"),
+                summary: document.getElementById("tab-summary"),
+                date: document.getElementById("tab-date")
+            };
+
+            tabs.forEach(t => {
+                t.addEventListener("click", function () {
+                    tabs.forEach(x => x.classList.remove("active"));
+                    this.classList.add("active");
+
+                    Object.values(contents).forEach(c => c && c.classList.remove("active"));
+                    const key = this.getAttribute("data-tab");
+                    if (contents[key]) contents[key].classList.add("active");
+                });
+            });
+
+            // Restore active tab from URL (?tab=summary / ?tab=date / ?tab=time)
+            const params = new URLSearchParams(window.location.search);
+            const tabFromUrl = params.get("tab");
+
+            if (tabFromUrl && contents[tabFromUrl]) {
+                tabs.forEach(x => x.classList.remove("active"));
+                Object.values(contents).forEach(c => c && c.classList.remove("active"));
+
+                document.querySelector(`.attendance-tab[data-tab="${tabFromUrl}"]`)?.classList.add("active");
+                contents[tabFromUrl].classList.add("active");
+            }
+
+            // Search
+            const search = document.getElementById("attendanceSearch");
+            search.addEventListener("input", function () {
+                const q = this.value.toLowerCase().trim();
+                const activeContent = document.querySelector(".tab-content.active");
+                if (!activeContent) return;
+
+                const rows = activeContent.querySelectorAll("tbody tr");
+                rows.forEach(r => {
+                    const text = r.innerText.toLowerCase();
+                    r.style.display = text.includes(q) ? "" : "none";
+                });
+            });
+
+        // Date filter (Date Tracking tab)
+        const btn = document.getElementById("applyDateFilter");
+        const dateFrom = document.getElementById("dateFrom");
+        const dateTo = document.getElementById("dateTo");
+        const tbody = document.getElementById("dateTbody");
+
+        // ✅ store original rows ONCE
+        const originalRows = tbody ? Array.from(tbody.querySelectorAll("tr")) : [];
+
+        if (btn && dateFrom && dateTo && tbody) {
+            btn.addEventListener("click", function () {
+
+                // if both empty => restore all rows
+                const fromVal = dateFrom.value;
+                const toVal = dateTo.value;
+
+                if (!fromVal && !toVal) {
+                    tbody.innerHTML = "";
+                    originalRows.forEach(r => tbody.appendChild(r));
+                    return;
+                }
+
+                // ✅ parse safely (no timezone issue)
+                const from = fromVal ? new Date(fromVal) : null;
+                const to = toVal ? new Date(toVal) : null;
+
+                // include full "to" day
+                if (to) to.setHours(23, 59, 59, 999);
+
+                const filtered = originalRows.filter(r => {
+                    const rowDateStr = r.getAttribute("data-date"); // yyyy-MM-dd
+                    if (!rowDateStr) return true;
+
+                    const rowDate = new Date(rowDateStr);
+
+                    if (from && rowDate < from) return false;
+                    if (to && rowDate > to) return false;
+                    return true;
+                });
+
+                // sort ascending
+                filtered.sort((a, b) => {
+                    const d1 = new Date(a.getAttribute("data-date"));
+                    const d2 = new Date(b.getAttribute("data-date"));
+                    return d1 - d2;
+                });
+
+                tbody.innerHTML = "";
+
+                if (filtered.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#6b7280;">No records found.</td></tr>`;
+                    return;
+                }
+
+                filtered.forEach(r => tbody.appendChild(r));
+            });
+        }
+
+            // Dropdown menu (⋮)
+            document.querySelectorAll(".table-options").forEach(icon => {
+                icon.addEventListener("click", function (e) {
+                    e.stopPropagation();
+                    const dropdown = this.nextElementSibling;
+                    if (!dropdown) return;
+
+                    document.querySelectorAll(".table-dropdown").forEach(d => {
+                        if (d !== dropdown) d.classList.remove("show");
+                    });
+
+                    dropdown.classList.toggle("show");
+                });
+            });
+
+            document.addEventListener("click", function () {
+                document.querySelectorAll(".table-dropdown").forEach(d => d.classList.remove("show"));
+            });
+
+            // ✅ SUMMARY MONTH PICKER
+            const summaryInput = document.getElementById("summaryMonthInput");
+
+            if (summaryInput) {
+                summaryInput.addEventListener("change", function () {
+                    const val = summaryInput.value; // YYYY-MM
+                    if (!val) return;
+
+                    const url = new URL(window.location.href);
+                    url.searchParams.set("summaryMonth", val);
+                    url.searchParams.set("tab", "summary"); //stay on summary after reload
+                    window.location.href = url.toString();
+                });
+            }
+
+            //-------------DATE PICKER--------------//
+
+            const summaryBtn = document.getElementById("summaryMonthBtn");
+            if (summaryBtn && summaryInput) {
+                summaryBtn.addEventListener("click", function () {
+                    // Chrome/Edge supports showPicker()
+                    if (typeof summaryInput.showPicker === "function") {
+                        summaryInput.showPicker();
+                    } else {
+                        // Fallback for other browsers
+                        summaryInput.focus();
+                        summaryInput.click();
+                    }
+                });
+                summaryInput.addEventListener("change", function () {
+                    const val = summaryInput.value; // YYYY-MM
+                    if (!val) return;
+
+                    const url = new URL(window.location.href);
+                    url.searchParams.set("summaryMonth", val);
+                    window.location.href = url.toString();
+                });
+            }
+
+        });
+
+        // Modal open
+        function openLog(userId) {
+            currentLogUserId = userId;
+
+            document.getElementById("logOverlay").style.display = "block";
+            document.getElementById("logModal").style.display = "block";
+
+            const now = new Date();
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+
+            document.getElementById("logDateFrom").value = firstDay.toISOString().slice(0, 10);
+            document.getElementById("logDateTo").value = lastDay.toISOString().slice(0, 10);
+
+            loadEmployeeLogs();
+        }
+
+        function loadEmployeeLogs() {
+            const from = document.getElementById("logDateFrom").value;
+            const to = document.getElementById("logDateTo").value;
+
+            let url = `?handler=EmployeeLogs&id=${currentLogUserId}`;
+            if (from) url += `&from=${from}`;
+            if (to) url += `&to=${to}`;
+
+            const tbody = document.getElementById("logTbody");
+            tbody.innerHTML = `<tr><td colspan="4">Loading...</td></tr>`;
+
+            fetch(url)
+                .then(res => {
+                    if (!res.ok) throw new Error("Failed to load logs");
+                    return res.json();
+                })
+                .then(data => {
+                    document.getElementById("empName").innerText = data.fullName;
+                    document.getElementById("employeeID").innerText = `ID: ${data.userIdNumber}`;
+
+                    if (!data.logs || data.logs.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="4">No records found.</td></tr>`;
+                        return;
+                    }
+
+                    tbody.innerHTML = "";
+                    data.logs.forEach(x => {
+                        const statusClass =
+                            x.status === "On-Time" ? "status-ontime" :
+                            x.status === "Late" ? "status-late" :
+                            x.status === "Absent" ? "status-absent" :
+                            "status-incomplete";
+
+                        tbody.insertAdjacentHTML("beforeend", `
+                            <tr>
+                                <td>${x.date}</td>
+                                <td>${x.timeIn ?? "-"}</td>
+                                <td>${x.timeOut ?? "-"}</td>
+                                <td><span class="status-badge ${statusClass}">${x.status}</span></td>
+                            </tr>
+                        `);
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    tbody.innerHTML = `<tr><td colspan="4">Error loading logs.</td></tr>`;
+                });
+        }
+
+        function applyLogFilter() {
+            if (!currentLogUserId) return;
+            loadEmployeeLogs();
+        }
+
+        function closeLog() {
+            document.getElementById("logOverlay").style.display = "none";
+            document.getElementById("logModal").style.display = "none";
+        }
+    </script>
+}
+
+

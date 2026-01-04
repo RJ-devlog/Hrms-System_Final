@@ -11,7 +11,7 @@
 
     <div class="records-header">
         <div>Employee Records</div>
-        <a asp-page="/Dashboard/EmployeeManagement/AddEmployee">
+        <a asp-page="/Hrms/EmployeeManagement/AddEmployee">
             Add New Employee
         </a>
     </div>
@@ -32,6 +32,7 @@
                     <th style="width: 80px;"></th>
                 </tr>
             </thead>
+
             <tbody>
                 @foreach (var emp in Model.employeeInfo)
                 {
@@ -44,23 +45,20 @@
                             <i class="bi bi-three-dots-vertical table-options"></i>
 
                             <div class="table-dropdown">
-                                <!-- VIEW -->
-                                <a href="javascript:void(0)"
-                                   onclick="openProfile(@emp.id)">
-                                    View
-                                </a>
-                                <!-- EDIT -->
-                                <a asp-page="/Dashboard/EmployeeManagement/EditEmployeeInformation"
+                                <a href="javascript:void(0)" onclick="openProfile(@emp.id)">View</a>
+
+                                <a asp-page="/Hrms/EmployeeManagement/EditEmployeeInformation"
                                    asp-route-id="@emp.id">
                                     Edit
                                 </a>
                             </div>
-                        </td>
+                        </td>   
                     </tr>
                 }
             </tbody>
         </table>
     </div>
+
 </div>
 <!-- Overlay -->
 <div id="overlay" onclick="closeProfile()"></div>
@@ -211,7 +209,7 @@
     });
 
     function openProfile(empId) {
-        fetch(`/Dashboard/EmployeeManagement?handler=EmployeeProfile&id=${empId}`)
+        fetch(`/Hrms/EmployeeManagement?handler=EmployeeProfile&id=${empId}`)
             .then(res => {
                 if (!res.ok) throw new Error("Employee not found");
                 return res.json();

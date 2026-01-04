@@ -26,7 +26,7 @@ namespace HRMS_System.Pages.Dashboard.EmployeeManagement
 
             _context.UserInformation.Add(Employee);
             _context.SaveChanges();
-            return RedirectToPage("/Dashboard/EmployeeManagement/EmployeeManagementLayout");
+            return RedirectToPage("/Hrms/EmployeeManagement/Index");
         }
     }
 }

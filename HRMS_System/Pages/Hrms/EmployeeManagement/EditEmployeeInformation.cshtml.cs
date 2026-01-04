@@ -101,7 +101,7 @@ namespace HRMS_System.Pages.Dashboard.EmployeeManagement
 
             await _context.SaveChangesAsync();
 
-            return RedirectToPage("/Dashboard/EmployeeManagement/Index");
+            return RedirectToPage("/Hrms/EmployeeManagement/Index");
         }
 
         private int CalculateTenureMonths(DateTime startDate)

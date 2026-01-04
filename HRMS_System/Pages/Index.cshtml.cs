@@ -9,7 +9,8 @@ namespace HRMS_System.Pages
         {
           //    return RedirectToPage("/Dashboard/EmployeeManagement");
                return RedirectToPage("/Hrms/EmployeeManagement/Index");
-         //   return RedirectToPage("/Dashboard/EditEmployeeInfo");
+         //   return RedirectToPage("/Hrms/AttendanceTracking/index");
+            //   return RedirectToPage("/Dashboard/EditEmployeeInfo");
         }
     }
 }

@@ -110,8 +110,8 @@ body {
 }
 
     .sidebar-logo img {
-        width: 40px;
-        height: 40px;
+        width: 130px;
+        height: 50px;
     }
 
 .logo-text {
@@ -679,28 +679,39 @@ td {
     cursor: pointer;
 }
 
-    .attendance-tab:not(:first-child) {
-        margin-left: -1px;
-    }
-
-    .attendance-tab.active {
-        background: #ffffff;
-        font-weight: 600;
-    }
+.attendance-tab:not(:first-child) {
+    margin-left: -1px;
+}
+.attendance-tab.active {
+    background: #ffffff;
+    font-weight: 600;
+    color: #0d6efd;
+}
 
 /* Search */
 .attendance-search {
     padding: 8px 12px;
-    width: 200px;
+    width: 350px;
     border: 1px solid #444;
     font-size: 14px;
 }
-
+.attendance-content-wrapper {
+    border: 1px solid #444;
+    min-height: 520px;
+    background: #fff;
+}
+/* Tab pages */
+.tab-content {
+    display: none;
+}
 /* Box */
 .attendance-box {
-    border: 1px solid #444;
-    padding: 0;
-    min-height: 520px;
+    border: none;
+    min-height: unset;
+}
+
+.tab-content.active {
+    display: block;
 }
 
 /* Table */
@@ -710,18 +721,18 @@ td {
     font-size: 18px;
 }
 
-    .attendance-table th {
-        font-weight: 600;
-        padding: 12px;
-        border-bottom: 1px solid #444;
-        text-align: center;
-    }
+.attendance-table th {
+    font-weight: 600;
+    padding: 12px;
+    border-bottom: 1px solid #444;
+    text-align: center;
+}
 
-    .attendance-table td {
-        padding: 10px 12px;
-        border-bottom: 1px solid #999;
-        text-align: center;
-    }
+.attendance-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #999;
+    text-align: center;
+}
 
 /* Summary Header */
 .attendance-summary-header {
@@ -734,11 +745,9 @@ td {
 }
 
 .summary-month {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    position: relative;
+    display: inline-block;
 }
-
 .summary-days {
     font-size: 18px;
 }
@@ -754,4 +763,218 @@ td {
 
 .text-red {
     color: #dc3545;
+}
+
+/* DATE TRACKING FILTER BAR */
+.date-tracking-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: 18px;
+    padding: 16px 18px;
+    border-bottom: 1px solid #444;
+}
+
+.date-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+    .date-field label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+    }
+
+.date-input {
+    width: 220px;
+    padding: 8px 10px;
+    border: 1px solid #444;
+    font-size: 14px;
+    background: #fff;
+}
+
+.date-filter-btn {
+    padding: 9px 18px;
+    border: 1px solid #444;
+    background: #f9f9f9;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+    .date-filter-btn:hover {
+        background: #ffffff;
+    }
+
+/*-----------------------------TIME IN/OUT COLOR INDICATOR--------------------------------------*/
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-ontime {
+    background-color: #e6f7ec;
+    color: #1f9254;
+}
+
+.status-late {
+    background-color: #fff4e5;
+    color: #b26a00;
+}
+
+.status-absent {
+    background-color: #fdecea;
+    color: #b42318;
+}
+
+.status-incomplete {
+    background-color: #eef2ff;
+    color: #3730a3;
+}
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.status-ontime {
+    background: #e7f7ee;
+    color: #1f9254;
+}
+
+.status-late {
+    background: #fff4e5;
+    color: #b26a00;
+}
+
+.status-absent {
+    background: #fdeaea;
+    color: #b42318;
+}
+
+.status-incomplete {
+    background: #eef2ff;
+    color: #3730a3;
+}
+.log-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.25);
+    display: none;
+    z-index: 2000;
+}
+
+.log-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    width: 850px;
+    max-width: 95%;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    display: none;
+    z-index: 2100;
+    overflow: hidden;
+}
+
+.log-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.log-close-btn {
+    border: none;
+    background: transparent;
+    font-size: 26px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.log-modal-body {
+    padding: 12px 18px 18px;
+    max-height: 70vh;
+    overflow: auto;
+}
+
+/* Compact filter row */
+.log-filter-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.log-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+    .log-field label {
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+.log-date-input {
+    width: 210px;
+    height: 36px;
+    padding: 6px 10px;
+    border: 1px solid #9ca3af;
+    border-radius: 3px;
+    font-size: 14px;
+}
+
+.log-filter-btn {
+    height: 36px;
+    padding: 0 16px;
+    border: 1px solid #9ca3af;
+    background: #fff;
+    border-radius: 3px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+    .log-filter-btn:hover {
+        background: #f9fafb;
+    }
+
+/* Month + calendar clickable*/
+.summary-month-btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+.summary-cal-icon {
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* hide the month input but keep it usable */
+.summary-month-input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
 }

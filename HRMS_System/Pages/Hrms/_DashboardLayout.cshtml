@@ -20,31 +20,33 @@
 
             <ul class="sidebar-menu">
                 <li class="menu-item">
-                    <a asp-page="/HRMS/EmployeeManagement/Index">
+                    <a asp-page="/Hrms/EmployeeManagement/Index">
                         <i class="bi bi-person"></i>
                         <span>Employee Management</span>
                     </a>
                 </li>
 
                 <li class="menu-item">
-                    <a asp-page="/HRMS/AttendanceTracking/Index">
+                    <a asp-page="/Hrms/AttendanceTracking/Index">
                         <i class="bi bi-clock-history"></i>
                         <span>Attendance Tracking</span>
                     </a>
                 </li>
-                <li class="menu-item">
-                    <a asp-page="/HRMS/Evaluation/Index">
-                        <i class="bi bi-file-earmark-text"></i>
-                        <span>Evaluation</span>
-                    </a>
-                </li>
 
-                <li class="menu-item">
+                <li class="menu-item">s
                     <a asp-page="/HRMS/Training/Index">
                         <i class="bi bi-mortarboard"></i>
                         <span>Training & Seminars</span>
                     </a>
                 </li>
+
+                <li class="menu-item">
+                    <a asp-page="/Hrms/Evaluation/Index">
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span>Evaluation</span>
+                    </a>
+                </li>
+
 
                 <li class="menu-item">
                     <a asp-page="/HRMS/Promotion/Index">
@@ -74,6 +76,6 @@
         </div>
 
     </div>
-
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

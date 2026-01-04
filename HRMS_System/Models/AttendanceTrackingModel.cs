@@ -16,28 +16,21 @@ namespace HRMS_System.Models
         [ForeignKey(nameof(UserId))]
         public UserInformationModel User { get; set; } = null!;
 
-        /* 📅 ATTENDANCE */
+        /*ATTENDANCE DATE*/
         [Required]
         [DataType(DataType.Date)]
         public DateTime AttendanceDate { get; set; }
 
+        /*IME IN / TIME OUT*/
         [DataType(DataType.Time)]
-        [Display(Name = "Time In")]
         public DateTime? TimeIn { get; set; }
 
         [DataType(DataType.Time)]
-        [Display(Name = "Time Out")]
         public DateTime? TimeOut { get; set; }
 
-        /* 📊 STATUS */
+        /*STATUS */
         [StringLength(20)]
         public string? AttendanceStatus { get; set; }
-        // On-Time | Late | Absent
 
-        /* 🖥 UI SUPPORT */
-        [NotMapped]
-        public string DisplayTime =>
-            TimeIn.HasValue ? TimeIn.Value.ToString("hh:mm tt") :
-            TimeOut.HasValue ? TimeOut.Value.ToString("hh:mm tt") : "-";
     }
 }
