@@ -20,6 +20,9 @@ namespace HRMS_System.Pages.Dashboard.EmployeeManagement
         // ?? Search term from URL (?SearchTerm=value)
         [BindProperty(SupportsGet = true)]
         public string? SearchTerm { get; set; }
+
+
+
         //---------------SEARCH-----------------------
         public async Task OnGetAsync()
         {

@@ -21,9 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Pages\Hrms\Notification\" />
-    <Folder Include="Pages\Hrms\Training\" />
-    <Folder Include="Pages\Hrms\Promotion\" />
     <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
 

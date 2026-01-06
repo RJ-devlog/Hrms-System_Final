@@ -36,9 +36,7 @@ namespace HRMS_System.Pages.Dashboard.EmployeeManagement
 
             return Page();
         }
-
         /* ========================= POST ========================= */
-
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
@@ -106,10 +104,11 @@ namespace HRMS_System.Pages.Dashboard.EmployeeManagement
 
         private int CalculateTenureMonths(DateTime startDate)
         {
+            int tenureMonth = 0;
             var today = DateTime.Today;
-            return Math.Max(0,
-                (today.Year - startDate.Year) * 12 +
-                (today.Month - startDate.Month));
+
+            tenureMonth = Math.Max(0,(today.Year - startDate.Year) * 12 + (today.Month - startDate.Month));
+            return tenureMonth;
         }
     }
 }

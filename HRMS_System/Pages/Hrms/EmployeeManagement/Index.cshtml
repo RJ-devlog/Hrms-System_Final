@@ -207,7 +207,7 @@
         });
 
     });
-
+    // View Employee Profile
     function openProfile(empId) {
         fetch(`/Hrms/EmployeeManagement?handler=EmployeeProfile&id=${empId}`)
             .then(res => {
@@ -254,7 +254,7 @@
         document.getElementById("overlay").classList.remove("active");
     }
 
-
+        // Search/Filter Employee
         function searchBtn() {
         const value = document.getElementById("searchInput").value.trim();
 

@@ -9,7 +9,6 @@ namespace HRMS_System.Models
         public int id { get; set; }
         [Required(ErrorMessage = "Id Number is required.")]
         public int UserIdNumber { get; set; }
-     //   public ICollection<AttendanceTrackingModel>? AttendanceTrackings { get; set; }
 
         [Required(ErrorMessage = "First Name is required.")]
         [StringLength(50)]
@@ -43,7 +42,7 @@ namespace HRMS_System.Models
         [StringLength(50)]
         public string? Schedule { get; set; }
 
-        // Example: Employee / Contractual / Intern
+        //EmployeeType  - Employee / Contractual / Intern
         [Required(ErrorMessage = "Employee type is required.")]
         [StringLength(30)]
         public string? EmployeeType { get; set; }

@@ -203,7 +203,7 @@
                             <td>@(a.TimeIn?.ToString("hh:mm tt") ?? "-")</td>
                             <td>@(a.TimeOut?.ToString("hh:mm tt") ?? "-")</td>
                              
-                            <!-- ✅ STATUS LABEL -->
+                            <!--STATUS LABEL -->
                             <td>
                                 <span class="status-badge @GetStatusClass(status)">
                                     @status
@@ -234,7 +234,6 @@
     </div>
 </div>
 <!-- LOG MODAL OVERLAY -->
-<!-- LOG MODAL OVERLAY -->
 <div id="logOverlay" class="log-overlay" onclick="closeLog()"></div>
 
 <!-- LOG MODAL -->
@@ -250,7 +249,7 @@
 
     <div class="log-modal-body">
 
-        <!-- FILTER BAR (same clean style) -->
+        <!-- FILTER BAR  -->
         <div class="log-filter-row">
             <div class="log-field">
                 <label for="logDateFrom">Date From</label>
