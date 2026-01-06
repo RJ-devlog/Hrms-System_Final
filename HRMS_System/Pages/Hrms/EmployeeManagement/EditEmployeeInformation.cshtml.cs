@@ -76,7 +76,7 @@ namespace HRMS_System.Pages.Dashboard.EmployeeManagement
 
             /* ========= UPDATE FIELDS ========= */
 
-            employeeInDb.UserIdNumber = Employee.UserIdNumber;
+            employeeInDb.EmployeeNumber = Employee.EmployeeNumber;
             employeeInDb.FirstName = Employee.FirstName;
             employeeInDb.MiddleName = Employee.MiddleName;
             employeeInDb.LastName = Employee.LastName;

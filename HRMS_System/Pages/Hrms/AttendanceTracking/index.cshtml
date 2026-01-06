@@ -82,7 +82,7 @@
                         .FirstOrDefault();
                         var status = GetAttendanceStatus(att?.TimeIn, att?.TimeOut);
                         <tr>
-                            <td>@emp.UserIdNumber</td>
+                            <td>@emp.EmployeeNumber</td>
                             <td>@emp.FirstName @emp.LastName</td>
                             <td>@(att?.AttendanceDate.ToString("MMMM d, yyyy") ?? DateTime.Today.ToString("MMMM d, yyyy"))</td>
                             <td>@(att?.TimeIn?.ToString("hh:mm tt") ?? "-")</td>
@@ -144,7 +144,7 @@
                     @foreach (var s in Model.AttendanceSummary)
                     {
                         <tr>
-                            <td>@s.UserIdNumber</td>
+                            <td>@s.EmployeeNumber</td>
                             <td>@s.FullName</td>
                             <td class="text-green">@s.OnTime</td>
                             <td class="text-orange">@s.Late</td>
@@ -197,7 +197,7 @@
                         var status = GetAttendanceStatus(a.TimeIn, a.TimeOut);
 
                         <tr data-date="@a.AttendanceDate.ToString("yyyy-MM-dd")">
-                            <td>@a.User.UserIdNumber</td>
+                            <td>@a.User.EmployeeNumber</td>
                             <td>@a.User.FirstName @a.User.LastName</td>
                             <td>@a.AttendanceDate.ToString("MMMM d, yyyy")</td>
                             <td>@(a.TimeIn?.ToString("hh:mm tt") ?? "-")</td>
@@ -486,7 +486,7 @@
                 })
                 .then(data => {
                     document.getElementById("empName").innerText = data.fullName;
-                    document.getElementById("employeeID").innerText = `ID: ${data.userIdNumber}`;
+                    document.getElementById("employeeID").innerText = `ID: ${data.EmployeeNumber}`;
 
                     if (!data.logs || data.logs.length === 0) {
                         tbody.innerHTML = `<tr><td colspan="4">No records found.</td></tr>`;

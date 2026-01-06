@@ -37,7 +37,7 @@
                 @foreach (var emp in Model.employeeInfo)
                 {
                     <tr>
-                        <td>@emp.UserIdNumber</td>
+                        <td>@emp.EmployeeNumber</td>
                         <td>@emp.FirstName @emp.LastName</td>
                         <td>@emp.PhoneNumber</td>
                         <td>@emp.Email</td>
@@ -218,15 +218,19 @@
 
                 // Avatar + basic info
                 document.getElementById("empAvatar").src =
-                    emp.profileImagePath || "/Icons/default-avatar.png";
-
+                emp.profileImagePath || "/Icons/default-avatar.png";
                 document.getElementById("empName").innerText = emp.fullName;
-                document.getElementById("empStatus").innerText = emp.status;
-                document.getElementById("empStartDate").innerText =
-                    new Date(emp.startDate).toLocaleDateString();
+
+                // Active and Inactive display
+                const empStatus = document.getElementById("empStatus");
+                empStatus.innerText = emp.status;
+                empStatus.classList.remove("status-active", "status-inactive");
+                const status = emp.status?.trim().toLowerCase();
+                empStatus.classList.add(status === "active"? "status-active":"status-inactive");
+                document.getElementById("empStartDate").innerText = new Date(emp.startDate).toLocaleDateString();
 
                 // Working information
-                document.getElementById("empId").innerText = emp.UserIdNumber;
+                document.getElementById("empId").innerText = emp.EmployeeNumber;
                 document.getElementById("empJobRole").innerText = emp.jobRole;
                 document.getElementById("empHours").innerText = emp.workHoursType;
                 document.getElementById("empSchedule").innerText = emp.schedule;

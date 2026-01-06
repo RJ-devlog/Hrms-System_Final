@@ -7,10 +7,11 @@ namespace HRMS_System.Pages
     {
         public IActionResult OnGet()
         {
-          //    return RedirectToPage("/Dashboard/EmployeeManagement");
-               return RedirectToPage("/Hrms/EmployeeManagement/Index");
-         //   return RedirectToPage("/Hrms/AttendanceTracking/index");
+            //    return RedirectToPage("/Dashboard/EmployeeManagement");
+            //   return RedirectToPage("/Hrms/AttendanceTracking/index");
             //   return RedirectToPage("/Dashboard/EditEmployeeInfo");
+            //     return RedirectToPage("/Hrms/EmployeeManagement/Index");
+            return RedirectToPage("/Account/LoginPage");
         }
     }
 }

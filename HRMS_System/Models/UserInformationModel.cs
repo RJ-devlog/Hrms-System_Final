@@ -8,7 +8,7 @@ namespace HRMS_System.Models
         [Key]
         public int id { get; set; }
         [Required(ErrorMessage = "Id Number is required.")]
-        public int UserIdNumber { get; set; }
+        public int EmployeeNumber { get; set; }
 
         [Required(ErrorMessage = "First Name is required.")]
         [StringLength(50)]

@@ -593,6 +593,13 @@ td {
     display: flex;
     flex-direction: column;
 }
+emp-Status{
+    color: green;
+}
+emp-Status:active {
+    color: red;
+}
+
 .profile-name {
     font-size: 22px;
     font-weight: 700;
@@ -617,6 +624,9 @@ td {
 /* Status color */
 .status-active {
     color: #0a8f3c;
+}
+.status-inactive {
+    color: #FF0000;
 }
 /* BODY */
 .profile-body {

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRMS_System.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260102195159_InitialCreate")]
+    [Migration("20260106185746_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -107,6 +107,9 @@ namespace HRMS_System.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("EmployeeNumber")
+                        .HasColumnType("int");
+
                     b.Property<string>("EmployeeType")
                         .IsRequired()
                         .HasMaxLength(30)
@@ -163,9 +166,6 @@ namespace HRMS_System.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<int?>("TenureMonths")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserIdNumber")
                         .HasColumnType("int");
 
                     b.Property<string>("WorkHoursType")

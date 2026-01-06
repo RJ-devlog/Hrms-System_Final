@@ -17,7 +17,7 @@ namespace HRMS_System.Migrations
                 {
                     id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserIdNumber = table.Column<int>(type: "int", nullable: false),
+                    EmployeeNumber = table.Column<int>(type: "int", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     MiddleName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
@@ -35,8 +35,8 @@ namespace HRMS_System.Migrations
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
-                    ProfileImagePath = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    TenureMonths = table.Column<int>(type: "int", nullable: true)
+                    TenureMonths = table.Column<int>(type: "int", nullable: true),
+                    ProfileImagePath = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true)
                 },
                 constraints: table =>
                 {

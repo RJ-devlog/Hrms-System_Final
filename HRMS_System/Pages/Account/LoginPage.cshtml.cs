@@ -24,15 +24,13 @@ namespace HRMS_System.Pages.Account
                 ModelState.AddModelError("", "Username and Password are required");
                 return Page();
             }
-            
-            var user = _context.Users
-              .FirstOrDefault(u => u.Username == Users.Username
-                    && u.Password == Users.Password);
+         
+            var user = _context.Users.FirstOrDefault(u => u.Username == Users.Username && u.Password == Users.Password);
 
             if (user != null)
             {
                 // SUCCESS LOGIN
-                return Redirect("/Dashboard/EmployeeManagement");
+                return Redirect("/Hrms/EmployeeManagement");
             }
             ModelState.AddModelError("", "Invalid username or password");
        

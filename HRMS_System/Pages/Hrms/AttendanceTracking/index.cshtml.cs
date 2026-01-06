@@ -9,7 +9,7 @@ namespace HRMS_System.Pages.Dashboard.AttendanceTracking
     public class AttendanceSummaryRow
     {
         public int UserId { get; set; }
-        public string UserIdNumber { get; set; } = "";
+        public string EmployeeNumber { get; set; } = "";
         public string FullName { get; set; } = "";
         public int OnTime { get; set; }
         public int Late { get; set; }
@@ -79,14 +79,14 @@ namespace HRMS_System.Pages.Dashboard.AttendanceTracking
                 .GroupBy(a => new
                 {
                     a.UserId,
-                    a.User.UserIdNumber,
+                    a.User.EmployeeNumber,
                     a.User.FirstName,
                     a.User.LastName
                 })
                 .Select(g => new AttendanceSummaryRow
                 {
                     UserId = g.Key.UserId,
-                    UserIdNumber = g.Key.UserIdNumber.ToString(), 
+                    EmployeeNumber = g.Key.EmployeeNumber.ToString(), 
                     FullName = g.Key.FirstName + " " + g.Key.LastName,
                     OnTime = g.Count(x => x.AttendanceStatus == "On-Time"),
                     Late = g.Count(x => x.AttendanceStatus == "Late"),
@@ -142,7 +142,7 @@ namespace HRMS_System.Pages.Dashboard.AttendanceTracking
 
             return new JsonResult(new
             {
-                userIdNumber = emp.UserIdNumber,
+                EmployeeNumber = emp.EmployeeNumber,
                 fullName = emp.FirstName + " " + emp.LastName,
                 logs
             });

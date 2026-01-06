@@ -21,8 +21,6 @@ namespace HRMS_System.Pages.Dashboard.EmployeeManagement
         [BindProperty(SupportsGet = true)]
         public string? SearchTerm { get; set; }
 
-
-
         //---------------SEARCH-----------------------
         public async Task OnGetAsync()
         {
@@ -31,7 +29,7 @@ namespace HRMS_System.Pages.Dashboard.EmployeeManagement
             if (!string.IsNullOrWhiteSpace(SearchTerm))
             {
                 query = query.Where(e =>
-                    e.UserIdNumber.ToString().Contains(SearchTerm) ||
+                    e.EmployeeNumber.ToString().Contains(SearchTerm) ||
                     e.FirstName.Contains(SearchTerm) ||
                     e.LastName.Contains(SearchTerm) ||
                     e.Email.Contains(SearchTerm) ||
@@ -49,7 +47,7 @@ namespace HRMS_System.Pages.Dashboard.EmployeeManagement
                 .Select(e => new
                 {
                     Id = e.id,
-                    idNumber = e.UserIdNumber,
+                    idNumber = e.EmployeeNumber,
                     fullName = e.FirstName + " " + e.LastName,
                     email = e.Email,
                     phoneNumber = e.PhoneNumber,
