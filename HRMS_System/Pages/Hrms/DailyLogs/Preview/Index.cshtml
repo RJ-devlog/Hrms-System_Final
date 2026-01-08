@@ -1,0 +1,63 @@
+﻿@page "/Hrms/DailyLogs/Preview"
+@model HRMS_System.Pages.Hrms.DailyLogs.Preview.IndexModel
+@{
+    ViewData["Title"] = "Preview";
+    Layout = "/Pages/Hrms/_SupervisorNavigationLayout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/dashboard-shared.css" />
+
+<div class="dashboard-page">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Preview</h1>
+            <div class="page-subtitle">Review uploaded rows before saving to the database.</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Preview (First 50 Rows)</div>
+            <div class="card-desc">These rows came from your parsed Excel file.</div>
+        </div>
+
+        <div class="card-body">
+            @if (Model.PreviewRows?.Any() != true)
+            {
+                <div class="empty-state">No preview available. Please parse the Excel file first.</div>
+            }
+            else
+            {
+                <div class="table-wrap">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Employee ID</th>
+                                <th>Name</th>
+                                <th>Date</th>
+                                <th>Time In</th>
+                                <th>Time Out</th>
+                                <th>Status</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var r in Model.PreviewRows.Take(50))
+                            {
+                                <tr>
+                                    <td>@r.EmployeeIdNumber</td>
+                                    <td>@r.EmployeeName</td>
+                                    <td>@r.AttendanceDate.ToString("MMM dd, yyyy")</td>
+                                    <td>@(r.TimeIn?.ToString(@"hh\:mm") ?? "-")</td>
+                                    <td>@(r.TimeOut?.ToString(@"hh\:mm") ?? "-")</td>
+                                    <td><span class="pill @r.StatusClass">@r.Status</span></td>
+                                    <td class="muted">@r.Note</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

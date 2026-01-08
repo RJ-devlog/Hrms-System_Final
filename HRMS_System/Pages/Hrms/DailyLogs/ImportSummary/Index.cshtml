@@ -1,0 +1,65 @@
+﻿@page "/Hrms/DailyLogs/ImportSummary"
+@model HRMS_System.Pages.Hrms.DailyLogs.ImportSummary.IndexModel
+@{
+    ViewData["Title"] = "Import Summary";
+    Layout = "/Pages/Hrms/_SupervisorNavigationLayout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/dashboard-shared.css" />
+
+<div class="dashboard-page">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Import Summary</h1>
+            <div class="page-subtitle">Shows parsed results, valid rows, imported rows, and errors.</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Summary</div>
+            <div class="card-desc">After you parse/import, results will show here.</div>
+        </div>
+
+        <div class="card-body">
+            <div class="stats-grid">
+                <div class="stat">
+                    <div class="stat-label">Parsed</div>
+                    <div class="stat-value">@Model.SummaryParsed</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Valid</div>
+                    <div class="stat-value">@Model.SummaryValid</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Imported</div>
+                    <div class="stat-value">@Model.SummaryImported</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">Errors</div>
+                    <div class="stat-value">@Model.SummaryErrors</div>
+                </div>
+            </div>
+
+            @if (Model.Errors?.Any() == true)
+            {
+                <div class="alert alert-danger">
+                    <div class="alert-title">Errors Found</div>
+                    <ul class="alert-list">
+                        @foreach (var err in Model.Errors)
+                        {
+                            <li>@err</li>
+                        }
+                    </ul>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <div class="alert-title">No Errors</div>
+                    <div class="alert-note">You can now review the Preview page or proceed with import.</div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

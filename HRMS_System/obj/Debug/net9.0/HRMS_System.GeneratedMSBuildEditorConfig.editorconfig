@@ -42,6 +42,22 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSHJtc1xBdHRlbmRhbmNlVHJhY2tpbmdcaW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/rieln/source/repos/HRMS_System/HRMS_System/Pages/Hrms/DailyLogs/DailyLogsUpload/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSHJtc1xEYWlseUxvZ3NcRGFpbHlMb2dzVXBsb2FkXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/rieln/source/repos/HRMS_System/HRMS_System/Pages/Hrms/DailyLogs/ImportSummary/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSHJtc1xEYWlseUxvZ3NcSW1wb3J0U3VtbWFyeVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/rieln/source/repos/HRMS_System/HRMS_System/Pages/Hrms/DailyLogs/Preview/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSHJtc1xEYWlseUxvZ3NcUHJldmlld1xJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/rieln/source/repos/HRMS_System/HRMS_System/Pages/Hrms/DailyLogs/UploadHistory/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSHJtc1xEYWlseUxvZ3NcVXBsb2FkSGlzdG9yeVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/rieln/source/repos/HRMS_System/HRMS_System/Pages/Hrms/EmployeeManagement/AddEmployee.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSHJtc1xFbXBsb3llZU1hbmFnZW1lbnRcQWRkRW1wbG95ZWUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
@@ -62,8 +78,12 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSHJtc1xUcmFpbmluZ2FuZFNlbWluYXJcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/rieln/source/repos/HRMS_System/HRMS_System/Pages/Hrms/_DashboardLayout.cshtml]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSHJtc1xfRGFzaGJvYXJkTGF5b3V0LmNzaHRtbA==
+[C:/Users/rieln/source/repos/HRMS_System/HRMS_System/Pages/Hrms/_HRNavigationLayout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSHJtc1xfSFJOYXZpZ2F0aW9uTGF5b3V0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/rieln/source/repos/HRMS_System/HRMS_System/Pages/Hrms/_SupervisorNavigationLayout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSHJtc1xfU3VwZXJ2aXNvck5hdmlnYXRpb25MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/rieln/source/repos/HRMS_System/HRMS_System/Pages/Index.cshtml]

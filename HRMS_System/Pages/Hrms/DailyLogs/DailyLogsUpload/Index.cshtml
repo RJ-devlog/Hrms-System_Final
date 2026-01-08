@@ -1,0 +1,101 @@
+﻿@page "/Hrms/DailyLogs/DailyLogsUpload"
+@model HRMS_System.Pages.Hrms.DailyLogs.DailyLogsUpload.DailyLogsUploadPageModel
+@{
+    ViewData["Title"] = "Daily Logs Upload";
+    Layout = "/Pages/Hrms/_SupervisorNavigationLayout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/dashboard-shared.css" />
+
+<div class="dashboard-page">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Daily Logs Upload</h1>
+            <div class="page-subtitle">Upload employee daily logs (Excel) and import to the system.</div>
+        </div>
+
+        <div class="page-actions">
+            <a class="btn btn-ghost" asp-page="/Dashboard/Supervisor/DownloadTemplate">Download Template</a>
+        </div>
+    </div>
+
+    <div class="grid-two">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Upload Excel File</div>
+                <div class="card-desc">Accepted: .xlsx (consistent columns required)</div>
+            </div>
+
+            <form method="post" enctype="multipart/form-data" class="card-body">
+                <div class="form-row">
+                    <label class="form-label">Excel File</label>
+                    <input class="form-input" type="file" asp-for="UploadFile" accept=".xlsx" />
+                    <span class="form-error" asp-validation-for="UploadFile"></span>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-row">
+                        <label class="form-label">Date From (optional)</label>
+                        <input class="form-input" type="date" asp-for="DateFrom" />
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Date To (optional)</label>
+                        <input class="form-input" type="date" asp-for="DateTo" />
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-row">
+                        <label class="form-label">Department (optional)</label>
+                        <select class="form-input" asp-for="DepartmentId" asp-items="Model.DepartmentOptions">
+                            <option value="">All Departments</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <label class="form-label">Import Mode</label>
+                        <select class="form-input" asp-for="ImportMode">
+                            <option value="ValidateOnly">Validate Only (Dry Run)</option>
+                            <option value="Import">Import to Database</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row checkbox-row">
+                    <input type="checkbox" asp-for="OverwriteDuplicates" />
+                    <label class="form-label-inline">Overwrite duplicates (update existing records)</label>
+                </div>
+
+                <div class="form-actions">
+                    <button class="btn btn-primary" type="submit" asp-page-handler="Parse">
+                        Parse & Preview
+                    </button>
+
+                    @if (Model.PreviewRows?.Any() == true)
+                    {
+                        <button class="btn btn-success" type="submit" asp-page-handler="ConfirmImport">
+                            Confirm Import
+                        </button>
+                    }
+                </div>
+            </form>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">Next Steps</div>
+                <div class="card-desc">After parsing, check Summary and Preview pages.</div>
+            </div>
+            <div class="card-body muted">
+                • Go to <b>Import Summary</b> to see counts & errors<br />
+                • Go to <b>Preview</b> to review rows before final import<br />
+                • Go to <b>Upload History</b> for audit trail
+            </div>
+        </div>
+    </div>  
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

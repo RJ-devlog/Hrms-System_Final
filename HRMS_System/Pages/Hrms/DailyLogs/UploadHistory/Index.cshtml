@@ -1,0 +1,67 @@
+﻿@page "/Hrms/DailyLogs/UploadHistory"
+@model HRMS_System.Pages.Hrms.DailyLogs.UploadHistory.IndexModel
+@{
+    ViewData["Title"] = "Upload History";
+    Layout = "/Pages/Hrms/_SupervisorNavigationLayout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/dashboard-shared.css" />
+
+<div class="dashboard-page">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Upload History</h1>
+            <div class="page-subtitle">Audit trail of uploads by supervisors.</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">Recent Uploads</div>
+            <div class="card-desc">Shows file name, uploaded by, imported rows, and errors.</div>
+        </div>
+
+        <div class="card-body">
+            @if (Model.History?.Any() != true)
+            {
+                <div class="empty-state">No upload history found.</div>
+            }
+            else
+            {
+                <div class="table-wrap">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date Uploaded</th>
+                                <th>File Name</th>
+                                <th>Uploaded By</th>
+                                <th>Parsed</th>
+                                <th>Imported</th>
+                                <th>Errors</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var h in Model.History.Take(10))
+                            {
+                                <tr>
+                                    <td>@h.UploadedAt.ToString("MMM dd, yyyy hh:mm tt")</td>
+                                    <td>@h.FileName</td>
+                                    <td>@h.UploadedBy</td>
+                                    <td>@h.ParsedCount</td>
+                                    <td>@h.ImportedCount</td>
+                                    <td>@h.ErrorCount</td>
+                                    <td>
+                                        <span class="pill @(h.IsSuccess ? "pill-ok" : "pill-bad")">
+                                            @(h.IsSuccess ? "Success" : "With Errors")
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
