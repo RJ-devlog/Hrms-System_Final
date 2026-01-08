@@ -4,6 +4,7 @@
     ViewData["Title"] = "Employee Management";
     Layout = "/Pages/Hrms/_DashboardLayout.cshtml";
 }
+
 <div class="dashboard-page">
 
     <h1 class="page-title">Employee Management</h1>
@@ -15,11 +16,17 @@
             Add New Employee
         </a>
     </div>
+
     <div class="input-group nb-3">
-        <input type="text" id="searchInput" class="form-control" placeholder="Search Employee (ID, name, email...)" aria-label="Search Employee" aria-describedby="button-addon2" />
+        <input type="text"
+               id="searchInput"
+               class="form-control"
+               placeholder="Search Employee (ID, name, email...)"
+               aria-label="Search Employee" />
         <button class="btn btn-outline-secondary" type="button" onclick="searchBtn()">Search</button>
     </div>
-    <br/>
+
+    <br />
 
     <div class="records-box">
         <table class="table-fixed">
@@ -32,7 +39,6 @@
                     <th style="width: 80px;"></th>
                 </tr>
             </thead>
-
             <tbody>
                 @foreach (var emp in Model.employeeInfo)
                 {
@@ -43,41 +49,35 @@
                         <td>@emp.Email</td>
                         <td style="position: relative; text-align: center;">
                             <i class="bi bi-three-dots-vertical table-options"></i>
-
                             <div class="table-dropdown">
                                 <a href="javascript:void(0)" onclick="openProfile(@emp.id)">View</a>
-
                                 <a asp-page="/Hrms/EmployeeManagement/EditEmployeeInformation"
                                    asp-route-id="@emp.id">
                                     Edit
                                 </a>
                             </div>
-                        </td>   
+                        </td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
-
 </div>
+
 <!-- Overlay -->
 <div id="overlay" onclick="closeProfile()"></div>
 
 <!-- Profile Panel -->
 <div id="profilePanel" class="profile-panel">
 
-    <!-- Header -->
     <div class="profile-header">
-
         <i class="bi bi-arrow-left back-icon" onclick="closeProfile()"></i>
 
         <div class="profile-header-row">
-            <!-- Avatar -->
             <img id="empAvatar"
                  class="profile-avatar"
                  src="/Icons/default-avatar.png" />
 
-            <!-- Text -->
             <div class="profile-header-text">
                 <h2 id="empName" class="profile-name"></h2>
 
@@ -92,18 +92,15 @@
                     </div>
                     <div>
                         <span>Tenure</span>
-                        <strong id="empTenure">11 months</strong>
+                        <strong id="empTenure">-</strong>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 
-    <!-- Body -->
     <div class="profile-body">
 
-        <!-- Working Info -->
         <h4 class="section-title">Working Information</h4>
 
         <div class="info-list">
@@ -119,17 +116,23 @@
                 <strong id="empJobRole"></strong>
             </div>
 
+            @* TEMPORARILY DISABLED — WORK HOURS *@
+            @*
             <div class="info-item">
                 <i class="bi bi-clock"></i>
                 <span>Hours</span>
                 <strong id="empHours"></strong>
             </div>
+            *@
 
+            @* TEMPORARILY DISABLED — SCHEDULE *@
+            @*
             <div class="info-item">
                 <i class="bi bi-calendar-week"></i>
                 <span>Schedule</span>
                 <strong id="empSchedule"></strong>
             </div>
+            *@
 
             <div class="info-item">
                 <i class="bi bi-diagram-3"></i>
@@ -144,7 +147,6 @@
             </div>
         </div>
 
-        <!-- Personal Info -->
         <h4 class="section-title">Personal Information</h4>
 
         <div class="info-list">
@@ -178,7 +180,6 @@
                 <strong id="empAddress"></strong>
             </div>
         </div>
-
     </div>
 </div>
 
@@ -188,7 +189,6 @@
         document.querySelectorAll(".table-options").forEach(icon => {
             icon.addEventListener("click", function (e) {
                 e.stopPropagation();
-
                 const dropdown = this.nextElementSibling;
                 if (!dropdown) return;
 
@@ -201,85 +201,75 @@
         });
 
         document.addEventListener("click", function () {
-            document.querySelectorAll(".table-dropdown").forEach(d => {
-                d.classList.remove("show");
-            });
+            document.querySelectorAll(".table-dropdown").forEach(d => d.classList.remove("show"));
         });
-
     });
-    // View Employee Profile
+
     function openProfile(empId) {
         fetch(`/Hrms/EmployeeManagement?handler=EmployeeProfile&id=${empId}`)
-            .then(res => {
-                if (!res.ok) throw new Error("Employee not found");
-                return res.json();
-            })
+            .then(res => res.json())
             .then(emp => {
 
-                // Avatar + basic info
                 document.getElementById("empAvatar").src =
-                emp.profileImagePath || "/Icons/default-avatar.png";
-                document.getElementById("empName").innerText = emp.fullName;
+                    emp.profileImagePath || "/Icons/default-avatar.png";
 
-                // Active and Inactive display
-                const empStatus = document.getElementById("empStatus");
-                empStatus.innerText = emp.status;
-                empStatus.classList.remove("status-active", "status-inactive");
-                const status = emp.status?.trim().toLowerCase();
-                empStatus.classList.add(status === "active"? "status-active":"status-inactive");
+                document.getElementById("empName").innerText = emp.fullName;
+                document.getElementById("empStatus").innerText = emp.status;
                 document.getElementById("empStartDate").innerText = new Date(emp.startDate).toLocaleDateString();
 
-                // Working information
+                    // Tenure (computed from startDate)
+                if (emp.startDate) {
+                    const start = new Date(emp.startDate);
+                    const today = new Date();
+                    let months = (today.getFullYear() - start.getFullYear()) * 12 + (today.getMonth() - start.getMonth());
+                    if (today.getDate() < start.getDate()) months--; // adjust if not completed month
+                    if (months < 0) months = 0;
+
+                    document.getElementById("empTenure").innerText =
+                        months === 1 ? "1 month" : `${months} months`;
+                } else {
+                    document.getElementById("empTenure").innerText = "-";
+                }
                 document.getElementById("empId").innerText = emp.EmployeeNumber;
                 document.getElementById("empJobRole").innerText = emp.jobRole;
-                document.getElementById("empHours").innerText = emp.workHoursType;
-                document.getElementById("empSchedule").innerText = emp.schedule;
+
+                // TEMPORARILY DISABLED
+                // document.getElementById("empHours").innerText = emp.workHoursType;
+                // document.getElementById("empSchedule").innerText = emp.schedule;
+
                 document.getElementById("empDepartment").innerText = emp.department;
                 document.getElementById("empType").innerText = emp.employeeType;
 
-                // Personal information
                 document.getElementById("empGender").innerText = emp.gender;
                 document.getElementById("empCivil").innerText = emp.civilStatus;
                 document.getElementById("empEmail").innerText = emp.email;
                 document.getElementById("empPhone").innerText = emp.phoneNumber;
                 document.getElementById("empAddress").innerText = emp.address;
 
-                // Open panel
                 document.getElementById("profilePanel").classList.add("active");
                 document.getElementById("overlay").classList.add("active");
-            })
-            .catch(err => {
-                console.error(err);
-                alert("Failed to load employee profile");
             });
     }
-        function closeProfile() {
+
+    function closeProfile() {
         document.getElementById("profilePanel").classList.remove("active");
         document.getElementById("overlay").classList.remove("active");
     }
 
-        // Search/Filter Employee
-        function searchBtn() {
+    function searchBtn() {
         const value = document.getElementById("searchInput").value.trim();
-
         const url = new URL(window.location.href);
 
-        if (value) {
-            url.searchParams.set("SearchTerm", value);
-        } else {
-            url.searchParams.delete("SearchTerm");
-        }
+        if (value) url.searchParams.set("SearchTerm", value);
+        else url.searchParams.delete("SearchTerm");
 
         window.location.href = url.toString();
     }
-        document.getElementById("searchInput").addEventListener("keydown", function (e) {
+
+    document.getElementById("searchInput").addEventListener("keydown", function (e) {
         if (e.key === "Enter") {
             e.preventDefault();
             searchBtn();
         }
     });
-
-
 </script>
-
-

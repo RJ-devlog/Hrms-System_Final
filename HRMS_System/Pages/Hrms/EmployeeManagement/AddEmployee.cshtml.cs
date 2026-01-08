@@ -17,6 +17,13 @@ namespace HRMS_System.Pages.Dashboard.EmployeeManagement
         [BindProperty]
         public UserInformationModel Employee { get; set; } = new();
 
+        public void OnGet()
+        {
+            Employee.StartDate = DateTime.Today;
+            Employee.EmploymentStatus = "Probationary";
+            Employee.Status = "Active";
+        }
+
         public IActionResult OnPost()
         {
             if (!ModelState.IsValid)

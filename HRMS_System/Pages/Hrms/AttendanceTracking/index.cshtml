@@ -7,15 +7,12 @@
 @functions {
     string GetAttendanceStatus(DateTime? timeIn, DateTime? timeOut)
     {
-        if (!timeIn.HasValue)
-            return "Absent";
+        if (!timeIn.HasValue) return "Absent";
 
-        if (!timeOut.HasValue)
-            return "Incomplete";
+        if (!timeOut.HasValue) return "Incomplete";
 
         var lateCutoff = new TimeSpan(8, 0, 0); // 8:00 AM
-        if (timeIn.Value.TimeOfDay > lateCutoff)
-            return "Late";
+        if (timeIn.Value.TimeOfDay > lateCutoff) return "Late";
 
         return "On-Time";
     }
@@ -53,7 +50,7 @@
                placeholder="Search Employee" />
     </div>
 
-    <!-- TAB CONTENT WRAPPER (same border container like screenshot) -->
+    <!-- TAB CONTENT WRAPPER -->
     <div class="attendance-content-wrapper">
 
         <!-- TIME IN / TIME OUT VIEW -->
@@ -70,33 +67,38 @@
                     </tr>
                 </thead>
                 <tbody id="timeTbody">
-                    @{
-                        var todayKey = DateTime.Today.ToString("yyyy-MM-dd");
-                    }
-                    @foreach (var emp in Model.Employees)
+                    @foreach (var a in Model.DateRangeAttendance)
                     {
-                        var att = Model.DateRangeAttendance
-                        .Where(a => a.UserId == emp.id)
-                        .OrderByDescending(a => a.AttendanceDate)
-                        .ThenByDescending(a => a.TimeIn)
-                        .FirstOrDefault();
-                        var status = GetAttendanceStatus(att?.TimeIn, att?.TimeOut);
+                        var status = GetAttendanceStatus(a.TimeIn, a.TimeOut);
+
                         <tr>
-                            <td>@emp.EmployeeNumber</td>
-                            <td>@emp.FirstName @emp.LastName</td>
-                            <td>@(att?.AttendanceDate.ToString("MMMM d, yyyy") ?? DateTime.Today.ToString("MMMM d, yyyy"))</td>
-                            <td>@(att?.TimeIn?.ToString("hh:mm tt") ?? "-")</td>
-                            <td>@(att?.TimeOut?.ToString("hh:mm tt") ?? "-")</td>
+                            <td>@a.User.EmployeeNumber</td>
+                            <td>@a.User.FirstName @a.User.LastName</td>
+                            <td>@a.AttendanceDate.ToString("MMMM d, yyyy")</td>
+                            <td>@(a.TimeIn?.ToString("hh:mm tt") ?? "-")</td>
+                            <td>@(a.TimeOut?.ToString("hh:mm tt") ?? "-")</td>
                             <td>
-                                <span class="status-badge @GetStatusClass(status)">
-                                    @status
-                                </span>
+                                <span class="status-badge @GetStatusClass(status)">@status</span>
                             </td>
+                     @*        <td style="position: relative; text-align: center;">
+                                <i class="bi bi-three-dots-vertical table-options"></i>
+                                <div class="table-dropdown">
+                                    <a href="javascript:void(0)" onclick="openLog(@a.UserId)">View Log</a>
+                                </div>
+                            </td> *@
                         </tr>
                     }
 
-
+                    @if (!Model.DateRangeAttendance.Any())
+                    {
+                        <tr>
+                            <td colspan="7" style="text-align:center;color:#6b7280;">No records found.</td>
+                        </tr>
+                    }
                 </tbody>
+
+
+
             </table>
         </div>
 
@@ -161,21 +163,24 @@
         <div class="tab-content" id="tab-date">
 
             <!-- FILTER BAR -->
-            <div class="date-tracking-bar">
+            <form method="get" class="date-tracking-bar">
+                <input type="hidden" name="tab" value="date" />
                 <div class="date-field">
-                    <label for="dateFrom">Date From</label>
-                    <input type="date" id="dateFrom" class="date-input" />
+                    <label>Date From</label>
+                    <input type="date" name="from" id="dateFrom" class="date-input"
+                           value="@(Request.Query["from"])" />
                 </div>
 
                 <div class="date-field">
-                    <label for="dateTo">Date To</label>
-                    <input type="date" id="dateTo" class="date-input" />
+                    <label>Date To</label>
+                    <input type="date" name="to" id="dateTo" class="date-input"
+                           value="@(Request.Query["to"])" />
                 </div>
 
-                <button type="button" class="date-filter-btn" id="applyDateFilter">
+                <button type="submit" class="date-filter-btn">
                     Filter
                 </button>
-            </div>
+            </form>
 
             <!-- TABLE -->
             <table class="attendance-table">
@@ -196,35 +201,30 @@
                     {
                         var status = GetAttendanceStatus(a.TimeIn, a.TimeOut);
 
-                        <tr data-date="@a.AttendanceDate.ToString("yyyy-MM-dd")">
+                        <tr>
                             <td>@a.User.EmployeeNumber</td>
                             <td>@a.User.FirstName @a.User.LastName</td>
                             <td>@a.AttendanceDate.ToString("MMMM d, yyyy")</td>
                             <td>@(a.TimeIn?.ToString("hh:mm tt") ?? "-")</td>
                             <td>@(a.TimeOut?.ToString("hh:mm tt") ?? "-")</td>
-                             
-                            <!--STATUS LABEL -->
                             <td>
-                                <span class="status-badge @GetStatusClass(status)">
-                                    @status
-                                </span>
+                                <span class="status-badge @GetStatusClass(status)">@status</span>
                             </td>
-
-                            <!-- Date Range / Actions -->
                             <td style="position: relative; text-align: center;">
                                 <i class="bi bi-three-dots-vertical table-options"></i>
-
                                 <div class="table-dropdown">
-                                    <a href="javascript:void(0)" onclick="openLog(@a.UserId)">
-                                        View Log
-                                    </a>
-
+                                    <a href="javascript:void(0)" onclick="openLog(@a.UserId)">View Log</a>
                                 </div>
                             </td>
-
                         </tr>
                     }
 
+                    @if (!Model.DateRangeAttendance.Any())
+                    {
+                        <tr>
+                            <td colspan="7" style="text-align:center;color:#6b7280;">No records found.</td>
+                        </tr>
+                    }
                 </tbody>
             </table>
 
@@ -341,53 +341,21 @@
 
         // ✅ store original rows ONCE
         const originalRows = tbody ? Array.from(tbody.querySelectorAll("tr")) : [];
-
         if (btn && dateFrom && dateTo && tbody) {
             btn.addEventListener("click", function () {
-
-                // if both empty => restore all rows
                 const fromVal = dateFrom.value;
                 const toVal = dateTo.value;
 
-                if (!fromVal && !toVal) {
-                    tbody.innerHTML = "";
-                    originalRows.forEach(r => tbody.appendChild(r));
-                    return;
-                }
+                const url = new URL(window.location.href);
+                url.searchParams.set("tab", "date");
 
-                // ✅ parse safely (no timezone issue)
-                const from = fromVal ? new Date(fromVal) : null;
-                const to = toVal ? new Date(toVal) : null;
+                if (fromVal) url.searchParams.set("from", fromVal);
+                else url.searchParams.delete("from");
 
-                // include full "to" day
-                if (to) to.setHours(23, 59, 59, 999);
+                if (toVal) url.searchParams.set("to", toVal);
+                else url.searchParams.delete("to");
 
-                const filtered = originalRows.filter(r => {
-                    const rowDateStr = r.getAttribute("data-date"); // yyyy-MM-dd
-                    if (!rowDateStr) return true;
-
-                    const rowDate = new Date(rowDateStr);
-
-                    if (from && rowDate < from) return false;
-                    if (to && rowDate > to) return false;
-                    return true;
-                });
-
-                // sort ascending
-                filtered.sort((a, b) => {
-                    const d1 = new Date(a.getAttribute("data-date"));
-                    const d2 = new Date(b.getAttribute("data-date"));
-                    return d1 - d2;
-                });
-
-                tbody.innerHTML = "";
-
-                if (filtered.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:#6b7280;">No records found.</td></tr>`;
-                    return;
-                }
-
-                filtered.forEach(r => tbody.appendChild(r));
+                window.location.href = url.toString();
             });
         }
 
@@ -458,15 +426,13 @@
             document.getElementById("logOverlay").style.display = "block";
             document.getElementById("logModal").style.display = "block";
 
-            const now = new Date();
-            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            //keep inputs empty (shows mm/dd/yyyy)
+            document.getElementById("logDateFrom").value = "";
+            document.getElementById("logDateTo").value = "";
 
-            document.getElementById("logDateFrom").value = firstDay.toISOString().slice(0, 10);
-            document.getElementById("logDateTo").value = lastDay.toISOString().slice(0, 10);
-
-            loadEmployeeLogs();
+            loadEmployeeLogs(); //will load default range
         }
+
 
         function loadEmployeeLogs() {
             const from = document.getElementById("logDateFrom").value;
@@ -486,7 +452,7 @@
                 })
                 .then(data => {
                     document.getElementById("empName").innerText = data.fullName;
-                    document.getElementById("employeeID").innerText = `ID: ${data.EmployeeNumber}`;
+                    document.getElementById("employeeID").innerText = `ID: ${data.employeeNumber}`;
 
                     if (!data.logs || data.logs.length === 0) {
                         tbody.innerHTML = `<tr><td colspan="4">No records found.</td></tr>`;
@@ -525,7 +491,16 @@
         function closeLog() {
             document.getElementById("logOverlay").style.display = "none";
             document.getElementById("logModal").style.display = "none";
+
+            currentLogUserId = null;
+
+            document.getElementById("logDateFrom").value = "";
+            document.getElementById("logDateTo").value = "";
+
+            document.getElementById("logTbody").innerHTML =
+                `<tr><td colspan="4" style="text-align:center;color:#6b7280;">No employee selected.</td></tr>`;
         }
+
     </script>
 }
 
