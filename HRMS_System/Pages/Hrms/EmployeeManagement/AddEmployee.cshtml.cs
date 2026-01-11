@@ -1,9 +1,10 @@
 using HRMS_System.Data;
 using HRMS_System.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace HRMS_System.Pages.Dashboard.EmployeeManagement
+namespace HRMS_System.Pages.Hrms.EmployeeManagement
 {
     public class AddEmployeeModel : PageModel
     {
@@ -19,6 +20,7 @@ namespace HRMS_System.Pages.Dashboard.EmployeeManagement
 
         public void OnGet()
         {
+            Employee.EmployeeNumber = GenerateNextEmployeeNumber();
             Employee.StartDate = DateTime.Today;
             Employee.EmploymentStatus = "Probationary";
             Employee.Status = "Active";
@@ -27,13 +29,40 @@ namespace HRMS_System.Pages.Dashboard.EmployeeManagement
         public IActionResult OnPost()
         {
             if (!ModelState.IsValid)
+                return Page();
+            try
             {
+                Employee.EmployeeNumber = GenerateNextEmployeeNumber();
+                _context.UserInformation.Add(Employee);
+                _context.SaveChanges();
+                return RedirectToPage("./Index");
+            }
+            catch /*(DbUpdateException ex)*/
+            {
+                // duplicate key / constraint error
+                ModelState.AddModelError(string.Empty, "Unable to save employee. Possible duplicate or invalid data.");
                 return Page();
             }
-
-            _context.UserInformation.Add(Employee);
-            _context.SaveChanges();
-            return RedirectToPage("/Hrms/EmployeeManagement/Index");
         }
+        private string GenerateNextEmployeeNumber()
+        {
+            var lastEmp = _context.UserInformation
+                .OrderByDescending(e => e.id)
+                .Select(e => e.EmployeeNumber)
+                .FirstOrDefault();
+
+            int nextNumber = 1;
+
+            if (!string.IsNullOrEmpty(lastEmp))
+            {
+                var digits = int.Parse(
+                    System.Text.RegularExpressions.Regex.Replace(lastEmp, @"\D", "")
+                );
+                nextNumber = digits + 1;
+            }
+
+            return $"EMP-{nextNumber:D6}";
+        }
+
     }
 }

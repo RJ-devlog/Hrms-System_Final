@@ -7,12 +7,10 @@ namespace HRMS_System.Pages
     {
         public IActionResult OnGet()
         {
-            //    return RedirectToPage("/Dashboard/EmployeeManagement");
-            //   return RedirectToPage("/Hrms/AttendanceTracking/index");
-            //   return RedirectToPage("/Dashboard/EditEmployeeInfo");
-            //     return RedirectToPage("/Hrms/EmployeeManagement/Index");
-           // return RedirectToPage("/Account/LoginPage");
-           return RedirectToPage("/Hrms/DailyLogs/DailyLogsUpload/Index");
+            //    return RedirectToPage("/Account/LoginPage");                      // Login
+                 return RedirectToPage("/Hrms/EmployeeManagement/Index");   // EmployeeManagement
+            //   return RedirectToPage("/Hrms/AttendanceTracking/index");     // AttendanceTracking
+         //  return RedirectToPage("/Hrms/DailyLogs/DailyLogsUpload/Index");  // Supervisor Dashboard
         }
     }
 }

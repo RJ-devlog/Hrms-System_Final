@@ -13,21 +13,18 @@ body {
     align-items: center;
 }
 
-    .header-logo img {
-        width: 55px;
-        height: 55px;
-        margin-right: 10px;
-    }
+.header-logo img {
+    width: 170px;
+    height: 55px;
+    margin-right: 10px;
+}
 
-    .header-logo span {
-        font-size: 28px;
-        font-weight: 700;
-        /* color: #0050C8;  HRMS Blue */
-    }
+.header-logo span {
+    font-size: 28px;
+    font-weight: 700;
+    /* color: #0050C8;  HRMS Blue */
+}
 
-        .header-logo span:last-child {
-            color: #D60000; /* HRMS Red */
-        }
 
 /* Login container */
 .login-box {
@@ -992,7 +989,16 @@ emp-Status:active {
 .dashboard-page {
     padding: 18px;
 }
-
+.log-out-label {
+    margin-left: 95%;
+    font-size: 13px;
+    font-weight: normal;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+.log-out-label:hover {
+    text-decoration: underline;
+    cursor:pointer;
+}
 .page-header {
     display: flex;
     justify-content: space-between;

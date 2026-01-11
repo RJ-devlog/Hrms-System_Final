@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace HRMS_System.Pages.Hrms.DailyLogs.DailyLogsUpload
 {
-    // [Authorize(Roles = "Supervisor")] // adjust to your roles system
+    [Authorize(Roles = "Supervisor")]
     public class DailyLogsUploadPageModel : PageModel
     {
         // ===== Upload Inputs =====

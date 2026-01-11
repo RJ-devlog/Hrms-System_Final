@@ -1,6 +1,218 @@
 ﻿@page
 @model HRMS_System.Pages.Hrms.TrainingandSeminar.IndexModel
 @{
-    ViewData["Title"] = "Seminars and Training";
-    Layout = "/Pages/Hrms/_DashboardLayout.cshtml";
+    ViewData["Title"] = "Training and Seminar";
+    Layout = "/Pages/Hrms/_HRNavigationLayout.cshtml"; // change if needed
 }
+
+<link rel="stylesheet" href="~/css/dashboard-shared.css" />
+
+<style>
+    /* Page Title */
+    .ts-page {
+        padding: 10px 0;
+    }
+
+    .ts-title {
+        font-size: 28px;
+        font-weight: 700;
+        margin: 0 0 10px 0;
+    }
+
+    .ts-title-line {
+        height: 2px;
+        background: #6f6f6f;
+        margin-bottom: 18px;
+        opacity: .6;
+    }
+
+    /* Outer Box */
+    .ts-box {
+        border: 2px solid #8a8a8a;
+        background: #fff;
+    }
+
+    /* Header Strip */
+    .ts-box-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px;
+        border-bottom: 1px solid #8a8a8a;
+    }
+
+    .ts-box-header-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 22px;
+        font-weight: 500;
+        color: #222;
+    }
+
+    .ts-caret {
+        width: 28px;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        cursor: pointer;
+        user-select: none;
+    }
+
+        .ts-caret svg {
+            width: 18px;
+            height: 18px;
+            opacity: .85;
+        }
+
+    /* Search box */
+    .ts-search {
+        width: 260px;
+        height: 34px;
+        border: 1px solid #8a8a8a;
+        padding: 6px 10px;
+        font-size: 15px;
+        outline: none;
+        background: #fff;
+    }
+
+    /* Table */
+    .ts-table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+    }
+
+        .ts-table th,
+        .ts-table td {
+            border-right: 1px solid #8a8a8a;
+            border-bottom: 1px solid #8a8a8a;
+            padding: 10px 10px;
+            font-size: 16px;
+            color: #222;
+            vertical-align: middle;
+            background: #fff;
+        }
+
+            .ts-table th:last-child,
+            .ts-table td:last-child {
+                border-right: none;
+            }
+
+        .ts-table thead th {
+            font-weight: 700;
+            text-align: center;
+            padding-top: 8px;
+            padding-bottom: 8px;
+        }
+
+    /* Column sizing close to screenshot */
+    .col-id {
+        width: 80px;
+        text-align: center;
+    }
+
+    .col-name {
+        width: 280px;
+        text-align: center;
+    }
+
+    .col-status {
+        width: 130px;
+        text-align: center;
+    }
+
+    .col-validity {
+        width: 110px;
+        text-align: center;
+    }
+
+    .col-action {
+        width: auto;
+    }
+
+    .ts-action-cell {
+        text-align: right;
+        padding-right: 18px;
+    }
+
+    .ts-link {
+        color: #0b3dff;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 500;
+    }
+
+        .ts-link:hover {
+            text-decoration: underline;
+        }
+
+    /* Make the empty area tall like the screenshot */
+    .ts-empty-row td {
+        height: 44px;
+    }
+
+    .ts-fill-row td {
+        height: 420px; /* big empty space like screenshot */
+    }
+</style>
+
+<div class="ts-page">
+    <div class="ts-title">Training and Seminar</div>
+    <div class="ts-title-line"></div>
+
+    <div class="ts-box">
+        <!-- Header strip -->
+        <div class="ts-box-header">
+            <div class="ts-box-header-left">
+                <span>Accreditation Log</span>
+
+                <!-- caret icon -->
+                <span class="ts-caret" title="Options">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M6 9l6 6 6-6" />
+                    </svg>
+                </span>
+            </div>
+
+            <input class="ts-search" type="text" placeholder="Search" />
+        </div>
+
+        <!-- Table -->
+        <table class="ts-table">
+            <thead>
+                <tr>
+                    <th class="col-id">ID. No</th>
+                    <th class="col-name">Name</th>
+                    <th class="col-status">Status</th>
+                    <th class="col-validity">Validity</th>
+                    <th class="col-action"></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <!-- Sample row (same as screenshot) -->
+                <tr>
+                    <td class="col-id">012</td>
+                    <td class="col-name">John Doe</td>
+                    <td class="col-status">Completed</td>
+                    <td class="col-validity">05/15/28</td>
+                    <td class="ts-action-cell">
+                        <a class="ts-link" href="#">View Training Record</a>
+                    </td>
+                </tr>
+
+                <!-- Big empty area like the screenshot -->
+                <tr class="ts-fill-row">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -9,7 +9,6 @@ namespace HRMS_System.Models
 {
     public class User 
     {
-
         [Key]
         public int Id { get; set; }
 
@@ -21,6 +20,9 @@ namespace HRMS_System.Models
         [DataType(DataType.Password)]
         [Column ("Passwordd")]
         public string? Password { get; set; }
+
+        [Required]
+        public UserRole Role { get; set; }   
 
     }
 }

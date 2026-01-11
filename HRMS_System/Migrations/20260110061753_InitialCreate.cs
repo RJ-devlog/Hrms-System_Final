@@ -17,14 +17,12 @@ namespace HRMS_System.Migrations
                 {
                     id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    EmployeeNumber = table.Column<int>(type: "int", nullable: false),
+                    EmployeeNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     MiddleName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     JobRole = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Department = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    WorkHoursType = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    Schedule = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     EmployeeType = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     EmploymentStatus = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
@@ -50,7 +48,8 @@ namespace HRMS_System.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Passwordd = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Passwordd = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Role = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -84,6 +83,12 @@ namespace HRMS_System.Migrations
                 name: "IX_AttendanceTrackings_UserId",
                 table: "AttendanceTrackings",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserInformation_EmployeeNumber",
+                table: "UserInformation",
+                column: "EmployeeNumber",
+                unique: true);
         }
 
         /// <inheritdoc />

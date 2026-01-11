@@ -1,14 +1,19 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.RegularExpressions;
 namespace HRMS_System.Models
 {
     public class UserInformationModel
     {
+        [NotMapped]
+        public string EmployeeNumberDigits =>
+        Regex.Replace(EmployeeNumber ?? "", @"\D", "");
         [Key]
         public int id { get; set; }
-        [Required(ErrorMessage = "Id Number is required.")]
-        public int EmployeeNumber { get; set; }
+        [Required]
+        [StringLength(20)]
+        public string EmployeeNumber { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "First Name is required.")]
         [StringLength(50)]
@@ -30,17 +35,6 @@ namespace HRMS_System.Models
         [Required(ErrorMessage = "Department is required.")]
         [StringLength(50)]
         public string? Department { get; set; }
-
-        // Full-time / Part-time
-        [Required(ErrorMessage = "Work hours type is required.")]
-        [StringLength(20)]
-        public string? WorkHoursType { get; set; }
-
-
-        ///Mon – Fri / Shifting
-        [Required(ErrorMessage = "Schedule is required.")]
-        [StringLength(50)]
-        public string? Schedule { get; set; }
 
         //EmployeeType  - Employee / Contractual / Intern
         [Required(ErrorMessage = "Employee type is required.")]

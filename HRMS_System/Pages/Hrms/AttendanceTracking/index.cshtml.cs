@@ -4,7 +4,7 @@
     using Microsoft.AspNetCore.Mvc.RazorPages;
     using Microsoft.EntityFrameworkCore;
 
-    namespace HRMS_System.Pages.Dashboard.AttendanceTracking
+    namespace HRMS_System.Pages.Hrms.AttendanceTracking
     {
         public class AttendanceSummaryRow
         {

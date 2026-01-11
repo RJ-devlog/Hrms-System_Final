@@ -15,6 +15,14 @@ namespace HRMS_System.Data
         public DbSet<UserInformationModel> UserInformation { get; set; }
         public DbSet<AttendanceTrackingModel> AttendanceTrackings { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<UserInformationModel>()
+                .HasIndex(e => e.EmployeeNumber)
+                .IsUnique();
+        }
 
     }
 }

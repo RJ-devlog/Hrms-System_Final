@@ -1,13 +1,17 @@
-using HRMS_System.Data;
+﻿using HRMS_System.Data;
 using HRMS_System.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace HRMS_System.Pages.Dashboard.EmployeeManagement
+
+namespace HRMS_System.Pages.Hrms.EmployeeManagement
 {
+
     public class EditEmployeeInfoModel : PageModel
     {
+
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _environment;
 
@@ -75,8 +79,6 @@ namespace HRMS_System.Pages.Dashboard.EmployeeManagement
             }
 
             /* ========= UPDATE FIELDS ========= */
-
-            employeeInDb.EmployeeNumber = Employee.EmployeeNumber;
             employeeInDb.FirstName = Employee.FirstName;
             employeeInDb.MiddleName = Employee.MiddleName;
             employeeInDb.LastName = Employee.LastName;
@@ -88,20 +90,25 @@ namespace HRMS_System.Pages.Dashboard.EmployeeManagement
             employeeInDb.Address = Employee.Address;
             employeeInDb.JobRole = Employee.JobRole;
             employeeInDb.Department = Employee.Department;
-            employeeInDb.WorkHoursType = Employee.WorkHoursType;
-            employeeInDb.Schedule = Employee.Schedule;
             employeeInDb.EmployeeType = Employee.EmployeeType;
             employeeInDb.EmploymentStatus = Employee.EmploymentStatus;
             employeeInDb.Status = Employee.Status;
             employeeInDb.StartDate = Employee.StartDate;
-
             employeeInDb.TenureMonths = CalculateTenureMonths(employeeInDb.StartDate);
-
+            if (!ModelState.IsValid)
+            {
+                foreach (var error in ModelState)
+                {
+                    foreach (var err in error.Value.Errors)
+                    {
+                        Console.WriteLine($"❌ {error.Key}: {err.ErrorMessage}");
+                    }
+                }
+                return Page();
+            }
             await _context.SaveChangesAsync();
-
-            return RedirectToPage("/Hrms/EmployeeManagement/Index");
+            return RedirectToPage("./Index");
         }
-
         private int CalculateTenureMonths(DateTime startDate)
         {
             int tenureMonth = 0;
@@ -110,5 +117,7 @@ namespace HRMS_System.Pages.Dashboard.EmployeeManagement
             tenureMonth = Math.Max(0,(today.Year - startDate.Year) * 12 + (today.Month - startDate.Month));
             return tenureMonth;
         }
+
     }
+
 }

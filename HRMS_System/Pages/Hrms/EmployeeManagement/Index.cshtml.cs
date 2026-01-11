@@ -1,11 +1,13 @@
 ﻿using HRMS_System.Data;
 using HRMS_System.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 
-namespace HRMS_System.Pages.Dashboard.EmployeeManagement
+namespace HRMS_System.Pages.Hrms.EmployeeManagement
 {
+    [Authorize(Roles = "HR")]
     public class EmployeeManagementModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -29,7 +31,7 @@ namespace HRMS_System.Pages.Dashboard.EmployeeManagement
             if (!string.IsNullOrWhiteSpace(SearchTerm))
             {
                 query = query.Where(e =>
-                    e.EmployeeNumber.ToString().Contains(SearchTerm) ||
+                    e.EmployeeNumber.Contains(SearchTerm) ||
                     e.FirstName.Contains(SearchTerm) ||
                     e.LastName.Contains(SearchTerm) ||
                     e.Email.Contains(SearchTerm) ||
@@ -56,8 +58,8 @@ namespace HRMS_System.Pages.Dashboard.EmployeeManagement
                     address = e.Address,
                     jobRole = e.JobRole,
                     department = e.Department,
-                    workHoursType = e.WorkHoursType,
-                    schedule = e.Schedule,
+/*                    workHoursType = e.WorkHoursType,
+                    schedule = e.Schedule,*/
                     employeeType = e.EmployeeType,
                     status = e.Status,
                     startDate = e.StartDate,

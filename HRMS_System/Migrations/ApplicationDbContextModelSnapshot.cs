@@ -66,6 +66,9 @@ namespace HRMS_System.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("Passwordd");
 
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -104,8 +107,10 @@ namespace HRMS_System.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("EmployeeNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("EmployeeNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("EmployeeType")
                         .IsRequired()
@@ -149,11 +154,6 @@ namespace HRMS_System.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<string>("Schedule")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
@@ -165,12 +165,10 @@ namespace HRMS_System.Migrations
                     b.Property<int?>("TenureMonths")
                         .HasColumnType("int");
 
-                    b.Property<string>("WorkHoursType")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
                     b.HasKey("id");
+
+                    b.HasIndex("EmployeeNumber")
+                        .IsUnique();
 
                     b.ToTable("UserInformation");
                 });

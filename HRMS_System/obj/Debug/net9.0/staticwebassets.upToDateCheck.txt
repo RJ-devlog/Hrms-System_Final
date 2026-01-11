@@ -73,6 +73,7 @@ wwwroot\uploads\496d5688-b82d-406b-b3bc-34418a86d793.jpg
 wwwroot\uploads\58fa6b89-cc36-4e1a-a93c-b38024c3a370.jpg
 wwwroot\uploads\6a99afdb-ab3f-406e-863a-62770806ca0e.png
 wwwroot\uploads\70ee5e25-a467-4e9a-abfa-bdae38a84804.jpg
+wwwroot\uploads\7aa2de9d-5a3c-4448-8cdc-4841aa7d9f57.jpg
 wwwroot\uploads\7fbfac78-e023-4845-82be-fc0efe598187.png
 wwwroot\uploads\80235e4d-1ee2-4138-8511-ca1696c2f008.jpg
 wwwroot\uploads\9e5661e6-d354-495f-affe-d1e3949de81a.jpg
@@ -83,10 +84,15 @@ wwwroot\uploads\b2445f14-db81-4abc-b8dc-1c1022b6ef1a.png
 wwwroot\uploads\b73bd8f5-170c-44ed-ae3b-8288233bb864.jpg
 wwwroot\uploads\b957e5e9-ce9d-4232-b581-3780ca9f0be2.png
 wwwroot\uploads\bcc58a79-6754-4322-91d2-5817a246d6de.jpg
+wwwroot\uploads\c6d78423-74c2-486a-96ea-f65a07d044c7.jpg
 wwwroot\uploads\dded5d45-33f9-4d35-b8a1-0aa4dc8f8d44.jpg
 wwwroot\uploads\e06c5249-017e-40ef-9647-931d345cc14d.jpg
 wwwroot\uploads\f8a231aa-f3c3-443a-9a41-e4b50db02d2f.jpg
 wwwroot\uploads\fbab066f-9680-45d7-bec6-d6c1f3e98ca6.png
+C:\Users\rieln\source\repos\HRMS_System\HRMS_System\wwwroot\lib\jquery\dist\jquery.slim.js
+C:\Users\rieln\source\repos\HRMS_System\HRMS_System\wwwroot\lib\jquery\dist\jquery.slim.min.js
+C:\Users\rieln\source\repos\HRMS_System\HRMS_System\wwwroot\lib\jquery\dist\jquery.slim.min.map
+C:\Users\rieln\source\repos\HRMS_System\HRMS_System\wwwroot\lib\jquery\LICENSE.txt
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\wwwroot\css\site.css
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\wwwroot\favicon.ico
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\wwwroot\js\site.js
@@ -145,7 +151,3 @@ C:\Users\rieln\source\repos\HRMS_System\HRMS_System\wwwroot\lib\jquery-validatio
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\wwwroot\lib\jquery\dist\jquery.js
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\wwwroot\lib\jquery\dist\jquery.min.js
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\wwwroot\lib\jquery\dist\jquery.min.map
-C:\Users\rieln\source\repos\HRMS_System\HRMS_System\wwwroot\lib\jquery\dist\jquery.slim.js
-C:\Users\rieln\source\repos\HRMS_System\HRMS_System\wwwroot\lib\jquery\dist\jquery.slim.min.js
-C:\Users\rieln\source\repos\HRMS_System\HRMS_System\wwwroot\lib\jquery\dist\jquery.slim.min.map
-C:\Users\rieln\source\repos\HRMS_System\HRMS_System\wwwroot\lib\jquery\LICENSE.txt

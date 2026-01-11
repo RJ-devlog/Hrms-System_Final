@@ -34,6 +34,10 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudFxMb2dpblBhZ2UuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/rieln/source/repos/HRMS_System/HRMS_System/Pages/Account/LogoutPage.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudFxMb2dvdXRQYWdlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/rieln/source/repos/HRMS_System/HRMS_System/Pages/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 

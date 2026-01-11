@@ -1,15 +1,13 @@
 ﻿@page
-@model HRMS_System.Pages.Dashboard.EmployeeManagement.EmployeeManagementModel
+@model HRMS_System.Pages.Hrms.EmployeeManagement.EmployeeManagementModel
 @{
     ViewData["Title"] = "Employee Management";
     Layout = "/Pages/Hrms/_HRNavigationLayout.cshtml";
 }
-
+<a asp-page="/Account/LogoutPage" class="log-out-label" style="color:black;text-decoration:none;"><h5 class="log-out-label">Log out</h5></a>
 <div class="dashboard-page">
-
     <h1 class="page-title">Employee Management</h1>
     <div class="title-line"></div>
-
     <div class="records-header">
         <div>Employee Records</div>
         <a asp-page="/Hrms/EmployeeManagement/AddEmployee">
@@ -43,7 +41,8 @@
                 @foreach (var emp in Model.employeeInfo)
                 {
                     <tr>
-                        <td>@emp.EmployeeNumber</td>
+                        <td>@emp.EmployeeNumberDigits</td>
+             @*            <td>@(emp.EmployeeNumber?.Replace("EMP-", ""))</td> *@
                         <td>@emp.FirstName @emp.LastName</td>
                         <td>@emp.PhoneNumber</td>
                         <td>@emp.Email</td>
@@ -115,25 +114,6 @@
                 <span>Job Role</span>
                 <strong id="empJobRole"></strong>
             </div>
-
-            @* TEMPORARILY DISABLED — WORK HOURS *@
-            @*
-            <div class="info-item">
-                <i class="bi bi-clock"></i>
-                <span>Hours</span>
-                <strong id="empHours"></strong>
-            </div>
-            *@
-
-            @* TEMPORARILY DISABLED — SCHEDULE *@
-            @*
-            <div class="info-item">
-                <i class="bi bi-calendar-week"></i>
-                <span>Schedule</span>
-                <strong id="empSchedule"></strong>
-            </div>
-            *@
-
             <div class="info-item">
                 <i class="bi bi-diagram-3"></i>
                 <span>Department</span>
@@ -215,6 +195,7 @@
 
                 document.getElementById("empName").innerText = emp.fullName;
                 document.getElementById("empStatus").innerText = emp.status;
+                document.getElementById("empStatus").className = emp.status === "Active"? "status-active" : "status-inactive";
                 document.getElementById("empStartDate").innerText = new Date(emp.startDate).toLocaleDateString();
 
                     // Tenure (computed from startDate)
@@ -223,23 +204,17 @@
                     const today = new Date();
                     let months = (today.getFullYear() - start.getFullYear()) * 12 + (today.getMonth() - start.getMonth());
                     if (today.getDate() < start.getDate()) months--; // adjust if not completed month
-                    if (months < 0) months = 0;
+                    if (months < 0) months = 0;``
 
-                    document.getElementById("empTenure").innerText =
-                        months === 1 ? "1 month" : `${months} months`;
+                    document.getElementById("empTenure").innerText = months === 1 ? "1 month" : `${months} months`;
                 } else {
                     document.getElementById("empTenure").innerText = "-";
                 }
-                document.getElementById("empId").innerText = emp.EmployeeNumber;
+                const digitsOnly = emp.idNumber?.split('-')[1] || "";
+                document.getElementById("empId").innerText = digitsOnly;
                 document.getElementById("empJobRole").innerText = emp.jobRole;
-
-                // TEMPORARILY DISABLED
-                // document.getElementById("empHours").innerText = emp.workHoursType;
-                // document.getElementById("empSchedule").innerText = emp.schedule;
-
                 document.getElementById("empDepartment").innerText = emp.department;
                 document.getElementById("empType").innerText = emp.employeeType;
-
                 document.getElementById("empGender").innerText = emp.gender;
                 document.getElementById("empCivil").innerText = emp.civilStatus;
                 document.getElementById("empEmail").innerText = emp.email;
