@@ -90,7 +90,7 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
             employeeInDb.Address = Employee.Address;
             employeeInDb.JobRole = Employee.JobRole;
             employeeInDb.Department = Employee.Department;
-            employeeInDb.EmployeeType = Employee.EmployeeType;
+       /*     employeeInDb.EmployeeType = Employee.EmployeeType;*/
             employeeInDb.EmploymentStatus = Employee.EmploymentStatus;
             employeeInDb.Status = Employee.Status;
             employeeInDb.StartDate = Employee.StartDate;

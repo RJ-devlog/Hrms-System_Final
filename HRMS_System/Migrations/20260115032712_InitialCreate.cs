@@ -12,6 +12,28 @@ namespace HRMS_System.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "TrainingSessions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+                    TargetAudience = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
+                    SessionType = table.Column<int>(type: "int", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    StartTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    EndTime = table.Column<TimeSpan>(type: "time", nullable: false),
+                    Provider = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    TrainingType = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TrainingSessions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserInformation",
                 columns: table => new
                 {
@@ -23,7 +45,6 @@ namespace HRMS_System.Migrations
                     LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     JobRole = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Department = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    EmployeeType = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     EmploymentStatus = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -79,9 +100,51 @@ namespace HRMS_System.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "TrainingRecords",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    TrainingSessionId = table.Column<int>(type: "int", nullable: false),
+                    Provider = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    CertificationId = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: true),
+                    DateCompleted = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Duration = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    Progress = table.Column<int>(type: "int", nullable: false),
+                    ValidUntil = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TrainingRecords", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TrainingRecords_TrainingSessions_TrainingSessionId",
+                        column: x => x.TrainingSessionId,
+                        principalTable: "TrainingSessions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TrainingRecords_UserInformation_UserId",
+                        column: x => x.UserId,
+                        principalTable: "UserInformation",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AttendanceTrackings_UserId",
                 table: "AttendanceTrackings",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TrainingRecords_TrainingSessionId",
+                table: "TrainingRecords",
+                column: "TrainingSessionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TrainingRecords_UserId",
+                table: "TrainingRecords",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -98,7 +161,13 @@ namespace HRMS_System.Migrations
                 name: "AttendanceTrackings");
 
             migrationBuilder.DropTable(
+                name: "TrainingRecords");
+
+            migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "TrainingSessions");
 
             migrationBuilder.DropTable(
                 name: "UserInformation");

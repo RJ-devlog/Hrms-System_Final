@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HRMS_System.Pages.Hrms.EmployeeManagement
 {
-    [Authorize(Roles = "HR")]
+  /*  [Authorize(Roles = "HR")]*/
     public class EmployeeManagementModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -60,7 +60,6 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
                     department = e.Department,
 /*                    workHoursType = e.WorkHoursType,
                     schedule = e.Schedule,*/
-                    employeeType = e.EmployeeType,
                     status = e.Status,
                     startDate = e.StartDate,
                     profileImagePath = e.ProfileImagePath

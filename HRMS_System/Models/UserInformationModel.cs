@@ -6,11 +6,11 @@ namespace HRMS_System.Models
 {
     public class UserInformationModel
     {
+        [Key]
+        public int id { get; set; }
         [NotMapped]
         public string EmployeeNumberDigits =>
         Regex.Replace(EmployeeNumber ?? "", @"\D", "");
-        [Key]
-        public int id { get; set; }
         [Required]
         [StringLength(20)]
         public string EmployeeNumber { get; set; } = string.Empty;
@@ -36,12 +36,7 @@ namespace HRMS_System.Models
         [StringLength(50)]
         public string? Department { get; set; }
 
-        //EmployeeType  - Employee / Contractual / Intern
-        [Required(ErrorMessage = "Employee type is required.")]
-        [StringLength(30)]
-        public string? EmployeeType { get; set; }
-
-        [Required(ErrorMessage = "Employment status is required.")]
+        [Required(ErrorMessage = "Employment Status is required.")]
         [StringLength(20)]
         public string? EmploymentStatus { get; set; }
 

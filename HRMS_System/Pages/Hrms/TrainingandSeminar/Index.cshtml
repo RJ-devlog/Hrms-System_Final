@@ -1,218 +1,802 @@
 ﻿@page
 @model HRMS_System.Pages.Hrms.TrainingandSeminar.IndexModel
+@using HRMS_System.Models.Training
 @{
     ViewData["Title"] = "Training and Seminar";
-    Layout = "/Pages/Hrms/_HRNavigationLayout.cshtml"; // change if needed
+    Layout = "/Pages/Hrms/_HRNavigationLayout.cshtml";
 }
 
 <link rel="stylesheet" href="~/css/dashboard-shared.css" />
 
 <style>
-    /* Page Title */
-    .ts-page {
-        padding: 10px 0;
-    }
+    .ts-page { padding: 10px 0; }
+    .ts-title { font-size: 28px; font-weight: 700; margin: 0 0 10px 0; }
+    .ts-title-line { height: 2px; background: #6f6f6f; margin-bottom: 18px; opacity: .6; }
 
-    .ts-title {
-        font-size: 28px;
-        font-weight: 700;
-        margin: 0 0 10px 0;
-    }
+    .ts-tabs { display:flex; gap:10px; margin-bottom:12px; align-items:center; flex-wrap:wrap; }
+    .ts-tab { border:1px solid #8a8a8a; background:#fff; padding:8px 14px; font-size:15px; cursor:pointer; border-radius:6px; }
+    .ts-tab.active { outline:2px solid #222; font-weight:700; }
 
-    .ts-title-line {
-        height: 2px;
-        background: #6f6f6f;
-        margin-bottom: 18px;
-        opacity: .6;
-    }
-
-    /* Outer Box */
-    .ts-box {
-        border: 2px solid #8a8a8a;
-        background: #fff;
-    }
-
-    /* Header Strip */
+    .ts-box { border: 2px solid #8a8a8a; background: #fff; }
     .ts-box-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 12px 14px;
-        border-bottom: 1px solid #8a8a8a;
+        display:flex; align-items:center; justify-content:space-between; gap:10px;
+        padding:12px 14px; border-bottom:1px solid #8a8a8a; flex-wrap:wrap;
     }
+    .ts-box-header-left { display:flex; align-items:center; gap:10px; font-size:20px; font-weight:500; color:#222; flex-wrap:wrap; }
 
-    .ts-box-header-left {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 22px;
-        font-weight: 500;
-        color: #222;
+    .ts-select { height:34px; border:1px solid #8a8a8a; padding:6px 10px; font-size:14px; background:#fff; min-width:200px; }
+    .ts-search { width:260px; height:34px; border:1px solid #8a8a8a; padding:6px 10px; font-size:15px; outline:none; background:#fff; }
+
+    .ts-btn { height:34px; border:1px solid #8a8a8a; background:#fff; padding:0 12px; cursor:pointer; border-radius:6px; font-size:14px; white-space:nowrap; }
+    .ts-btn.primary { border-color:#1b3cff; color:#1b3cff; font-weight:600; }
+
+    .ts-table { width:100%; border-collapse:collapse; table-layout:fixed; }
+    .ts-table th, .ts-table td {
+        border-right:1px solid #8a8a8a; border-bottom:1px solid #8a8a8a;
+        padding:10px 10px; font-size:14px; color:#222; vertical-align:top; background:#fff; word-wrap:break-word;
     }
+    .ts-table th:last-child, .ts-table td:last-child { border-right:none; }
+    .ts-table thead th { font-weight:700; text-align:center; padding:8px 10px; }
 
-    .ts-caret {
-        width: 28px;
-        height: 28px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 4px;
-        cursor: pointer;
-        user-select: none;
+    .ts-action-cell { text-align:right; padding-right:18px; }
+    .ts-link { color:#0b3dff; text-decoration:none; font-size:14px; font-weight:600; cursor:pointer; }
+    .ts-link:hover { text-decoration:underline; }
+
+    .ts-hidden { display:none !important; }
+    .ts-empty-state { padding:30px 14px; color:#666; font-size:14px; }
+
+    /* ===== Modal ===== */
+    .ts-modal-backdrop { position:fixed; inset:0; background:rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index:9999; padding:18px; }
+    .ts-modal { width:min(860px, 96vw); background:#fff; border:2px solid #8a8a8a; border-radius:10px; overflow:hidden; }
+    .ts-modal-header { display:flex; justify-content:space-between; align-items:center; padding:12px 14px; border-bottom:1px solid #8a8a8a; font-weight:700; font-size:16px; }
+    .ts-modal-body { padding:14px; }
+    .ts-modal-footer { padding:12px 14px; border-top:1px solid #8a8a8a; display:flex; justify-content:flex-end; gap:10px; }
+    .ts-x { border:none; background:transparent; cursor:pointer; font-size:18px; line-height:1; }
+
+    .ts-form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .ts-field label { display:block; font-size:13px; font-weight:600; margin-bottom:6px; }
+    .ts-field input, .ts-field textarea, .ts-field select {
+        width:100%; border:1px solid #8a8a8a; padding:8px 10px; font-size:14px; border-radius:6px; outline:none; background:#fff;
     }
+    .ts-field textarea { min-height:90px; resize:vertical; }
+    .ts-form-grid .span-2 { grid-column:1 / span 2; }
 
-        .ts-caret svg {
-            width: 18px;
-            height: 18px;
-            opacity: .85;
-        }
+    /* ===== Progress badges ===== */
+    .badge-progress { padding:4px 10px; border-radius:999px; font-weight:700; font-size:12px; display:inline-block; }
+    .p-notstarted { background:#ffdddd; border:1px solid #ff4d4d; color:#b30000; }
+    .p-inprogress { background:#fff3cd; border:1px solid #ffc107; color:#7a5a00; }
+    .p-completed  { background:#d4edda; border:1px solid #28a745; color:#155724; }
+    .ts-cell-actions { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
 
-    /* Search box */
-    .ts-search {
-        width: 260px;
-        height: 34px;
-        border: 1px solid #8a8a8a;
-        padding: 6px 10px;
-        font-size: 15px;
-        outline: none;
-        background: #fff;
-    }
-
-    /* Table */
-    .ts-table {
-        width: 100%;
-        border-collapse: collapse;
-        table-layout: fixed;
-    }
-
-        .ts-table th,
-        .ts-table td {
-            border-right: 1px solid #8a8a8a;
-            border-bottom: 1px solid #8a8a8a;
-            padding: 10px 10px;
-            font-size: 16px;
-            color: #222;
-            vertical-align: middle;
-            background: #fff;
-        }
-
-            .ts-table th:last-child,
-            .ts-table td:last-child {
-                border-right: none;
-            }
-
-        .ts-table thead th {
-            font-weight: 700;
-            text-align: center;
-            padding-top: 8px;
-            padding-bottom: 8px;
-        }
-
-    /* Column sizing close to screenshot */
-    .col-id {
-        width: 80px;
+    .prog-badge {
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 12px;
+        border: 1px solid transparent;
+        display: inline-block;
+        min-width: 90px;
         text-align: center;
     }
 
-    .col-name {
-        width: 280px;
-        text-align: center;
+    .prog-completed {
+        background: #d4edda;
+        border-color: #28a745;
+        color: #155724;
     }
-
-    .col-status {
-        width: 130px;
-        text-align: center;
+    /* green */
+    .prog-inprogress {
+        background: #fff3cd;
+        border-color: #ffc107;
+        color: #7a5a00;
     }
-
-    .col-validity {
-        width: 110px;
-        text-align: center;
+    /* yellow */
+    .prog-incomplete {
+        background: #ffdddd;
+        border-color: #ff4d4d;
+        color: #b30000;
     }
+    /* red */
 
-    .col-action {
-        width: auto;
-    }
-
-    .ts-action-cell {
-        text-align: right;
-        padding-right: 18px;
-    }
-
-    .ts-link {
-        color: #0b3dff;
-        text-decoration: none;
-        font-size: 16px;
-        font-weight: 500;
-    }
-
-        .ts-link:hover {
-            text-decoration: underline;
-        }
-
-    /* Make the empty area tall like the screenshot */
-    .ts-empty-row td {
-        height: 44px;
-    }
-
-    .ts-fill-row td {
-        height: 420px; /* big empty space like screenshot */
-    }
 </style>
+
+@functions{
+    public static string JS(string value)
+        => (value ?? "").Replace("\\", "\\\\").Replace("'", "\\'").Replace("\"", "\\\"");
+}
 
 <div class="ts-page">
     <div class="ts-title">Training and Seminar</div>
     <div class="ts-title-line"></div>
 
-    <div class="ts-box">
-        <!-- Header strip -->
+    <div class="ts-tabs">
+        <button type="button" class="ts-tab active" data-tab="tab-cert">Certification Tracker</button>
+        <button type="button" class="ts-tab" data-tab="tab-records">Records</button>
+        <button type="button" class="ts-tab" data-tab="tab-sessions">Sessions</button>
+    </div>
+
+    <!-- ================= CERTIFICATION TRACKER ================= -->
+    <section id="tab-cert" class="ts-box">
         <div class="ts-box-header">
             <div class="ts-box-header-left">
-                <span>Accreditation Log</span>
-
-                <!-- caret icon -->
-                <span class="ts-caret" title="Options">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M6 9l6 6 6-6" />
-                    </svg>
-                </span>
+                <span>Certification Tracker</span>
+                <select class="ts-select" id="certFilter">
+                    <option value="all">All</option>
+                    <option value="completed">Completed</option>
+                    <option value="renewaldue">Renewal Due</option>
+                    <option value="expired">Expired</option>
+                </select>
             </div>
-
-            <input class="ts-search" type="text" placeholder="Search" />
+            <input class="ts-search" id="certSearch" type="text" placeholder="Search (Employee / Name / Status)" />
         </div>
 
-        <!-- Table -->
-        <table class="ts-table">
+        <table class="ts-table" id="certTable">
             <thead>
                 <tr>
-                    <th class="col-id">ID. No</th>
-                    <th class="col-name">Name</th>
-                    <th class="col-status">Status</th>
-                    <th class="col-validity">Validity</th>
-                    <th class="col-action"></th>
+                    <th style="width:120px;">ID. No</th>
+                    <th style="width:260px;">Name</th>
+                    <th style="width:150px;">Progress</th>
+                    <th style="width:160px;">Status</th>
+                    <th style="width:140px;">Validity</th>
+                    <th style="width:340px;">Description</th>
                 </tr>
             </thead>
 
             <tbody>
-                <!-- Sample row (same as screenshot) -->
-                <tr>
-                    <td class="col-id">012</td>
-                    <td class="col-name">John Doe</td>
-                    <td class="col-status">Completed</td>
-                    <td class="col-validity">05/15/28</td>
-                    <td class="ts-action-cell">
-                        <a class="ts-link" href="#">View Training Record</a>
-                    </td>
-                </tr>
+            @{
+                    var trackerRows = Model.Records
+                    .Select(r =>
+                    {
+                        var status = "Completed";
+                        if (r.ValidUntil.HasValue)
+                        {
+                            if (r.ValidUntil.Value.Date < DateTime.Today) status = "Expired";
+                            else if (r.ValidUntil.Value.Date <= DateTime.Today.AddDays(30)) status = "Renewal Due";
+                        }
 
-                <!-- Big empty area like the screenshot -->
-                <tr class="ts-fill-row">
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                </tr>
+                        // If not completed yet, status can be "In Progress"
+                        if (r.Progress != TrainingProgress.Completed)
+                            status = "In Progress";
+
+                        return new
+                        {
+                            EmpNo = r.User?.EmployeeNumberDigits ?? "",
+                            FullName = $"{r.User?.FirstName} {r.User?.LastName}".Trim(),
+                            ValidUntil = r.ValidUntil,
+                            Status = status,
+                            Progress = r.Progress,
+                            Record = r,
+                            
+                        };
+                    })
+                    .ToList();
+
+            }
+
+            @if (!trackerRows.Any())
+            {
+                <tr><td colspan="5" class="ts-empty-state">No completed certifications found.</td></tr>
+            }
+            else
+            {
+                foreach (var t in trackerRows)
+                {
+                    var statusKey = t.Status.ToLower().Replace(" ", "");
+                    <tr data-status="@statusKey">
+                        <td style="text-align:center;">@t.EmpNo</td>
+                        <td style="text-align:center;">@t.FullName</td>
+
+                        @{
+                            var pKey = t.Progress.ToString().ToLower();
+                            var pClass = pKey == "completed" ? "prog-completed"
+                            : pKey == "inprogress" ? "prog-inprogress"
+                            : "prog-incomplete";
+
+                            var pText = pKey == "notstarted" ? "Incomplete"
+                            : t.Progress.ToString();
+                        }
+
+                        <td style="text-align:center;">
+                            <span class="prog-badge @pClass">@pText</span>
+                        </td>
+                        <td style="text-align:center;">@t.Status</td>
+                        <td style="text-align:center;">@(t.ValidUntil?.ToString("MM/dd/yy") ?? "—")</td>
+
+                        <td class="ts-action-cell">
+                            <a class="ts-link js-view-record"
+                               data-title="@(t.Record.Session?.Title ?? "—")"
+                               data-provider="@(t.Record.Provider ?? "—")"
+                               data-certid="@(t.Record.CertificationId ?? "—")"
+                               data-date="@(t.Record.DateCompleted?.ToString("MM/dd/yy") ?? "—")"
+                               data-duration="@(t.Record.Duration ?? "—")"
+                               data-type="@(t.Record.Session?.TrainingType.ToString() ?? "—")"
+                               data-progress="@t.Record.Progress">
+                               View Training Record
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
             </tbody>
         </table>
+
+        <div id="certEmpty" class="ts-empty-state ts-hidden">No results found.</div>
+    </section>
+
+    <!-- ================= RECORDS ================= -->
+    <section id="tab-records" class="ts-box ts-hidden">
+        <div class="ts-box-header">
+            <div class="ts-box-header-left">
+                <span>Records</span>
+                <select class="ts-select" id="recordsFilter">
+                    <option value="all">All Progress</option>
+                    <option value="notstarted">Not Started</option>
+                    <option value="inprogress">In Progress</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+            <input class="ts-search" id="recordsSearch" type="text" placeholder="Search (Title / Provider / Cert ID)" />
+        </div>
+
+        <table class="ts-table" id="recordsTable">
+            <thead>
+                <tr>
+                    <th style="width:220px;">Title</th>
+                    <th style="width:160px;">Provider</th>
+                    <th style="width:170px;">Certification ID</th>
+                    <th style="width:130px;">Date Completed</th>
+                    <th style="width:110px;">Duration</th>
+                    <th style="width:120px;">Training Type</th>
+                    <th style="width:140px;">Progress</th>
+                </tr>
+            </thead>
+            <tbody>
+            @if (!Model.Records.Any())
+            {
+                    <tr><td colspan="6" class="ts-empty-state">No completed certifications found.</td></tr>
+            }
+            else
+            {
+                foreach (var r in Model.Records)
+                {
+                    var key = r.Progress.ToString().ToLower();
+                    var cls = key == "notstarted" ? "p-notstarted"
+                            : key == "inprogress" ? "p-inprogress"
+                            : "p-completed";
+
+                    <tr data-progress="@key">
+                        <td>@(r.Session?.Title ?? "—")</td>
+                        <td style="text-align:center;">@r.Provider</td>
+                        <td style="text-align:center;">@(r.CertificationId ?? "—")</td>
+                        <td style="text-align:center;">@(r.DateCompleted?.ToString("MM/dd/yy") ?? "—")</td>
+                        <td style="text-align:center;">@(r.Duration ?? "—")</td>
+                        <td style="text-align:center;">@(r.Session?.TrainingType.ToString() ?? "—")</td>
+                        <td style="text-align:center;">
+                            <span class="badge-progress @cls">@r.Progress</span>
+                        </td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+
+        <div id="recordsEmpty" class="ts-empty-state ts-hidden">No results found.</div>
+
+@*         <!-- OPTIONAL: Quick Assign Record (creates TrainingRecord; cert id auto when Completed) -->
+        <div style="padding:12px 14px; border-top:1px solid #8a8a8a;">
+            <div style="font-weight:700; margin-bottom:8px;">Quick Add Record (Optional)</div>
+            <form method="post" asp-page-handler="CreateRecord" style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px; align-items:end;">
+                <div class="ts-field" style="margin:0;">
+                    <label>Employee UserId</label>
+                    <input asp-for="CreateRecord.UserId" type="number" placeholder="e.g. 1" />
+                </div>
+                <div class="ts-field" style="margin:0;">
+                    <label>Session Id</label>
+                    <input asp-for="CreateRecord.TrainingSessionId" type="number" placeholder="e.g. 2" />
+                </div>
+                <div class="ts-field" style="margin:0;">
+                    <label>Duration</label>
+                    <input asp-for="CreateRecord.Duration" placeholder="e.g. 8 hours" />
+                </div>
+                <div class="ts-field" style="margin:0;">
+                    <label>Progress</label>
+                    <select asp-for="CreateRecord.Progress">
+                        <option value="NotStarted">NotStarted</option>
+                        <option value="InProgress">InProgress</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+                <div style="grid-column: 1 / -1; display:flex; justify-content:flex-end;">
+                    <button type="submit" class="ts-btn primary">Add Record</button>
+                </div>
+            </form>
+            <div style="font-size:12px; color:#666; margin-top:6px;">
+                *Certification ID is generated automatically when Progress = Completed and is NOT editable.
+            </div>
+        </div> *@
+    </section>
+
+    <!-- ================= SESSIONS ================= -->
+    <section id="tab-sessions" class="ts-box ts-hidden">
+        <div class="ts-box-header">
+            <div class="ts-box-header-left">
+                <span>Sessions</span>
+                <select class="ts-select" id="sessionsFilter">
+                    <option value="all">All Sessions</option>
+                    <option value="mandatory">Mandatory</option>
+                    <option value="optional">Optional</option>
+                </select>
+            </div>
+
+            <div style="display:flex; gap:10px; align-items:center;">
+                <input class="ts-search" id="sessionsSearch" type="text" placeholder="Search (Title / Provider / Target)" />
+                <button type="button" class="ts-btn primary" id="btnCreateEvent">Create event</button>
+            </div>
+        </div>
+
+        <table class="ts-table" id="sessionsTable">
+            <thead>
+                <tr>
+                    <th style="width:200px;">Title</th>
+                    <th style="width:110px;">Date</th>
+                    <th style="width:105px;">Start</th>
+                    <th style="width:105px;">End</th>
+                    <th style="width:160px;">Provider</th>
+                    <th style="width:120px;">Type</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+            @if (!Model.Sessions.Any())
+            {
+                <tr><td colspan="7" class="ts-empty-state">No sessions created yet.</td></tr>
+            }
+            else
+            {
+                foreach (var s in Model.Sessions)
+                {
+                    var typeKey = s.SessionType.ToString().ToLower();
+                    var startTimeText = DateTime.Today.Add(s.StartTime).ToString("hh:mm tt");
+                    var endTimeText = DateTime.Today.Add(s.EndTime).ToString("hh:mm tt");
+
+                    <tr data-sessiontype="@typeKey">
+                        <td>@s.Title</td>
+                        <td style="text-align:center;">@s.StartDate.ToString("MM/dd/yy")</td>
+                        <td style="text-align:center;">@startTimeText</td>
+                        <td style="text-align:center;">@endTimeText</td>
+                        <td style="text-align:center;">@s.Provider</td>
+                        <td style="text-align:center;">@s.TrainingType</td>
+                        <td>
+                            <div class="ts-cell-actions">
+                                <div>
+                                    @s.Description
+                                    @if (!string.IsNullOrWhiteSpace(s.TargetAudience))
+                                    {
+                                        <br /><strong>Target Audience:</strong> @s.TargetAudience
+                                    }
+                                </div>
+                                <!-- ✅ Edit button beside description -->
+                                <button type="button"
+                                        class="ts-btn"
+                                            onclick="openEditSessionModal(
+                                            @s.Id,
+                                            '@JS(s.Title)',
+                                            '@JS(s.Description)',
+                                            '@JS(s.TargetAudience ?? "")',
+                                            '@s.SessionType',
+                                            '@s.StartDate.ToString("yyyy-MM-dd")',
+                                            '@s.StartTime.ToString(@"hh\:mm")',
+                                            '@s.EndTime.ToString(@"hh\:mm")',
+                                            '@JS(s.Provider)',
+                                            '@s.TrainingType',
+                                            '@JS(s.Progress.ToString())'
+                                        )"
+                                        >Edit
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            }
+            </tbody>
+        </table>
+
+        <div id="sessionsEmpty" class="ts-empty-state ts-hidden">No results found.</div>
+    </section>
+</div>
+
+<!-- ================= VIEW TRAINING RECORD MODAL ================= -->
+<div class="ts-modal-backdrop" id="recordModalBackdrop" aria-hidden="true">
+    <div class="ts-modal" role="dialog" aria-modal="true" aria-labelledby="recordModalTitle">
+        <div class="ts-modal-header">
+            <div id="recordModalTitle">Training Record</div>
+            <button type="button" class="ts-x" id="closeRecordModal" aria-label="Close">✕</button>
+        </div>
+        <div class="ts-modal-body">
+            <div class="ts-form-grid">
+                <div class="ts-field"><label>Title</label><input type="text" id="mTitle" readonly /></div>
+                <div class="ts-field"><label>Provider</label><input type="text" id="mProvider" readonly /></div>
+                <div class="ts-field"><label>Certification ID</label><input type="text" id="mCertId" readonly /></div>
+                <div class="ts-field"><label>Date Completed</label><input type="text" id="mDate" readonly /></div>
+                <div class="ts-field"><label>Duration</label><input type="text" id="mDuration" readonly /></div>
+                <div class="ts-field"><label>Training Type</label><input type="text" id="mType" readonly /></div>
+                <div class="ts-field span-2"><label>Progress</label><input type="text" id="mProgress" readonly /></div>
+            </div>
+        </div>
+        <div class="ts-modal-footer">
+            <button type="button" class="ts-btn" id="okRecordModal">Close</button>
+        </div>
     </div>
 </div>
+
+<!-- ================= CREATE EVENT MODAL ================= -->
+<div class="ts-modal-backdrop" id="createModalBackdrop" aria-hidden="true">
+    <div class="ts-modal" role="dialog" aria-modal="true">
+        <div class="ts-modal-header">
+            <div>Create Training / Seminar</div>
+            <button type="button" class="ts-x" id="closeCreateModal" aria-label="Close">✕</button>
+        </div>
+
+        <form method="post" asp-page-handler="CreateSession">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="All" class="text-danger" style="margin-bottom:10px;"></div>
+            <div class="ts-modal-body">
+                <div class="ts-form-grid">
+                    <div class="ts-field">
+                        <label>Title</label>
+                        <input asp-for="CreateSession.Title" required/>
+                        <span asp-validation-for="CreateSession.Title" class="text-danger"></span>
+                    </div>
+
+                    <div class="ts-field">
+                        <label>Session Type</label>
+                        <select asp-for="CreateSession.SessionType">
+                            <option value="Mandatory">Mandatory</option>
+                            <option value="Optional">Optional</option>
+                        </select>
+                    </div>
+
+                    <div class="ts-field">
+                        <label>Date to Start</label>
+                        <input asp-for="CreateSession.StartDate" type="date" />
+                        <span asp-validation-for="CreateSession.StartDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="ts-field">
+                        <label>Time to Start</label>
+                        <input asp-for="CreateSession.StartTime" type="time" />
+                        <span asp-validation-for="CreateSession.StartTime" class="text-danger"></span>
+                    </div>
+
+                    <div class="ts-field">
+                        <label>Time to End</label>
+                        <input asp-for="CreateSession.EndTime" type="time" />
+                        <span asp-validation-for="CreateSession.EndTime" class="text-danger"></span>
+                    </div>
+
+                    <div class="ts-field">
+                        <label>Provider</label>
+                        <input asp-for="CreateSession.Provider" placeholder="Internal / External Provider" />
+                        <span asp-validation-for="CreateSession.Provider" class="text-danger"></span>
+                    </div>
+
+                    <div class="ts-field">
+                        <label>Training Type</label>
+                        <select asp-for="CreateSession.TrainingType">
+                            <option value="Workshop">Workshop</option>
+                            <option value="Online">Online</option>
+                            <option value="InPerson">InPerson</option>
+                        </select>
+                    </div>
+                    <div class="ts-field">
+                        <label>Training Progress</label>
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <select asp-for="CreateSession.Progress" id="createProgressSelect">
+                                 <option value="NotStarted">Incomplete</option>
+                                <option value="InProgress">InProgress</option>
+                                <option value="Completed" disabled>Completed</option>
+                            </select>
+
+                            <span id="createProgressBadge" class="prog-badge prog-incomplete">Incomplete</span>
+                        </div>
+
+                        <span asp-validation-for="CreateSession.Progress" class="text-danger"></span>
+                    </div>
+
+                    <div class="ts-field span-2">
+                        <label>Description</label>
+                        <textarea asp-for="CreateSession.Description" required></textarea>
+                        <span asp-validation-for="CreateSession.Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="ts-field span-2">
+                        <label>Target Audience</label>
+                        <input asp-for="CreateSession.TargetAudience" required/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ts-modal-footer">
+                <button type="button" class="ts-btn" id="cancelCreate">Cancel</button>
+                <button type="submit" class="ts-btn primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ================= EDIT EVENT MODAL ================= -->
+<div class="ts-modal-backdrop" id="editModalBackdrop" aria-hidden="true">
+    <div class="ts-modal" role="dialog" aria-modal="true">
+        <div class="ts-modal-header">
+            <div>Edit Training / Seminar</div>
+            <button type="button" class="ts-x" onclick="closeEditModal()">✕</button>
+        </div>
+
+        <form method="post" asp-page-handler="EditSession">
+            <div class="ts-modal-body">
+                <input type="hidden" asp-for="EditSession.Id" />
+
+                <div class="ts-form-grid">
+                    <div class="ts-field">
+                        <label>Title</label>
+                        <input asp-for="EditSession.Title" />
+                    </div>
+
+                    <div class="ts-field">
+                        <label>Session Type</label>
+                        <select asp-for="EditSession.SessionType">
+                            <option value="Mandatory">Mandatory</option>
+                            <option value="Optional">Optional</option>
+                        </select>
+                    </div>
+
+                    <div class="ts-field">
+                        <label>Date to Start</label>
+                        <input asp-for="EditSession.StartDate" type="date" />
+                    </div>
+
+                    <div class="ts-field">
+                        <label>Time to Start</label>
+                        <input asp-for="EditSession.StartTime" type="time" />
+                    </div>
+
+                    <div class="ts-field">
+                        <label>Time to End</label>
+                        <input asp-for="EditSession.EndTime" type="time" />
+                    </div>
+
+                    <div class="ts-field">
+                        <label>Provider</label>
+                        <input asp-for="EditSession.Provider" />
+                    </div>
+
+                    <div class="ts-field">
+                        <label>Training Type</label>
+                        <select asp-for="EditSession.TrainingType">
+                            <option value="Workshop">Workshop</option>
+                            <option value="Online">Online</option>
+                            <option value="InPerson">InPerson</option>
+                        </select>
+                    </div>
+                    @* @asdasd@ *@
+                    <div class="ts-field">
+                        <label>Training Progress</label>
+
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <select asp-for="EditSession.Progress" id="editProgressSelect">
+                                <option value="NotStarted">Incomplete</option>
+                                <option value="InProgress">InProgress</option>
+                                <option value="Completed">Completed</option> @* ✅ selectable in edit *@
+                            </select>
+
+                            <span id="editProgressBadge" class="prog-badge prog-incomplete">Incomplete</span>
+                        </div>
+                    </div>
+
+                    <div class="ts-field span-2">
+                        <label>Description</label>
+                        <textarea asp-for="EditSession.Description"></textarea>
+                    </div>
+
+                    <div class="ts-field span-2">
+                        <label>Target Audience</label>
+                        <input asp-for="EditSession.TargetAudience" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="ts-modal-footer">
+                <button type="button" class="ts-btn" onclick="closeEditModal()">Cancel</button>
+                <button type="submit" class="ts-btn primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // ===== Tabs =====
+    const tabs = document.querySelectorAll(".ts-tab");
+    const panels = ["tab-cert", "tab-records", "tab-sessions"].map(id => document.getElementById(id));
+    tabs.forEach(t => {
+        t.addEventListener("click", () => {
+            tabs.forEach(x => x.classList.remove("active"));
+            t.classList.add("active");
+            const target = t.getAttribute("data-tab");
+            panels.forEach(p => p.classList.add("ts-hidden"));
+            document.getElementById(target).classList.remove("ts-hidden");
+        });
+    });
+
+    // ===== Generic table filter =====
+    function filterTable({ searchInputId, filterSelectId, tableId, emptyId, dataKey }) {
+        const searchEl = document.getElementById(searchInputId);
+        const filterEl = document.getElementById(filterSelectId);
+        const table = document.getElementById(tableId);
+        const emptyEl = document.getElementById(emptyId);
+
+        function run() {
+            const q = (searchEl?.value || "").toLowerCase().trim();
+            const f = (filterEl?.value || "all").toLowerCase();
+
+            const rows = Array.from(table.querySelectorAll("tbody tr"))
+                .filter(r => r.querySelectorAll("td").length > 1); // ignore empty row
+
+            let visibleCount = 0;
+
+            rows.forEach(r => {
+                const text = r.innerText.toLowerCase();
+                const hasSearch = !q || text.includes(q);
+
+                let hasFilter = true;
+                if (dataKey && f !== "all") {
+                    const attr = (r.getAttribute(dataKey) || "").toLowerCase();
+                    hasFilter = attr === f;
+                }
+
+                const show = hasSearch && hasFilter;
+                r.style.display = show ? "" : "none";
+                if (show) visibleCount++;
+            });
+
+            emptyEl.classList.toggle("ts-hidden", visibleCount !== 0);
+        }
+
+        searchEl?.addEventListener("input", run);
+        filterEl?.addEventListener("change", run);
+        run();
+    }
+
+    filterTable({ searchInputId: "certSearch", filterSelectId: "certFilter", tableId: "certTable", emptyId: "certEmpty", dataKey: "data-status" });
+    filterTable({ searchInputId: "recordsSearch", filterSelectId: "recordsFilter", tableId: "recordsTable", emptyId: "recordsEmpty", dataKey: "data-progress" });
+    filterTable({ searchInputId: "sessionsSearch", filterSelectId: "sessionsFilter", tableId: "sessionsTable", emptyId: "sessionsEmpty", dataKey: "data-sessiontype" });
+
+    // ===== Record Modal =====
+    const recordBackdrop = document.getElementById("recordModalBackdrop");
+    const closeRecordModalBtn = document.getElementById("closeRecordModal");
+    const okRecordModalBtn = document.getElementById("okRecordModal");
+
+    function openRecordModal(a) {
+        document.getElementById("mTitle").value = a.dataset.title || "";
+        document.getElementById("mProvider").value = a.dataset.provider || "";
+        document.getElementById("mCertId").value = a.dataset.certid || "";
+        document.getElementById("mDate").value = a.dataset.date || "";
+        document.getElementById("mDuration").value = a.dataset.duration || "";
+        document.getElementById("mType").value = a.dataset.type || "";
+        document.getElementById("mProgress").value = a.dataset.progress || "";
+
+        recordBackdrop.style.display = "flex";
+        recordBackdrop.setAttribute("aria-hidden", "false");
+    }
+    function closeRecordModal() {
+        recordBackdrop.style.display = "none";
+        recordBackdrop.setAttribute("aria-hidden", "true");
+    }
+
+    document.addEventListener("click", (e) => {
+        const a = e.target.closest(".js-view-record");
+        if (!a) return;
+        e.preventDefault();
+        openRecordModal(a);
+    });
+
+    closeRecordModalBtn.addEventListener("click", closeRecordModal);
+    okRecordModalBtn.addEventListener("click", closeRecordModal);
+    recordBackdrop.addEventListener("click", (e) => { if (e.target === recordBackdrop) closeRecordModal(); });
+
+    // ===== Create Modal =====
+    const createBackdrop = document.getElementById("createModalBackdrop");
+    const btnCreateEvent = document.getElementById("btnCreateEvent");
+    const closeCreateModalBtn = document.getElementById("closeCreateModal");
+    const cancelCreateBtn = document.getElementById("cancelCreate");
+
+    function openCreateModal() {
+        createBackdrop.style.display = "flex";
+        createBackdrop.setAttribute("aria-hidden", "false");
+    }
+    function closeCreateModal() {
+        createBackdrop.style.display = "none";
+        createBackdrop.setAttribute("aria-hidden", "true");
+    }
+
+    btnCreateEvent.addEventListener("click", openCreateModal);
+    closeCreateModalBtn.addEventListener("click", closeCreateModal);
+    cancelCreateBtn.addEventListener("click", closeCreateModal);
+    createBackdrop.addEventListener("click", (e) => { if (e.target === createBackdrop) closeCreateModal(); });
+
+    // ===== Edit Modal =====
+    const editBackdrop = document.getElementById("editModalBackdrop");
+
+    function openEditSessionModal(id, title, desc, target, sessionType, date, startTime, endTime, provider, trainingType,progress) {
+        document.querySelector('[name="EditSession.Id"]').value = id;
+        document.querySelector('[name="EditSession.Title"]').value = title;
+        document.querySelector('[name="EditSession.Description"]').value = desc;
+        document.querySelector('[name="EditSession.TargetAudience"]').value = target;
+
+        document.querySelector('[name="EditSession.SessionType"]').value = sessionType;
+        document.querySelector('[name="EditSession.StartDate"]').value = date;
+
+        document.querySelector('[name="EditSession.StartTime"]').value = startTime;
+        document.querySelector('[name="EditSession.EndTime"]').value = endTime;
+
+        document.querySelector('[name="EditSession.Provider"]').value = provider;
+        document.querySelector('[name="EditSession.TrainingType"]').value = trainingType;
+
+       document.querySelector('[name="EditSession.Progress"]').value = progress;
+       updateEditProgressBadge();
+
+        editBackdrop.style.display = "flex";
+        editBackdrop.setAttribute("aria-hidden", "false");
+    }
+    function updateEditProgressBadge() {
+        const sel = document.getElementById("editProgressSelect");
+        const badge = document.getElementById("editProgressBadge");
+        if (!sel || !badge) return;
+
+        badge.classList.remove("prog-completed", "prog-inprogress", "prog-incomplete");
+
+        if (sel.value === "Completed") {
+            badge.classList.add("prog-completed");
+            badge.textContent = "Completed";
+        } else if (sel.value === "InProgress") {
+            badge.classList.add("prog-inprogress");
+            badge.textContent = "InProgress";
+        } else {
+            badge.classList.add("prog-incomplete");
+            badge.textContent = "Incomplete";
+        }
+    }
+
+    updateEditProgressBadge();
+    document.getElementById("editProgressSelect")?.addEventListener("change", updateEditProgressBadge);
+
+        function closeEditModal() {
+        editBackdrop.style.display = "none";
+        editBackdrop.setAttribute("aria-hidden", "true");
+    }
+
+    editBackdrop.addEventListener("click", (e) => {
+        if (e.target === editBackdrop) closeEditModal();
+    });
+        function updateCreateProgressBadge() {
+        const sel = document.getElementById("createProgressSelect");
+        const badge = document.getElementById("createProgressBadge");
+        if (!sel || !badge) return;
+
+        badge.classList.remove("prog-completed","prog-inprogress","prog-incomplete");
+
+        if (sel.value === "Completed") {
+            badge.classList.add("prog-completed");
+            badge.textContent = "Completed";
+        } else if (sel.value === "InProgress") {
+            badge.classList.add("prog-inprogress");
+            badge.textContent = "InProgress";
+        } else {
+            badge.classList.add("prog-incomplete");
+            badge.textContent = "Incomplete";
+        }
+    }
+
+    updateCreateProgressBadge();
+    document.getElementById("createProgressSelect")?.addEventListener("change", updateCreateProgressBadge);
+
+</script>

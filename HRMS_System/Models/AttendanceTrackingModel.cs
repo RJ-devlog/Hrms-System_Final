@@ -9,7 +9,7 @@ namespace HRMS_System.Models
         [Key]
         public int Id { get; set; }
 
-        /* 🔗 RELATIONSHIP */
+        /* RELATIONSHIP */
         [Required]
         public int UserId { get; set; }
 
