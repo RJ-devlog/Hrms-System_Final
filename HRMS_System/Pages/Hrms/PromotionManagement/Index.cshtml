@@ -1,7 +1,161 @@
 ﻿@page
-@model HRMS_System.Pages.Hrms.Promotion.IndexModel
+@model HRMS_System.Pages.Hrms.PromotionManagement.IndexModel
 @{
     ViewData["Title"] = "Promotion Management";
-    Layout = "/Pages/Hrms/_DashboardLayout.cshtml";
+    Layout = "/Pages/Hrms/_HRNavigationLayout.cshtml";
+}
 
+<link rel="stylesheet" href="~/css/dashboard-shared.css" />
+<link rel="stylesheet" href="~/css/promotion.css" />
+
+<div class="dashboard-page promo-page">
+
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Promotion Management</h1>
+            <div class="page-subtitle">Predictive employee promotion eligibility using performance & HR metrics.</div>
+        </div>
+
+        <div class="page-actions">
+            <form method="post" asp-page-handler="TrainModel">
+                <button class="btn btn-ghost" type="submit">Train / Re-train Model</button>
+            </form>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert error">@TempData["Error"]</div>
+    }
+
+    <div class="card-grid">
+
+        <!-- LEFT: Employee list + predict -->
+        <div class="card">
+            <div class="card-title">Employees</div>
+            <div class="card-subtitle">Select an employee then click Predict.</div>
+
+            <div class="tool-row">
+                <input class="form-control small" placeholder="Search name / ID..." id="searchBox" />
+                <select class="form-control small" asp-for="SelectedUserId">
+                    <option value="">-- Select Employee --</option>
+                    @* Populate from Model.EmployeeOptions *@
+                    @foreach (var e in Model.EmployeeOptions)
+                    {
+                        <option value="@e.Value">@e.Text</option>
+                    }
+                </select>
+
+                <form method="post" asp-page-handler="Predict" class="inline-form">
+                    <input type="hidden" name="SelectedUserId" value="@Model.SelectedUserId" />
+                    <button class="btn btn-primary" type="submit">Predict Promotion</button>
+                </form>
+            </div>
+
+            <div class="table-wrap">
+                <table class="table-fixed">
+                    <thead>
+                        <tr>
+                            <th style="width:130px;">Emp ID</th>
+                            <th>Name</th>
+                            <th style="width:140px;">Dept</th>
+                            <th style="width:140px;">Tenure</th>
+                            <th style="width:150px;">Latest Eval</th>
+                        </tr>
+                    </thead>
+                    <tbody id="empBody">
+                        @foreach (var row in Model.EmployeeRows)
+                        {
+                            <tr class="emp-row" data-name="@row.SearchText">
+                                <td>@row.EmployeeNumber</td>
+                                <td>@row.FullName</td>
+                                <td>@row.Department</td>
+                                <td>@row.TenureMonths mo</td>
+                                <td><span class="pill pill-info">@row.LatestEvalAvg</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-footer">
+                <div class="muted">Tip: Ensure Evaluation + Attendance records exist for better prediction.</div>
+            </div>
+        </div>
+
+        <!-- RIGHT: Prediction Panel -->
+        <div class="card side-card">
+            <div class="card-title">Prediction Result</div>
+            <div class="card-subtitle">Model output using Random Forest (FastForest).</div>
+
+            <div class="predict-box">
+                <div class="predict-label">Employee</div>
+                <div class="predict-value">@Model.PredictionEmployeeName</div>
+
+                <div class="predict-divider"></div>
+
+                <div class="predict-label">Predicted Promotion</div>
+                @if (Model.PredictionAvailable)
+                {
+                    <div class="predict-big @(Model.PredictedPromoted ? "good" : "bad")">
+                        @(Model.PredictedPromoted ? "YES" : "NO")
+                    </div>
+
+                    <div class="predict-label">Confidence</div>
+                    <div class="predict-value">@Model.PredictionProbability.ToString("P2")</div>
+
+                    <div class="predict-label">Recommendation</div>
+                    <div class="hint-box">
+                        @Model.RecommendationText
+                    </div>
+
+                    <div class="predict-divider"></div>
+
+                    <div class="actions">
+                        <a class="btn btn-ghost" asp-page="/Hrms/Evaluation/Index">View Evaluations</a>
+                        <a class="btn btn-ghost" asp-page="/Hrms/TrainingandSeminar/Index">View Training</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="hint-box">
+                        No prediction yet. Select an employee then click <b>Predict Promotion</b>.
+                    </div>
+                }
+            </div>
+
+            <!-- OPTIONAL: Manual approval -->
+            <div class="card-subsection">
+                <div class="card-subtitle">Manual Promotion Action</div>
+                <form method="post" asp-page-handler="CreatePromotion">
+                    <input type="hidden" name="SelectedUserId" value="@Model.SelectedUserId" />
+                    <div class="form-group">
+                        <label class="form-label">Proposed New Role</label>
+                        <input class="form-control" asp-for="ProposedRole" placeholder="e.g., Senior Staff / Team Lead" /><br>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Create Promotion Record</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const search = document.getElementById("searchBox");
+        const rows = document.querySelectorAll(".emp-row");
+
+        search?.addEventListener("input", () => {
+            const q = (search.value || "").toLowerCase();
+            rows.forEach(r => {
+                const txt = (r.getAttribute("data-name") || "").toLowerCase();
+                r.style.display = txt.includes(q) ? "" : "none";
+            });
+        });
+    </script>
 }

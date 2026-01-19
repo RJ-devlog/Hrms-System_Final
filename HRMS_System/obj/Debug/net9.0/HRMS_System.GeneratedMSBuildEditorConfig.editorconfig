@@ -74,6 +74,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSHJtc1xFbXBsb3llZU1hbmFnZW1lbnRcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/rieln/source/repos/HRMS_System/HRMS_System/Pages/Hrms/Evaluation/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSHJtc1xFdmFsdWF0aW9uXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/rieln/source/repos/HRMS_System/HRMS_System/Pages/Hrms/Notification/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSHJtc1xOb3RpZmljYXRpb25cSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/rieln/source/repos/HRMS_System/HRMS_System/Pages/Hrms/PromotionManagement/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSHJtc1xQcm9tb3Rpb25NYW5hZ2VtZW50XEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 

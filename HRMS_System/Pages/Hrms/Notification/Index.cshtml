@@ -1,0 +1,199 @@
+﻿@page
+@model HRMS_System.Pages.Hrms.Notification.IndexModel
+@{
+    ViewData["Title"] = "Notification";
+    Layout = "/Pages/Hrms/_HRNavigationLayout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/dashboard-shared.css" />
+<link rel="stylesheet" href="~/css/promo-notification.css" />
+
+<div class="dashboard-page promo-notif-page">
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Promotion Notifications</h1>
+            <div class="page-subtitle">Updates from promotion prediction, promotion records, and approvals.</div>
+        </div>
+
+        <div class="page-actions">
+            <form method="post" asp-page-handler="MarkAllRead" class="inline-form">
+                <button type="submit" class="btn btn-ghost">Mark All as Read</button>
+            </form>
+            <a class="btn btn-primary" asp-page="/Hrms/PromotionManagement/Index">Go to Promotion Management</a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert success">@TempData["Success"]</div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert error">@TempData["Error"]</div>
+    }
+
+    <div class="card-grid">
+
+        <!-- LEFT: NOTIFICATION LIST -->
+        <div class="card">
+            <div class="list-top">
+                <div>
+                    <div class="card-title">Promotion Alerts</div>
+                    <div class="card-subtitle">Click a notification to preview details.</div>
+                </div>
+
+                <div class="list-tools">
+                    <input class="form-control small" id="searchBox" placeholder="Search employee / message..." />
+
+                    <select class="form-control small" id="filterRead">
+                        <option value="">All</option>
+                        <option value="unread">Unread</option>
+                        <option value="read">Read</option>
+                    </select>
+
+                    <select class="form-control small" id="filterStatus">
+                        <option value="">All Status</option>
+                        <option value="predicted_yes">Predicted: YES</option>
+                        <option value="predicted_no">Predicted: NO</option>
+                        <option value="created">Record Created</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="notif-list" id="notifList">
+                @foreach (var n in Model.PromotionNotifications)
+                {
+                    <div class="notif-item @(n.IsRead ? "" : "unread")"
+                         data-id="@n.Id"
+                         data-read="@(n.IsRead ? "read" : "unread")"
+                         data-status="@n.StatusKey"
+                         data-search="@($"{n.EmployeeName} {n.Title} {n.Message} {n.StatusKey}".ToLower())">
+
+                        <div class="notif-left">
+                            <div class="badge badge-promo">Promotion</div>
+
+                            <div class="notif-title">
+                                @n.Title
+                                @if (!n.IsRead)
+                                {
+                                    <span class="mini-dot" title="Unread"></span>
+                                }
+                            </div>
+
+                            <div class="notif-snippet">@n.Message</div>
+
+                            <div class="notif-meta">
+                                <span class="emp">@n.EmployeeName</span>
+                                <span class="dot">•</span>
+                                <span>@n.CreatedAtText</span>
+                            </div>
+                        </div>
+
+                        <div class="notif-right">
+                            <span class="status-pill status-@n.StatusKey">@n.StatusLabel</span>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="table-footer">
+                <div class="muted">Tip: Predictions generate alerts; approvals create a status update.</div>
+            </div>
+        </div>
+
+        <!-- RIGHT: PREVIEW -->
+        <div class="card side-card">
+            <div class="card-title">Preview</div>
+            <div class="card-subtitle">Review promotion notification details.</div>
+
+            <div class="preview-box">
+                <div class="preview-title" id="pvTitle">Select a notification</div>
+                <div class="preview-meta" id="pvMeta">—</div>
+                <div class="preview-status" id="pvStatus">—</div>
+
+                <div class="preview-message" id="pvMessage">
+                    Click a promotion notification on the left to view its details.
+                </div>
+
+                <div class="preview-actions">
+                    <form method="post" asp-page-handler="MarkRead" class="inline-form">
+                        <input type="hidden" name="SelectedId" id="pvId" />
+                        <button type="submit" class="btn btn-primary">Mark as Read</button>
+                    </form>
+
+                    <form method="post" asp-page-handler="Archive" class="inline-form">
+                        <input type="hidden" name="SelectedId" id="pvId2" />
+                        <button type="submit" class="btn btn-ghost">Archive</button>
+                    </form>
+                </div>
+
+                <div class="hint-box">
+                    This notification is linked to Promotion Management workflow and model predictions.
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Preview click (fills the right panel)
+        const pvId = document.getElementById("pvId");
+        const pvId2 = document.getElementById("pvId2");
+        const pvTitle = document.getElementById("pvTitle");
+        const pvMeta = document.getElementById("pvMeta");
+        const pvMessage = document.getElementById("pvMessage");
+        const pvStatus = document.getElementById("pvStatus");
+
+        document.querySelectorAll(".notif-item").forEach(item => {
+            item.addEventListener("click", () => {
+                document.querySelectorAll(".notif-item").forEach(x => x.classList.remove("selected"));
+                item.classList.add("selected");
+
+                const id = item.getAttribute("data-id");
+                const title = item.querySelector(".notif-title")?.childNodes?.[0]?.textContent?.trim() ?? "";
+                const msg = item.querySelector(".notif-snippet")?.textContent ?? "";
+                const meta = item.querySelector(".notif-meta")?.textContent ?? "";
+                const status = item.querySelector(".status-pill")?.textContent ?? "";
+
+                pvId.value = id;
+                pvId2.value = id;
+                pvTitle.textContent = title;
+                pvMessage.textContent = msg;
+                pvMeta.textContent = meta;
+                pvStatus.textContent = "Status: " + status;
+            });
+        });
+
+        // Filters (search + status + read)
+        const searchBox = document.getElementById("searchBox");
+        const filterRead = document.getElementById("filterRead");
+        const filterStatus = document.getElementById("filterStatus");
+
+        function applyFilters() {
+            const q = (searchBox.value || "").toLowerCase().trim();
+            const r = filterRead.value;
+            const s = filterStatus.value;
+
+            document.querySelectorAll(".notif-item").forEach(item => {
+                const text = item.getAttribute("data-search") || "";
+                const ir = item.getAttribute("data-read") || "";
+                const is = item.getAttribute("data-status") || "";
+
+                const okQ = !q || text.includes(q);
+                const okR = !r || ir === r;
+                const okS = !s || is === s;
+
+                item.style.display = (okQ && okR && okS) ? "" : "none";
+            });
+        }
+
+        [searchBox, filterRead, filterStatus].forEach(el => el?.addEventListener("input", applyFilters));
+    </script>
+}

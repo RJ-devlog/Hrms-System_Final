@@ -1,0 +1,342 @@
+﻿@page
+@model HRMS_System.Pages.Hrms.Evaluation.IndexModel
+@{
+    ViewData["Title"] = "Evaluation";
+    Layout = "/Pages/Hrms/_HRNavigationLayout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/dashboard-shared.css" />
+<link rel="stylesheet" href="~/css/evaluation.css" />
+
+<div class="dashboard-page eval-page">
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">Employee Evaluation</h1>
+            <div class="page-subtitle">Create performance evaluations and manage records.</div>
+        </div>
+
+        <div class="page-actions">
+            <button type="button" class="btn btn-ghost" id="btnPrint">Print</button>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tab-menu">
+        <button type="button" class="tab-btn active" data-tab="tab-evaluate">Evaluate Employee</button>
+        <button type="button" class="tab-btn" data-tab="tab-records">Evaluation Records</button>
+    </div>
+
+    <!-- TAB: EVALUATE -->
+    <div class="tab-content active" id="tab-evaluate">
+
+        <div class="card-grid">
+            <!-- LEFT: FORM -->
+            <div class="card eval-card">
+                <div class="card-title">Evaluation Form</div>
+                <div class="card-subtitle">Fill in the evaluation details and submit.</div>
+
+                <form method="post" class="eval-form">
+
+                    <!-- Employee + Period -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Employee</label>
+                            <select class="form-control" asp-for="Input.UserId">
+                                <option value="">-- Select Employee --</option>
+                                @* Populate from Model.EmployeeOptions *@
+                                @* <option value="1">EMP-001 - Juan Dela Cruz</option> *@
+                            </select>
+                            <span class="text-danger" asp-validation-for="Input.UserId"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Evaluation Period</label>
+                            <select class="form-control" asp-for="Input.Period">
+                                <option value="">-- Select Period --</option>
+                                <option>Q1</option>
+                                <option>Q2</option>
+                                <option>Q3</option>
+                                <option>Q4</option>
+                                <option>Semi-Annual FH </option>
+                                <option>Semi-Annual SH </option>
+                                <option>Annual</option>
+                            </select>
+                            <span class="text-danger" asp-validation-for="Input.Period"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Evaluation Date</label>
+                            <input type="date" class="form-control" asp-for="Input.EvaluationDate" />
+                            <span class="text-danger" asp-validation-for="Input.EvaluationDate"></span>
+                        </div>
+                    </div>
+
+                    <!-- Ratings -->
+                    <div class="section-title">Performance Ratings (1 = Low, 5 = Excellent)</div>
+
+                    <div class="rating-block">
+                        <div class="rating-title">Work Quality/Performance</div>
+                        <div class="rating-scale">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <label class="rate-pill">
+                                    <input type="radio" asp-for="Input.WorkQuality" value="@i" />
+                                    <span>@i</span>
+                                </label>
+                            }
+                        </div>
+                        <span class="text-danger" asp-validation-for="Input.WorkQuality"></span>
+                    </div>
+
+                    <div class="rating-block">
+                        <div class="rating-title">Productivity</div>
+                        <div class="rating-scale">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <label class="rate-pill">
+                                    <input type="radio" asp-for="Input.Productivity" value="@i" />
+                                    <span>@i</span>
+                                </label>
+                            }
+                        </div>
+                        <span class="text-danger" asp-validation-for="Input.Productivity"></span>
+                    </div>
+
+                    <div class="rating-block">
+                        <div class="rating-title">Teamwork</div>
+                        <div class="rating-scale">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <label class="rate-pill">
+                                    <input type="radio" asp-for="Input.Teamwork" value="@i" />
+                                    <span>@i</span>
+                                </label>
+                            }
+                        </div>
+                        <span class="text-danger" asp-validation-for="Input.Teamwork"></span>
+                    </div>
+
+                    <div class="rating-block">
+                        <div class="rating-title">Attendance & Punctuality</div>
+                        <div class="rating-scale">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <label class="rate-pill">
+                                    <input type="radio" asp-for="Input.Attendance" value="@i" />
+                                    <span>@i</span>
+                                </label>
+                            }
+                        </div>
+                        <span class="text-danger" asp-validation-for="Input.Attendance"></span>
+                    </div>
+
+                    <div class="rating-block">
+                        <div class="rating-title">Communication</div>
+                        <div class="rating-scale">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <label class="rate-pill">
+                                    <input type="radio" asp-for="Input.Communication" value="@i" />
+                                    <span>@i</span>
+                                </label>
+                            }
+                        </div>
+                        <span class="text-danger" asp-validation-for="Input.Communication"></span>
+                    </div>
+
+                    <!-- Comments -->
+                    <div class="form-row">
+                        <div class="form-group full">
+                            <label class="form-label">Strengths</label>
+                            <textarea class="form-control" rows="3" asp-for="Input.Strengths" placeholder="Write strengths..."></textarea>
+                            <span class="text-danger" asp-validation-for="Input.Strengths"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group full">
+                            <label class="form-label">Areas for Improvement</label>
+                            <textarea class="form-control" rows="3" asp-for="Input.Improvements" placeholder="Write improvements..."></textarea>
+                            <span class="text-danger" asp-validation-for="Input.Improvements"></span>
+                        </div>
+                    </div>
+
+                    <!-- Overall -->
+                    <div class="overall-row">
+                        <div class="overall-box">
+                            <div class="overall-label">Overall Rating</div>
+                            <input class="overall-input" asp-for="Input.OverallRating" readonly placeholder="Auto-calc / optional" />
+                        </div>
+
+                        <div class="overall-actions">
+                            <button type="submit" class="btn btn-primary">Save Evaluation</button>
+                            <button type="reset" class="btn btn-ghost">Reset</button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <!-- RIGHT: SUMMARY -->
+            <div class="card side-card">
+                <div class="card-title">Quick Summary</div>
+                <div class="card-subtitle">Use this to verify before saving.</div>
+
+                <div class="summary-item">
+                    <div class="summary-label">Selected Employee</div>
+                    <div class="summary-value" id="sumEmployee">—</div>
+                </div>
+
+                <div class="summary-item">
+                    <div class="summary-label">Period</div>
+                    <div class="summary-value" id="sumPeriod">—</div>
+                </div>
+
+                <div class="summary-item">
+                    <div class="summary-label">Date</div>
+                    <div class="summary-value" id="sumDate">—</div>
+                </div>
+
+                <div class="summary-divider"></div>
+
+                <div class="summary-item">
+                    <div class="summary-label">Overall</div>
+                    <div class="summary-score" id="sumOverall">—</div>
+                </div>
+
+                <div class="hint-box">
+                    Tip: Keep ratings consistent with Attendance Tracking and Training records when applicable.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB: RECORDS -->
+    <div class="tab-content" id="tab-records">
+
+        <div class="card">
+            <div class="records-top">
+                <div class="records-title">Evaluation Records</div>
+
+                <div class="records-tools">
+                    <input type="text" class="form-control small" placeholder="Search name / ID..." id="searchBox" />
+                    <select class="form-control small" id="filterPeriod">
+                        <option value="">All Periods</option>
+                        <option>Q1</option>
+                        <option>Q2</option>
+                        <option>Q3</option>
+                        <option>Q4</option>
+                        <option>Annual</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table class="table-fixed">
+                    <thead>
+                        <tr>
+                            <th style="width: 120px;">Eval ID</th>
+                            <th style="width: 220px;">Employee</th>
+                            <th style="width: 120px;">Period</th>
+                            <th style="width: 160px;">Date</th>
+                            <th style="width: 140px;">Overall</th>
+                            <th style="width: 220px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recordsBody">
+                        @* Example Row *@
+                        @* 
+                        <tr>
+                            <td>EV-0001</td>
+                            <td>EMP-001 - Juan Dela Cruz</td>
+                            <td>Q1</td>
+                            <td>2026-01-16</td>
+                            <td><span class="pill pill-good">4.2</span></td>
+                            <td class="actions">
+                                <a class="btn btn-ghost btn-xs" href="#">View</a>
+                                <a class="btn btn-ghost btn-xs" href="#">Edit</a>
+                                <button type="button" class="btn btn-danger btn-xs">Delete</button>
+                            </td>
+                        </tr>
+                        *@
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-footer">
+                <div class="muted">Showing latest evaluations</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        // Tabs
+        document.querySelectorAll(".tab-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+                document.querySelectorAll(".tab-content").forEach(t => t.classList.remove("active"));
+
+                btn.classList.add("active");
+                document.getElementById(btn.dataset.tab).classList.add("active");
+            });
+        });
+
+        // Print
+        document.getElementById("btnPrint")?.addEventListener("click", () => window.print());
+
+        // Quick summary + optional overall calc
+        const selEmp = document.querySelector('[name="Input.UserId"]');
+        const selPeriod = document.querySelector('[name="Input.Period"]');
+        const inpDate = document.querySelector('[name="Input.EvaluationDate"]');
+        const overall = document.querySelector('[name="Input.OverallRating"]');
+
+        function getCheckedValue(name) {
+            const el = document.querySelector(`input[name="${name}"]:checked`);
+            return el ? parseInt(el.value) : null;
+        }
+
+        function calcOverall() {
+            const vals = [
+                getCheckedValue("Input.WorkQuality"),
+                getCheckedValue("Input.Productivity"),
+                getCheckedValue("Input.Teamwork"),
+                getCheckedValue("Input.Attendance"),
+                getCheckedValue("Input.Communication"),
+            ].filter(v => v !== null);
+
+            if (!vals.length) return "";
+            const avg = (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2);
+            return avg;
+        }
+
+        function updateSummary() {
+            const empText = selEmp?.selectedOptions?.[0]?.text ?? "—";
+            const periodText = selPeriod?.value ?? "—";
+            const dateText = inpDate?.value ?? "—";
+
+            const avg = calcOverall();
+            if (overall) overall.value = avg;
+
+            document.getElementById("sumEmployee").textContent = (selEmp?.value ? empText : "—");
+            document.getElementById("sumPeriod").textContent = (periodText && periodText !== "" ? periodText : "—");
+            document.getElementById("sumDate").textContent = (dateText && dateText !== "" ? dateText : "—");
+            document.getElementById("sumOverall").textContent = (avg && avg !== "" ? avg : "—");
+        }
+
+        ["change", "input"].forEach(evt => {
+            selEmp?.addEventListener(evt, updateSummary);
+            selPeriod?.addEventListener(evt, updateSummary);
+            inpDate?.addEventListener(evt, updateSummary);
+        });
+
+        document.querySelectorAll('input[type="radio"]').forEach(r => r.addEventListener("change", updateSummary));
+        updateSummary();
+    </script>
+}

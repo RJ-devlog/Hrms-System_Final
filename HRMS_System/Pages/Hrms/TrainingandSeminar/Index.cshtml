@@ -175,7 +175,7 @@
 
             @if (!trackerRows.Any())
             {
-                <tr><td colspan="5" class="ts-empty-state">No completed certifications found.</td></tr>
+                <tr><td colspan="6" class="ts-empty-state">No completed certifications found.</td></tr>
             }
             else
             {
@@ -253,7 +253,7 @@
             <tbody>
             @if (!Model.Records.Any())
             {
-                    <tr><td colspan="6" class="ts-empty-state">No completed certifications found.</td></tr>
+                    <tr><td colspan="7" class="ts-empty-state">No completed certifications found.</td></tr>
             }
             else
             {
@@ -271,9 +271,7 @@
                         <td style="text-align:center;">@(r.DateCompleted?.ToString("MM/dd/yy") ?? "—")</td>
                         <td style="text-align:center;">@(r.Duration ?? "—")</td>
                         <td style="text-align:center;">@(r.Session?.TrainingType.ToString() ?? "—")</td>
-                        <td style="text-align:center;">
-                            <span class="badge-progress @cls">@r.Progress</span>
-                        </td>
+                        <td style="text-align:center;"><span class="badge-progress @cls">@r.Progress</span></td>
                     </tr>
                 }
             }
