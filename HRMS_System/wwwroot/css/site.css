@@ -83,22 +83,29 @@ body {
 .app-container {
     display: flex;
     min-height: 100vh;
-    width: 100%;
+   /* width: 100%;*/
 }
 
 /* SIDEBAR ------------------------------------------------------*/
 /* SIDEBAR CONTAINER */
 .sidebar {
-    width: 260px;
+    /*    width: 260px;
     background: #fff;
     border-right: 1px solid #e0e0e0;
     display: flex;
-    flex-direction: column;
+    flex-direction: column;*/
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    overflow-y: auto;
+    width: 260px; /* adjust if your sidebar is bigger/smaller */
+    z-index: 1000;
 }
 
 /* LOGO CONTAINER */
 .sidebar-logo {
-    height: 90px; /* 👈 makes top area taller */
+    height: 90px; /* makes top area taller */
     display: flex;
     align-items: center; /* vertical centering */
     justify-content: center;
@@ -133,20 +140,20 @@ body {
 .menu-item a {
     display: flex;
     align-items: center;
-    gap: 14px; /* 👈 icon–text gap */
+    gap: 14px; /* icon–text gap */
     color: #555;
-    text-decoration: none; /* 👈 remove underline */
+    text-decoration: none; /* remove underline */
     font-size: 16px;
     width: 100%;
     transition: all 0.25s ease;
 }
 .menu-item a i {
     font-size: 20px;
-    min-width: 28px; /* 👈 consistent icon alignment */
+    min-width: 28px; /* consistent icon alignment */
 }
 .menu-item:hover a {
     color: #0033cc;
-    padding-left: 6px; /* 👈 subtle slide */
+    padding-left: 6px; /* subtle slide */
 }
 .menu-item.active a {
     color: #0033cc;
@@ -192,10 +199,13 @@ body {
 
 /* MAIN CONTENT --------------------------------------------------*/
 .main-content {
-    flex: 1; /* 👈 take remaining space */
-    padding: 30px 45px;
+    /*flex: 1;*/ /* 👈 take remaining space */
+    /*padding: 30px 45px;
     box-sizing: border-box;
-    overflow-x: hidden;
+    overflow-x: hidden;*/
+    margin-left: 270px; /* must match .sidebar width */
+    width: calc(100% - 260px);
+    min-height: 100vh;
 }
 
 
@@ -300,31 +310,37 @@ td {
     z-index: 9999;
 }
 
-    .table-dropdown a,
-    .table-dropdown button {
-        display: block;
-        width: 100%;
-        padding: 8px 12px;
-        text-align: left;
-        background: none;
-        border: none;
-        text-decoration: none;
-        color: #333;
-        cursor: pointer;
-        font-size: 14px;
-    }
+.table-dropdown a,
+.table-dropdown button {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    text-align: left;
+    background: none;
+    border: none;
+    text-decoration: none;
+    color: #333;
+    cursor: pointer;
+    font-size: 14px;
+}
 
-        .table-dropdown a:hover,
-        .table-dropdown button:hover {
-            background-color: #f1f1f1;
-        }
+.table-dropdown a:hover,
+.table-dropdown button:hover {
+    background-color: #f1f1f1;
+}
 
-    .table-dropdown.show {
-        display: block;
-    }
-/*.table-responsive{
-    overflow:visible !important;
-}*/
+.table-dropdown.show {
+    display: block;
+}
+.select2-results__options {
+    max-height: 260px;
+    overflow-y: auto;
+}
+/* Force Select2 to render below (even if it prefers above) */
+.select2-dropdown--above {
+    top: 100% !important;
+    bottom: auto !important;
+}
 /* SLIDE PANEL ----------------------------------------------------------*/
 .slide-panel {
     position: fixed;
@@ -340,10 +356,10 @@ td {
     overflow-y: auto;
 }
 
-    /* PANEL ACTIVE ---------------------------------------------------------*/
-    .slide-panel.active {
-        right: 0;
-    }
+/* PANEL ACTIVE ---------------------------------------------------------*/
+.slide-panel.active {
+    right: 0;
+}
 
 .slide-overlay.active {
     display: block;

@@ -6,8 +6,10 @@
 }
 
 <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
 
-<div class="container mt-4">
+
+<div class="container mt-4" style="max-height: 85vh; overflow-y: auto;" >
     <h3 class="mb-3">Add New Employee</h3>
     <hr />
 
@@ -90,156 +92,21 @@
         <h6 class="mt-3">Working Information</h6>
 
         <div class="row">
-            <div class="col-md-6 mb-3">
+            <div class="col-md-4 mb-3">
                 <label asp-for="Employee.JobRole"></label>
-                <select asp-for="Employee.JobRole" class="form-control" id="JobRole">
-                    <option value="">-- Select Job Role --</option>
-
-                    <optgroup label="Operations / Port Operations">
-                        <option value="Port Worker">Port Worker</option>
-                        <option value="Extra Port Worker">Extra Port Worker</option>
-                        <option value="Port Worker / RTG">Port Worker / RTG</option>
-                        <option value="Port Worker / Timekeeper">Port Worker / Timekeeper</option>
-                        <option value="Gantry Operator">Gantry Operator</option>
-                        <option value="Quay Crane Operator">Quay Crane Operator</option>
-                        <option value="QC Crane Operator">QC Crane Operator</option>
-                        <option value="RTG Operator">RTG Operator</option>
-                        <option value="RTG Trainee">RTG Trainee</option>
-                        <option value="Reach Stacker Operator">Reach Stacker Operator</option>
-                        <option value="Prime Mover Operator">Prime Mover Operator</option>
-                        <option value="Extra Prime Mover">Extra Prime Mover</option>
-                        <option value="PM Operator">PM Operator</option>
-                        <option value="Transtrainer Operator">Transtrainer Operator</option>
-                        <option value="Sidelifter Operator">Sidelifter Operator</option>
-                        <option value="Forklift Operator">Forklift Operator</option>
-                        <option value="Winchman">Winchman</option>
-                        <option value="Winchman – Pooling">Winchman – Pooling</option>
-                        <option value="Gang Boss">Gang Boss</option>
-                        <option value="Foreman">Foreman</option>
-                        <option value="Gear Locker">Gear Locker</option>
-                        <option value="Gatekeeper">Gatekeeper</option>
-                        <option value="Gate Control Checker">Gate Control Checker</option>
-                        <option value="Assigning Checker">Assigning Checker</option>
-                        <option value="CY Checker">CY Checker</option>
-                        <option value="Dock Checker">Dock Checker</option>
-                        <option value="Document Verifier">Document Verifier</option>
-                        <option value="Checker">Checker</option>
-                        <option value="Tireman">Tireman</option>
-                    </optgroup>
-
-                    <optgroup label="Technical / Engineering / Maintenance">
-                        <option value="Mechanic">Mechanic</option>
-                        <option value="Senior Mechanic">Senior Mechanic</option>
-                        <option value="Junior Mechanic">Junior Mechanic</option>
-                        <option value="Heavy Equipment Mechanic">Heavy Equipment Mechanic</option>
-                        <option value="Junior Heavy Equipment Mechanic">Junior Heavy Equipment Mechanic</option>
-                        <option value="Senior Heavy Equipment Mechanic">Senior Heavy Equipment Mechanic</option>
-                        <option value="Bulk Handling Mechanic">Bulk Handling Mechanic</option>
-                        <option value="Industrial Electrician">Industrial Electrician</option>
-                        <option value="Junior Industrial Electrician">Junior Industrial Electrician</option>
-                        <option value="Automotive Electrician">Automotive Electrician</option>
-                        <option value="Electronics Technician">Electronics Technician</option>
-                        <option value="Junior Electronics Technician">Junior Electronics Technician</option>
-                        <option value="Assistant Electronics Technician">Assistant Electronics Technician</option>
-                        <option value="Reefer Container Technician">Reefer Container Technician</option>
-                        <option value="Reefer Monitoring Technician">Reefer Monitoring Technician</option>
-                        <option value="Welder">Welder</option>
-                        <option value="Industrial Welder">Industrial Welder</option>
-                        <option value="Carpenter">Carpenter</option>
-                        <option value="Painter">Painter</option>
-                        <option value="Sewer">Sewer</option>
-                        <option value="Toolkeeper">Toolkeeper</option>
-                        <option value="Maintenance Utility">Maintenance Utility</option>
-                        <option value="Technical &amp; Maintenance Staff">Technical &amp; Maintenance Staff</option>
-                    </optgroup>
-
-                    <optgroup label="Administrative / Office">
-                        <option value="Office Staff">Office Staff</option>
-                        <option value="Office Assistant to the OM">Office Assistant to the OM</option>
-                        <option value="Record Keeper">Record Keeper</option>
-                        <option value="Timekeeper">Timekeeper</option>
-                        <option value="Head Timekeeper">Head Timekeeper</option>
-                        <option value="Payroll Clerk">Payroll Clerk</option>
-                        <option value="Billing Clerk">Billing Clerk</option>
-                        <option value="Billing Staff">Billing Staff</option>
-                        <option value="Accounting Staff">Accounting Staff</option>
-                        <option value="Subsidiary Ledger Clerk">Subsidiary Ledger Clerk</option>
-                        <option value="Subsidiary Ledger In-Charge">Subsidiary Ledger In-Charge</option>
-                        <option value="Credit &amp; Collection Staff">Credit &amp; Collection Staff</option>
-                        <option value="Purchasing Clerk">Purchasing Clerk</option>
-                        <option value="HR Clerk">HR Clerk</option>
-                        <option value="HR Staff">HR Staff</option>
-                        <option value="Paymaster">Paymaster</option>
-                        <option value="Audit Staff">Audit Staff</option>
-                    </optgroup>
-
-                    <optgroup label="IT / MIS / Systems">
-                        <option value="MIS Staff">MIS Staff</option>
-                        <option value="MIS Programmer">MIS Programmer</option>
-                        <option value="Junior MIS Programmer">Junior MIS Programmer</option>
-                        <option value="IT Development Personnel">IT Development Personnel</option>
-                        <option value="Junior Technical Specialist">Junior Technical Specialist</option>
-                        <option value="MIS Junior Technical Specialist">MIS Junior Technical Specialist</option>
-                    </optgroup>
-
-                    <optgroup label="Drivers / Transport">
-                        <option value="Service Driver">Service Driver</option>
-                        <option value="Shuttle Driver">Shuttle Driver</option>
-                        <option value="Executive Driver">Executive Driver</option>
-                        <option value="Ambulance Driver">Ambulance Driver</option>
-                    </optgroup>
-
-                    <optgroup label="Safety / Medical / Security">
-                        <option value="Company Nurse">Company Nurse</option>
-                        <option value="First Aider">First Aider</option>
-                        <option value="Safety Officer">Safety Officer</option>
-                        <option value="Security Aide">Security Aide</option>
-                        <option value="SSHEMO Staff">SSHEMO Staff</option>
-                        <option value="Assistant Pollution Control Officer">Assistant Pollution Control Officer</option>
-                    </optgroup>
-
-                    <optgroup label="Logistics / Warehouse / Support">
-                        <option value="Warehouse Staff">Warehouse Staff</option>
-                        <option value="Warehouse Clerk">Warehouse Clerk</option>
-                        <option value="CFS Staff">CFS Staff</option>
-                        <option value="ISO Staff">ISO Staff</option>
-                        <option value="Utility Personnel">Utility Personnel</option>
-                        <option value="General Services Utility">General Services Utility</option>
-                        <option value="General Services Driver">General Services Driver</option>
-                        <option value="General Services Painter">General Services Painter</option>
-                        <option value="General Services Carpenter">General Services Carpenter</option>
-                    </optgroup>
-
-                    <optgroup label="Finance / Claims / Insurance">
-                        <option value="Insurance &amp; Claims Staff">Insurance &amp; Claims Staff</option>
-                        <option value="Insurance &amp; Claims In-Charge">Insurance &amp; Claims In-Charge</option>
-                    </optgroup>
-
-                    <optgroup label="Misc / Support Roles">
-                        <option value="Cashier">Cashier</option>
-                        <option value="Satellite Cashier">Satellite Cashier</option>
-                        <option value="Augmentation Cashier">Augmentation Cashier</option>
-                        <option value="Extra">Extra</option>
-                        <option value="Operations Staff">Operations Staff</option>
-                        <option value="Operations &amp; Monitoring Staff">Operations &amp; Monitoring Staff</option>
-                        <option value="OPN / Monitoring Staff">OPN / Monitoring Staff</option>
-                        <option value="VOS">VOS</option>
-                    </optgroup>
+                <select asp-for="Employee.JobRole"
+                        class="form-control"
+                        id="JobRole"
+                        asp-items="Model.JobRoleOptions">
                 </select>
                 <span asp-validation-for="Employee.JobRole" class="text-danger"></span>
             </div>
-
             <div class="col-md-4 mb-3">
                 <label asp-for="Employee.Department"></label>
-                <select id="Department" name="Employee.Department" class="form-control">
-                    <option value="">-- Select Department --</option>
-                    <option value="Chairman's Office">Chairman's Office</option>
-                    <option value="Vice Chairman's Office">Vice Chairman's Office</option>
-                    <option value="Administration">Administration</option>
-                    <option value="Engineering">Engineering</option>
-                    <option value="Finance">Finance</option>
-                    <option value="Finance">General Manager</option>
-                    <option value="Legal">Legal</option>
+                <select asp-for="Employee.Department"
+                        class="form-control"
+                        id="Department"
+                        asp-items="Model.DepartmentOptions">
                 </select>
                 <span asp-validation-for="Employee.Department" class="text-danger"></span>
             </div>
@@ -290,17 +157,17 @@
     </form>
 </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+@* @section Scripts {
+} *@
+<partial name="_ValidationScriptsPartial" />
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    <script>
-        $(document).ready(function () {
-            $('#JobRole').select2({
-                width: '100%',
-                dropdownParent: $('.container')
-            });
+<script>
+    $(document).ready(function () {
+        $('#JobRole').select2({
+            width: '100%',
+            dropdownParent: $('.container')
         });
-    </script>
-}
+    });
+</script>

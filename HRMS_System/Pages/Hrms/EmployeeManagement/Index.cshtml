@@ -35,28 +35,46 @@
                     <th style="width: 80px;"></th>
                 </tr>
             </thead>
-            <tbody>
-                @foreach (var emp in Model.employeeInfo)
-                {
-                    <tr>
-                        <td>@emp.EmployeeNumberDigits</td>
-             @*            <td>@(emp.EmployeeNumber?.Replace("EMP-", ""))</td> *@
-                        <td>@emp.FirstName @emp.LastName</td>
-                        <td>@emp.PhoneNumber</td>
-                        <td>@emp.Email</td>
-                        <td style="position: relative; text-align: center;">
-                            <i class="bi bi-three-dots-vertical table-options"></i>
-                            <div class="table-dropdown">
-                                <a href="javascript:void(0)" onclick="openProfile(@emp.id)">View</a>
-                                <a asp-page="/Hrms/EmployeeManagement/EditEmployeeInformation"
-                                   asp-route-id="@emp.id">
-                                    Edit
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                }
-            </tbody>
+<tbody>
+@if (Model.employeeInfo == null || !Model.employeeInfo.Any())
+{
+    <tr>
+        <td colspan="5" class="text-center text-muted py-4">
+            @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+            {
+                <span>No employees records found for "<strong>@Model.SearchTerm</strong>".</span>
+            }
+            else
+            {
+                <span>No employee records found.</span>
+            }
+        </td>
+    </tr>
+}
+else
+{
+    @foreach (var emp in Model.employeeInfo)
+    {
+        <tr>
+            <td>@emp.EmployeeNumberDigits</td>
+            <td>@emp.FirstName @emp.LastName</td>
+            <td>@emp.PhoneNumber</td>
+            <td>@emp.Email</td>
+            <td style="position: relative; text-align: center;">
+                <i class="bi bi-three-dots-vertical table-options"></i>
+                <div class="table-dropdown">
+                    <a href="javascript:void(0)" onclick="openProfile(@emp.id)">View</a>
+                    <a asp-page="/Hrms/EmployeeManagement/EditEmployeeInformation"
+                       asp-route-id="@emp.id">
+                        Edit
+                    </a>
+                </div>
+            </td>
+        </tr>
+    }
+}
+</tbody>
+
         </table>
     </div>
 </div>

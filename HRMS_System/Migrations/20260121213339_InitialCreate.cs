@@ -12,13 +12,56 @@ namespace HRMS_System.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Evaluations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Period = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    EvaluationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    WorkQuality = table.Column<int>(type: "int", nullable: true),
+                    Productivity = table.Column<int>(type: "int", nullable: true),
+                    Teamwork = table.Column<int>(type: "int", nullable: true),
+                    Attendance = table.Column<int>(type: "int", nullable: true),
+                    Communication = table.Column<int>(type: "int", nullable: true),
+                    Strengths = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    Improvements = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    Comments = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    OverallRating = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Evaluations", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ReportFilters",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ActiveTab = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FromDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ToDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Search = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Period = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Department = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Provider = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ReportFilters", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TrainingSessions",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: true),
                     TargetAudience = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: true),
                     SessionType = table.Column<int>(type: "int", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -26,7 +69,8 @@ namespace HRMS_System.Migrations
                     EndTime = table.Column<TimeSpan>(type: "time", nullable: false),
                     Provider = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
                     TrainingType = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Progress = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -159,6 +203,12 @@ namespace HRMS_System.Migrations
         {
             migrationBuilder.DropTable(
                 name: "AttendanceTrackings");
+
+            migrationBuilder.DropTable(
+                name: "Evaluations");
+
+            migrationBuilder.DropTable(
+                name: "ReportFilters");
 
             migrationBuilder.DropTable(
                 name: "TrainingRecords");

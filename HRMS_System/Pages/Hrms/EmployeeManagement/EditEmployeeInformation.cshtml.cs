@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Humanizer;
 
 
 namespace HRMS_System.Pages.Hrms.EmployeeManagement
@@ -14,7 +15,8 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
 
         private readonly ApplicationDbContext _context;
         private readonly IWebHostEnvironment _environment;
-
+        public List<SelectListItem> JobRoleOptions { get; set; } = new();
+        public List<SelectListItem> DepartmentOptions { get; set; } = new();
         public EditEmployeeInfoModel(
             ApplicationDbContext context,
             IWebHostEnvironment environment)
@@ -28,11 +30,12 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
 
         [BindProperty]
         public UserInformationModel Employee { get; set; } = new();
-
-        /* ========================= GET ========================= */
-
         public async Task<IActionResult> OnGetAsync(int id)
         {
+            //Load dropdowns
+            JobRoleOptions = EmployeeCatalog.JobRoles;
+            DepartmentOptions = EmployeeCatalog.Departments;
+
             Employee = await _context.UserInformation.FirstOrDefaultAsync(e => e.id == id);
 
             if (Employee == null)
@@ -43,6 +46,9 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
         /* ========================= POST ========================= */
         public async Task<IActionResult> OnPostAsync()
         {
+            //Load dropdowns
+            JobRoleOptions = EmployeeCatalog.JobRoles;
+            DepartmentOptions = EmployeeCatalog.Departments;
             if (!ModelState.IsValid)
                 return Page();
 
@@ -90,7 +96,6 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
             employeeInDb.Address = Employee.Address;
             employeeInDb.JobRole = Employee.JobRole;
             employeeInDb.Department = Employee.Department;
-       /*     employeeInDb.EmployeeType = Employee.EmployeeType;*/
             employeeInDb.EmploymentStatus = Employee.EmploymentStatus;
             employeeInDb.Status = Employee.Status;
             employeeInDb.StartDate = Employee.StartDate;

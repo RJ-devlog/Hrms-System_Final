@@ -1,8 +1,9 @@
 using HRMS_System.Data;
 using HRMS_System.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace HRMS_System.Pages.Hrms.EmployeeManagement
 {
@@ -17,17 +18,23 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
 
         [BindProperty]
         public UserInformationModel Employee { get; set; } = new();
-
+        public List<SelectListItem> JobRoleOptions { get; set; } = new();
+        public List<SelectListItem> DepartmentOptions { get; set; } = new();
         public void OnGet()
         {
             Employee.EmployeeNumber = GenerateNextEmployeeNumber();
             Employee.StartDate = DateTime.Today;
+            Employee.BirthDate = new DateTime(2000,01,01);
             Employee.EmploymentStatus = "Probationary";
             Employee.Status = "Active";
+            DepartmentOptions = EmployeeCatalog.Departments;
+            JobRoleOptions = EmployeeCatalog.JobRoles;
         }
 
         public IActionResult OnPost()
         {
+            JobRoleOptions = EmployeeCatalog.JobRoles;
+            DepartmentOptions = EmployeeCatalog.Departments;
             if (!ModelState.IsValid)
                 return Page();
             try
@@ -37,7 +44,7 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
                 _context.SaveChanges();
                 return RedirectToPage("./Index");
             }
-            catch /*(DbUpdateException ex)*/
+            catch
             {
                 // duplicate key / constraint error
                 ModelState.AddModelError(string.Empty, "Unable to save employee. Possible duplicate or invalid data.");

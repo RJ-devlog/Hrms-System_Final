@@ -5,6 +5,8 @@ namespace HRMS_System.Models.Evaluation
 {
     public class EvaluationModel
     {
+        [Key]
+        public int Id { get; set; } 
         [Required]
         public int? UserId { get; set; }
 

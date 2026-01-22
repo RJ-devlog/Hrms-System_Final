@@ -27,7 +27,10 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
         public async Task OnGetAsync()
         {
             IQueryable<UserInformationModel> query = _context.UserInformation;
+            if (string.IsNullOrWhiteSpace(SearchTerm))
+            {
 
+            }
             if (!string.IsNullOrWhiteSpace(SearchTerm))
             {
                 query = query.Where(e =>
@@ -58,8 +61,6 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
                     address = e.Address,
                     jobRole = e.JobRole,
                     department = e.Department,
-/*                    workHoursType = e.WorkHoursType,
-                    schedule = e.Schedule,*/
                     status = e.Status,
                     startDate = e.StartDate,
                     profileImagePath = e.ProfileImagePath
@@ -68,7 +69,6 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
 
             if (emp == null)
                 return NotFound();
-
             return new JsonResult(emp);
         }
 

@@ -1,0 +1,412 @@
+﻿@page
+@model HRMS_System.Pages.Hrms.ReportManagement.IndexModel
+@{
+    ViewData["Title"] = "Report Management";
+    Layout = "/Pages/Hrms/_HRNavigationLayout.cshtml"; // keep your theme layout
+}
+
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+<div class="dashboard-page">
+    <h1 class="page-title">Report Management</h1>
+    <div class="title-line"></div>
+
+    <!-- Tabs -->
+    <ul class="nav nav-pills mb-3">
+        <li class="nav-item">
+            <a class="nav-link @(Model.Filter.ActiveTab == "performance" ? "active" : "")"
+               href="?ActiveTab=performance">Performance Report</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(Model.Filter.ActiveTab == "attendance" ? "active" : "")"
+               href="?ActiveTab=attendance">Attendance Report</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link @(Model.Filter.ActiveTab == "training" ? "active" : "")"
+               href="?ActiveTab=training">Training / Seminar Report</a>
+        </li>
+    </ul>
+
+    <!-- ===================== PERFORMANCE REPORT ===================== -->
+    @if (Model.Filter.ActiveTab == "performance")
+    {
+        <div class="card mb-3">
+            <div class="card-body">
+                <form method="get" class="row g-2 align-items-end">
+                    <input type="hidden" name="ActiveTab" value="performance" />
+
+                    <div class="col-md-3">
+                        <label class="form-label">Period</label>
+                        <select class="form-control" name="Period">
+                            <option value="">All</option>
+                            <option value="Q1" selected="@(Model.Filter.Period == "Q1")">Q1</option>
+                            <option value="Q2" selected="@(Model.Filter.Period == "Q2")">Q2</option>
+                            <option value="Q3" selected="@(Model.Filter.Period == "Q3")">Q3</option>
+                            <option value="Q4" selected="@(Model.Filter.Period == "Q4")">Q4</option>
+                            <option value="H1" selected="@(Model.Filter.Period == "H1")">H1 (Semi-Annual)</option>
+                            <option value="H2" selected="@(Model.Filter.Period == "H2")">H2 (Semi-Annual)</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">From</label>
+                        <input type="date" class="form-control" name="FromDate"
+                               value="@(Model.Filter.FromDate?.ToString("yyyy-MM-dd"))" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">To</label>
+                        <input type="date" class="form-control" name="ToDate"
+                               value="@(Model.Filter.ToDate?.ToString("yyyy-MM-dd"))" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Search</label>
+                        <input type="text" class="form-control" name="Search"
+                               value="@Model.Filter.Search"
+                               placeholder="Name / Email / Employee No." />
+                    </div>
+
+                    <div class="col-12 d-flex gap-2 mt-2">
+                        <button class="btn btn-primary" type="submit">Apply Filter</button>
+                        <a class="btn btn-outline-secondary" href="?ActiveTab=performance">Reset</a>
+
+                        <!-- optional export buttons (wire later) -->
+                        <button class="btn btn-outline-success ms-auto" type="submit" name="export" value="csv">Export CSV</button>
+                        <button class="btn btn-outline-danger" type="submit" name="export" value="pdf">Export PDF</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Summary cards -->
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="text-muted">Total Evaluations</div>
+                        <div class="fs-3 fw-semibold">@Model.PerformanceSummary.TotalEvaluations</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="text-muted">Average Score</div>
+                        <div class="fs-3 fw-semibold">@Model.PerformanceSummary.AvgScore.ToString("0.00")</div>
+                        <div class="small text-muted">(from WorkQuality + Productivity + Teamwork + Attendance + Communication)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="text-muted">Top Period</div>
+                        <div class="fs-3 fw-semibold">@Model.PerformanceSummary.TopPeriod</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PIE CHART -->
+        <div class="card mt-3 mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>Performance Summary</strong>
+            </div>
+            <div class="card-body">
+                <div style="max-width: 420px;">
+                    <canvas id="performancePie"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="mb-0">Performance Report</h5>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Employee</th>
+                                <th>Period</th>
+                                <th class="text-center">Work Quality</th>
+                                <th class="text-center">Productivity</th>
+                                <th class="text-center">Teamwork</th>
+                                <th class="text-center">Attendance</th>
+                                <th class="text-center">Communication</th>
+                                <th class="text-center">Avg</th>
+                                <th>Overall</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.PerformanceRows.Any())
+                            {
+                                <tr>
+                                    <td colspan="10" class="text-center text-muted py-4">
+                                        No performance records found.
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                foreach (var r in Model.PerformanceRows)
+                                {
+                                    <tr>
+                                        <td>@r.EvaluationDate.ToString("yyyy-MM-dd")</td>
+                                        <td>@r.EmployeeDisplay</td>
+                                        <td>@r.Period</td>
+                                        <td class="text-center">@r.WorkQuality</td>
+                                        <td class="text-center">@r.Productivity</td>
+                                        <td class="text-center">@r.Teamwork</td>
+                                        <td class="text-center">@r.Attendance</td>
+                                        <td class="text-center">@r.Communication</td>
+                                        <td class="text-center fw-semibold">@r.AvgScore.ToString("0.00")</td>
+                                        <td>@r.OverallRating</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ===================== ATTENDANCE REPORT ===================== -->
+    @if (Model.Filter.ActiveTab == "attendance")
+    {
+        <div class="card mb-3">
+            <div class="card-body">
+                <form method="get" class="row g-2 align-items-end">
+                    <input type="hidden" name="ActiveTab" value="attendance" />
+
+                    <div class="col-md-3">
+                        <label class="form-label">From</label>
+                        <input type="date" class="form-control" name="FromDate"
+                               value="@(Model.Filter.FromDate?.ToString("yyyy-MM-dd"))" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">To</label>
+                        <input type="date" class="form-control" name="ToDate"
+                               value="@(Model.Filter.ToDate?.ToString("yyyy-MM-dd"))" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Department</label>
+                        <select class="form-control" asp-items="Model.DepartmentOptions" name="Department"></select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Search</label>
+                        <input type="text" class="form-control" name="Search" value="@Model.Filter.Search"
+                               placeholder="Name / Employee No." />
+                    </div>
+
+                    <div class="col-12 d-flex gap-2 mt-2">
+                        <button class="btn btn-primary" type="submit">Apply Filter</button>
+                        <a class="btn btn-outline-secondary" href="?ActiveTab=attendance">Reset</a>
+
+                        <button class="btn btn-outline-success ms-auto" type="submit" name="export" value="csv">Export CSV</button>
+                        <button class="btn btn-outline-danger" type="submit" name="export" value="pdf">Export PDF</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="text-muted">Total Records</div>
+                        <div class="fs-3 fw-semibold">@Model.AttendanceSummary.TotalRecords</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="text-muted">Present</div>
+                        <div class="fs-3 fw-semibold">@Model.AttendanceSummary.PresentCount</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="text-muted">Absent</div>
+                        <div class="fs-3 fw-semibold">@Model.AttendanceSummary.AbsentCount</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="mb-2">Attendance Report</h5>
+
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Employee</th>
+                                <th>Status</th>
+                                <th>Time In</th>
+                                <th>Time Out</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.AttendanceRows.Any())
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">
+                                        No attendance records found.
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                foreach (var r in Model.AttendanceRows)
+                                {
+                                    <tr>
+                                        <td>@r.AttendanceDate.ToString("yyyy-MM-dd")</td>
+                                        <td>@r.EmployeeDisplay</td>
+                                        <td>@r.AttendanceStatus</td>
+                                        <td>@r.TimeInDisplay</td>
+                                        <td>@r.TimeOutDisplay</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+    <!-- ===================== TRAINING / SEMINAR REPORT ===================== -->
+    @if (Model.Filter.ActiveTab == "training")
+    {
+        <div class="card mb-3">
+            <div class="card-body">
+                <form method="get" class="row g-2 align-items-end">
+                    <input type="hidden" name="ActiveTab" value="training" />
+
+                    <div class="col-md-3">
+                        <label class="form-label">From</label>
+                        <input type="date" class="form-control" name="FromDate"
+                               value="@(Model.Filter.FromDate?.ToString("yyyy-MM-dd"))" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">To</label>
+                        <input type="date" class="form-control" name="ToDate"
+                               value="@(Model.Filter.ToDate?.ToString("yyyy-MM-dd"))" />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Provider</label>
+                        <input class="form-control" name="Provider" value="@Model.Filter.Provider" placeholder="Internal / External..." />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Search</label>
+                        <input class="form-control" name="Search" value="@Model.Filter.Search" placeholder="Title / Employee..." />
+                    </div>
+
+                    <div class="col-12 d-flex gap-2 mt-2">
+                        <button class="btn btn-primary" type="submit">Apply Filter</button>
+                        <a class="btn btn-outline-secondary" href="?ActiveTab=training">Reset</a>
+
+                        <button class="btn btn-outline-success ms-auto" type="submit" name="export" value="csv">Export CSV</button>
+                        <button class="btn btn-outline-danger" type="submit" name="export" value="pdf">Export PDF</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="text-muted">Total Sessions</div>
+                        <div class="fs-3 fw-semibold">@Model.TrainingSummary.TotalSessions</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="text-muted">Total Participants (Records)</div>
+                        <div class="fs-3 fw-semibold">@Model.TrainingSummary.TotalRecords</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="text-muted">Completed</div>
+                        <div class="fs-3 fw-semibold">@Model.TrainingSummary.CompletedCount</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="mb-2">Training / Seminar Report</h5>
+
+                <div class="table-responsive">
+                    <table class="table table-striped align-middle">
+                        <thead>
+                            <tr>
+                                <th>Session Date</th>
+                                <th>Title</th>
+                                <th>Provider</th>
+                                <th>Type</th>
+                                <th>Employee</th>
+                                <th>Progress</th>
+                                <th>Completed</th>
+                                <th>Certification</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!Model.TrainingRows.Any())
+                            {
+                                <tr>
+                                    <td colspan="8" class="text-center text-muted py-4">
+                                        No training records found.
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                foreach (var r in Model.TrainingRows)
+                                {
+                                    <tr>
+                                        <td>@r.SessionDate.ToString("yyyy-MM-dd")</td>
+                                        <td>@r.Title</td>
+                                        <td>@r.Provider</td>
+                                        <td>@r.TrainingType</td>
+                                        <td>@r.EmployeeDisplay</td>
+                                        <td>@r.Progress</td>
+                                        <td>@r.DateCompletedDisplay</td>
+                                        <td>@(string.IsNullOrWhiteSpace(r.CertificationId) ? "-" : r.CertificationId)</td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
