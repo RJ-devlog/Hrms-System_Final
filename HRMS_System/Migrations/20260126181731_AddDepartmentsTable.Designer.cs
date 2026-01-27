@@ -4,6 +4,7 @@ using HRMS_System.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRMS_System.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260126181731_AddDepartmentsTable")]
+    partial class AddDepartmentsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -96,7 +99,8 @@ namespace HRMS_System.Migrations
                         .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("OverallRating")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<string>("Period")
                         .IsRequired()
@@ -120,8 +124,6 @@ namespace HRMS_System.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Evaluations");
                 });
@@ -376,17 +378,6 @@ namespace HRMS_System.Migrations
                 });
 
             modelBuilder.Entity("HRMS_System.Models.AttendanceTrackingModel", b =>
-                {
-                    b.HasOne("HRMS_System.Models.UserInformationModel", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("HRMS_System.Models.Evaluation.EvaluationModel", b =>
                 {
                     b.HasOne("HRMS_System.Models.UserInformationModel", "User")
                         .WithMany()

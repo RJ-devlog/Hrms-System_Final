@@ -26,6 +26,8 @@
     <div class="tab-menu">
         <button type="button" class="tab-btn active" data-tab="tab-evaluate">Evaluate Employee</button>
         <button type="button" class="tab-btn" data-tab="tab-records">Evaluation Records</button>
+        <!-- ✅ NEW TAB -->
+   @*      <button type="button" class="tab-btn" data-tab="tab-activity">Activity Report</button> *@
     </div>
 
     <!-- TAB: EVALUATE -->
@@ -45,8 +47,10 @@
                             <label class="form-label">Employee</label>
                             <select class="form-control" asp-for="Input.UserId">
                                 <option value="">-- Select Employee --</option>
-                                @* Populate from Model.EmployeeOptions *@
-                                @* <option value="1">EMP-001 - Juan Dela Cruz</option> *@
+                                @foreach (var emp in Model.EmployeeOptions)
+                                {
+                                    <option value="@emp.Value">@emp.Text</option>
+                                }
                             </select>
                             <span class="text-danger" asp-validation-for="Input.UserId"></span>
                         </div>
@@ -246,21 +250,26 @@
                         </tr>
                     </thead>
                     <tbody id="recordsBody">
-                        @* Example Row *@
-                        @* 
-                        <tr>
-                            <td>EV-0001</td>
-                            <td>EMP-001 - Juan Dela Cruz</td>
-                            <td>Q1</td>
-                            <td>2026-01-16</td>
-                            <td><span class="pill pill-good">4.2</span></td>
-                            <td class="actions">
-                                <a class="btn btn-ghost btn-xs" href="#">View</a>
-                                <a class="btn btn-ghost btn-xs" href="#">Edit</a>
-                                <button type="button" class="btn btn-danger btn-xs">Delete</button>
-                            </td>
-                        </tr>
-                        *@
+                        @foreach (var r in Model.Records)
+                        {
+                            <tr>
+                                <td>EV-@r.Id.ToString("0000")</td>
+
+                                <td>
+                                    @(r.User != null? $"{r.User.EmployeeNumber} - {r.User.FirstName} {r.User.LastName}": $"User #{r.UserId}")
+                                </td>
+
+                                <td>@(r.Period ?? "-")</td>
+                                <td>@r.EvaluationDate.ToString("MMMM d, yyyy")</td>
+                                <td>@(string.IsNullOrWhiteSpace(r.OverallRating) ? "-" : r.OverallRating)</td>
+
+                                <td>
+                                    <button type="button" class="btn btn-ghost btn-xs" onclick="openEvalModal(@r.Id)">
+                                        View
+                                    </button>
+                                </td>
+                            </tr>
+                        }
                     </tbody>
                 </table>
             </div>
@@ -268,6 +277,332 @@
             <div class="table-footer">
                 <div class="muted">Showing latest evaluations</div>
             </div>
+        </div>
+    </div>
+</div>
+    <!-- ✅ NEW TAB: ACTIVITY REPORT (DETAILED) -->
+    @* <div class="tab-content" id="tab-activity">
+
+        <!-- Summary Cards -->
+        <div class="row g-3 mb-3">
+            <div class="col-md-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="text-muted">Total Actions</div>
+                        <div class="fs-3 fw-semibold" id="actTotal">0</div>
+                        <div class="small text-muted">All logged evaluation activities</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="text-muted">Created</div>
+                        <div class="fs-3 fw-semibold" id="actCreated">0</div>
+                        <div class="small text-muted">New evaluation entries</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="text-muted">Updated</div>
+                        <div class="fs-3 fw-semibold" id="actUpdated">0</div>
+                        <div class="small text-muted">Modified evaluations</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="text-muted">Deleted</div>
+                        <div class="fs-3 fw-semibold" id="actDeleted">0</div>
+                        <div class="small text-muted">Removed evaluations</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters + Table -->
+        <div class="card">
+            <div class="records-top">
+                <div class="records-title">Activity Report</div>
+
+                <div class="records-tools" style="gap:10px; flex-wrap:wrap;">
+                    <input type="date" class="form-control small" id="actFrom" />
+                    <input type="date" class="form-control small" id="actTo" />
+
+                    <select class="form-control small" id="actType">
+                        <option value="">All Actions</option>
+                        <option value="Created">Created</option>
+                        <option value="Updated">Updated</option>
+                        <option value="Deleted">Deleted</option>
+                        <option value="Printed">Printed</option>
+                    </select>
+
+                    <select class="form-control small" id="actUser">
+                        <option value="">All Users</option>
+                        <option value="Admin">Admin</option>
+                        <option value="HR Staff">HR Staff</option>
+                    </select>
+
+                    <input type="text" class="form-control small" placeholder="Search employee / period / details..." id="actSearch" />
+
+                    <button type="button" class="btn btn-outline-secondary" id="actResetBtn">Reset</button>
+                    <button type="button" class="btn btn-primary" id="actApplyBtn">Apply</button>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table class="table-fixed">
+                    <thead>
+                        <tr>
+                            <th style="width: 180px;">Date & Time</th>
+                            <th style="width: 160px;">User</th>
+                            <th style="width: 220px;">Employee</th>
+                            <th style="width: 140px;">Action</th>
+                            <th style="width: 140px;">Module</th>
+                            <th style="width: 120px;">Period</th>
+                            <th style="width: 120px;">Status</th>
+                            <th>Details</th>
+                            <th style="width: 110px;">View</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="activityBody">
+                        <!-- SAMPLE ROWS (UI demo only) -->
+                        <tr data-dt="2026-01-22" data-action="Created" data-user="Admin" data-text="emp-000031 q1 created evaluation">
+                            <td>2026-01-22 09:10</td>
+                            <td>Admin</td>
+                            <td>EMP-000031 - Juan Dela Cruz</td>
+                            <td><span class="badge bg-success">Created</span></td>
+                            <td>Evaluation</td>
+                            <td>Q1</td>
+                            <td><span class="badge bg-primary">Success</span></td>
+                            <td>Saved new evaluation record (Avg 4.20).</td>
+                            <td>
+                                <button type="button" class="btn btn-ghost btn-xs actViewBtn"
+                                        data-bs-toggle="modal" data-bs-target="#activityModal"
+                                        data-when="2026-01-22 09:10"
+                                        data-user="Admin"
+                                        data-emp="EMP-000031 - Juan Dela Cruz"
+                                        data-action="Created"
+                                        data-module="Evaluation"
+                                        data-period="Q1"
+                                        data-status="Success"
+                                        data-detail="Saved new evaluation record (Avg 4.20). WorkQuality=4, Productivity=4, Teamwork=4, Attendance=5, Communication=4">
+                                    View
+                                </button>
+                            </td>
+                        </tr>
+
+                        <tr data-dt="2026-01-22" data-action="Updated" data-user="Admin" data-text="emp-000015 q2 updated overall rating">
+                            <td>2026-01-22 10:25</td>
+                            <td>Admin</td>
+                            <td>EMP-000015 - Brian Co</td>
+                            <td><span class="badge bg-warning text-dark">Updated</span></td>
+                            <td>Evaluation</td>
+                            <td>Q2</td>
+                            <td><span class="badge bg-primary">Success</span></td>
+                            <td>Updated overall rating from 3.80 → 4.00.</td>
+                            <td>
+                                <button type="button" class="btn btn-ghost btn-xs actViewBtn"
+                                        data-bs-toggle="modal" data-bs-target="#activityModal"
+                                        data-when="2026-01-22 10:25"
+                                        data-user="Admin"
+                                        data-emp="EMP-000015 - Brian Co"
+                                        data-action="Updated"
+                                        data-module="Evaluation"
+                                        data-period="Q2"
+                                        data-status="Success"
+                                        data-detail="Changed OverallRating: 3.80 → 4.00. Updated strengths/improvements notes.">
+                                    View
+                                </button>
+                            </td>
+                        </tr>
+
+                        <tr data-dt="2026-01-21" data-action="Printed" data-user="HR Staff" data-text="printed evaluation report q4">
+                            <td>2026-01-21 16:02</td>
+                            <td>HR Staff</td>
+                            <td>—</td>
+                            <td><span class="badge bg-info text-dark">Printed</span></td>
+                            <td>Evaluation</td>
+                            <td>Q4</td>
+                            <td><span class="badge bg-secondary">Info</span></td>
+                            <td>Printed evaluation records list (Q4 filter).</td>
+                            <td>
+                                <button type="button" class="btn btn-ghost btn-xs actViewBtn"
+                                        data-bs-toggle="modal" data-bs-target="#activityModal"
+                                        data-when="2026-01-21 16:02"
+                                        data-user="HR Staff"
+                                        data-emp="—"
+                                        data-action="Printed"
+                                        data-module="Evaluation"
+                                        data-period="Q4"
+                                        data-status="Info"
+                                        data-detail="User printed the Evaluation Records tab with filter Period=Q4.">
+                                    View
+                                </button>
+                            </td>
+                        </tr>
+
+                        <tr data-dt="2026-01-20" data-action="Deleted" data-user="Admin" data-text="deleted evaluation emp-000012 annual">
+                            <td>2026-01-20 13:40</td>
+                            <td>Admin</td>
+                            <td>EMP-000012 - Maria Santos</td>
+                            <td><span class="badge bg-danger">Deleted</span></td>
+                            <td>Evaluation</td>
+                            <td>Annual</td>
+                            <td><span class="badge bg-primary">Success</span></td>
+                            <td>Deleted evaluation record EV-0007.</td>
+                            <td>
+                                <button type="button" class="btn btn-ghost btn-xs actViewBtn"
+                                        data-bs-toggle="modal" data-bs-target="#activityModal"
+                                        data-when="2026-01-20 13:40"
+                                        data-user="Admin"
+                                        data-emp="EMP-000012 - Maria Santos"
+                                        data-action="Deleted"
+                                        data-module="Evaluation"
+                                        data-period="Annual"
+                                        data-status="Success"
+                                        data-detail="Deleted record EV-0007 (Reason: duplicate entry).">
+                                    View
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-footer">
+                <div class="muted" id="actFooter">Showing activities</div>
+            </div>
+        </div>
+
+        <!-- Modal: View Full Activity -->
+        <div class="modal fade" id="activityModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Activity Details</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="text-muted small">Date & Time</div>
+                                <div class="fw-semibold" id="mWhen">—</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-muted small">User</div>
+                                <div class="fw-semibold" id="mUser">—</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="text-muted small">Employee</div>
+                                <div class="fw-semibold" id="mEmp">—</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-muted small">Action</div>
+                                <div class="fw-semibold" id="mAction">—</div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="text-muted small">Module</div>
+                                <div class="fw-semibold" id="mModule">—</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="text-muted small">Period</div>
+                                <div class="fw-semibold" id="mPeriod">—</div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="text-muted small">Status</div>
+                                <div class="fw-semibold" id="mStatus">—</div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="text-muted small">Full Details</div>
+                                <div class="p-3 rounded border" style="background:#fafafa;" id="mDetail">—</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+     *@
+<!-- VIEW EVALUATION MODAL OVERLAY -->
+<div id="evalOverlay" class="log-overlay" onclick="closeEvalModal()"></div>
+
+<!-- VIEW EVALUATION MODAL -->
+<div id="evalModal" class="log-modal" style="max-width: 920px;">
+    <div class="log-modal-header">
+        <div>
+            <h3 id="vTitle" style="margin:0;">Evaluation Details</h3>
+            <div id="vSub" style="color:#6b7280;font-size:13px;"></div>
+        </div>
+
+        <div style="display:flex; gap:10px; align-items:center;">
+            <button type="button" class="btn btn-ghost btn-xs" onclick="window.print()">Print</button>
+            <button type="button" class="log-close-btn" onclick="closeEvalModal()">×</button>
+        </div>
+    </div>
+
+    <div class="log-modal-body" style="padding-top: 10px;">
+
+        <div class="row" style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; margin-bottom:12px;">
+            <div>
+                <div class="text-muted small">Employee</div>
+                <div class="fw-semibold" id="vEmployee">—</div>
+            </div>
+            <div>
+                <div class="text-muted small">Period</div>
+                <div class="fw-semibold" id="vPeriod">—</div>
+            </div>
+            <div>
+                <div class="text-muted small">Evaluation Date</div>
+                <div class="fw-semibold" id="vDate">—</div>
+            </div>
+        </div>
+
+        <table class="attendance-table">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th style="width:140px;">Score</th>
+                </tr>
+            </thead>
+            <tbody id="vRatings">
+                <tr><td colspan="2">Loading...</td></tr>
+            </tbody>
+        </table>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:12px;">
+            <div>
+                <div class="text-muted small">Strengths</div>
+                <div class="p-3 rounded border" style="background:#fafafa;" id="vStrengths">—</div>
+            </div>
+            <div>
+                <div class="text-muted small">Areas for Improvement</div>
+                <div class="p-3 rounded border" style="background:#fafafa;" id="vImprovements">—</div>
+            </div>
+        </div>
+
+        <div style="margin-top:12px;">
+            <div class="text-muted small">Comments</div>
+            <div class="p-3 rounded border" style="background:#fafafa;" id="vComments">—</div>
+        </div>
+
+        <div style="margin-top:12px;">
+            <div class="text-muted small">Overall Rating</div>
+            <div class="fw-semibold" style="font-size:18px;" id="vOverall">—</div>
         </div>
 
     </div>
@@ -338,5 +673,72 @@
 
         document.querySelectorAll('input[type="radio"]').forEach(r => r.addEventListener("change", updateSummary));
         updateSummary();
+
+        // (Optional) Activity search filter (frontend only)
+        function filterActivity() {
+            const q = (document.getElementById("actSearch")?.value || "").toLowerCase();
+            document.querySelectorAll("#activityBody tr").forEach(tr => {
+                const text = tr.innerText.toLowerCase();
+                tr.style.display = text.includes(q) ? "" : "none";
+            });
+        }
+        document.getElementById("actSearch")?.addEventListener("input", filterActivity);
+
+        //MODAL VIEW DISPLAY
+             function openEvalModal(id) {
+            document.getElementById("evalOverlay").style.display = "block";
+            document.getElementById("evalModal").style.display = "block";
+
+            // reset
+            document.getElementById("vEmployee").innerText = "Loading...";
+            document.getElementById("vPeriod").innerText = "—";
+            document.getElementById("vDate").innerText = "—";
+            document.getElementById("vStrengths").innerText = "—";
+            document.getElementById("vImprovements").innerText = "—";
+            document.getElementById("vComments").innerText = "—";
+            document.getElementById("vOverall").innerText = "—";
+            document.getElementById("vRatings").innerHTML = `<tr><td colspan="2">Loading...</td></tr>`;
+
+            fetch(`?handler=EvalDetails&id=${id}`)
+                .then(res => {
+                    if (!res.ok) throw new Error("Failed to load evaluation");
+                    return res.json();
+                })
+                .then(data => {
+                    document.getElementById("vSub").innerText = `Eval ID: EV-${String(data.id).padStart(4, "0")}`;
+                    document.getElementById("vEmployee").innerText = data.employee || "—";
+                    document.getElementById("vPeriod").innerText = data.period || "—";
+                    document.getElementById("vDate").innerText = data.date || "—";
+
+                    const rows = [
+                        ["Work Quality / Performance", data.workQuality],
+                        ["Productivity", data.productivity],
+                        ["Teamwork", data.teamwork],
+                        ["Attendance & Punctuality", data.attendance],
+                        ["Communication", data.communication],
+                    ];
+
+                    document.getElementById("vRatings").innerHTML = rows.map(r => `
+                        <tr>
+                            <td>${r[0]}</td>
+                            <td>${(r[1] ?? "-")}</td>
+                        </tr>
+                    `).join("");
+
+                    document.getElementById("vStrengths").innerText = data.strengths?.trim() ? data.strengths : "—";
+                    document.getElementById("vImprovements").innerText = data.improvements?.trim() ? data.improvements : "—";
+                    document.getElementById("vComments").innerText = data.comments?.trim() ? data.comments : "—";
+                    document.getElementById("vOverall").innerText = data.overall?.trim() ? data.overall : "—";
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById("vRatings").innerHTML = `<tr><td colspan="2">Error loading evaluation.</td></tr>`;
+                });
+        }
+
+        function closeEvalModal() {
+            document.getElementById("evalOverlay").style.display = "none";
+            document.getElementById("evalModal").style.display = "none";
+        }
     </script>
 }

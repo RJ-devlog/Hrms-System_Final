@@ -1,6 +1,7 @@
 ﻿using HRMS_System.Data;
-using Microsoft.EntityFrameworkCore;
+using HRMS_System.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 
 namespace HRMS_System
 {
@@ -19,11 +20,15 @@ namespace HRMS_System
                 var conn = builder.Configuration.GetConnectionString("DefaultConnection");
                 if (string.IsNullOrWhiteSpace(conn))
                 {
-                    throw new InvalidOperationException("Connection string 'DefaultConnection' is missing or empty in appsettings.json.");
+                    throw new InvalidOperationException(
+                        "Connection string 'DefaultConnection' is missing or empty in appsettings.json.");
                 }
 
                 builder.Services.AddDbContext<ApplicationDbContext>(options =>
                     options.UseSqlServer(conn));
+
+                // ✅ Register your custom services BEFORE Build()
+                builder.Services.AddScoped<DepartmentSelectService>();
 
                 // Cookie Authentication
                 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -44,6 +49,7 @@ namespace HRMS_System
                 }
                 else
                 {
+                    // In minimal hosting model this is fine, but optional.
                     app.UseDeveloperExceptionPage();
                 }
 
@@ -52,7 +58,6 @@ namespace HRMS_System
 
                 app.UseRouting();
 
-                // ✅ MUST be after UseRouting and before MapRazorPages
                 app.UseAuthentication();
                 app.UseAuthorization();
 

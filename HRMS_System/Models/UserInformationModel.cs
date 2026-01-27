@@ -8,6 +8,9 @@ namespace HRMS_System.Models
     {
         [Key]
         public int id { get; set; }
+
+        [Required(ErrorMessage = "Department is required.")]
+        public int? DepartmentId { get; set; }
         [NotMapped]
         public string EmployeeNumberDigits =>
         Regex.Replace(EmployeeNumber ?? "", @"\D", "");
@@ -78,6 +81,7 @@ namespace HRMS_System.Models
 
         [StringLength(255)]
         public string? ProfileImagePath { get; set; }
+
 
     }
 }

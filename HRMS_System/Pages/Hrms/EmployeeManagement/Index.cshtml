@@ -10,31 +10,42 @@
     <div class="title-line"></div>
     <div class="records-header">
         <div>Employee Records</div>
-        <a asp-page="/Hrms/EmployeeManagement/AddEmployee">
+        <a asp-page="/Hrms/EmployeeManagement/AddEmployee" class="button-43">
             Add New Employee
         </a>
     </div>
 
-    <div class="input-group nb-3">
+    <div class="input-group mb-3 hrms-toolbar">
         <input type="text"
                id="searchInput"
                class="form-control"
                placeholder="Search Employee (ID, name, email...)"
                aria-label="Search Employee" />
-        <button class="btn btn-outline-secondary" type="button" onclick="searchBtn()">Search</button>
+        <button class="btn-hrms btn-hrms-ghost" type="button" onclick="searchBtn()">
+            <i class="bi bi-search"></i> Search
+        </button>
     </div>
     <br />
     <div class="records-box">
         <table class="table-fixed">
             <thead>
                 <tr>
-                    <th>ID No.</th>
-                    <th>Name</th>
-                    <th>Phone</th>
-                    <th>Email</th>
+                    <th class="th-sort" data-sort="id" data-type="number">
+                        ID No. <span class="sort-icon"></span>
+                    </th>
+                    <th class="th-sort" data-sort="name" data-type="string">
+                        Name <span class="sort-icon"></span>
+                    </th>
+                    <th class="th-sort" data-sort="phone" data-type="string">
+                        Phone <span class="sort-icon"></span>
+                    </th>
+                    <th class="th-sort" data-sort="email" data-type="string">
+                        Email <span class="sort-icon"></span>
+                    </th>
                     <th style="width: 80px;"></th>
                 </tr>
             </thead>
+
 <tbody>
 @if (Model.employeeInfo == null || !Model.employeeInfo.Any())
 {
@@ -220,14 +231,14 @@ else
                     const today = new Date();
                     let months = (today.getFullYear() - start.getFullYear()) * 12 + (today.getMonth() - start.getMonth());
                     if (today.getDate() < start.getDate()) months--; // adjust if not completed month
-                    if (months < 0) months = 0;``
+                    if (months < 0) months = 0;
 
                     document.getElementById("empTenure").innerText = months === 1 ? "1 month" : `${months} months`;
                 } else {
                     document.getElementById("empTenure").innerText = "-";
                 }
-                const digitsOnly = emp.idNumber?.split('-')[1] || "";
-                document.getElementById("empId").innerText = digitsOnly;
+                const idNumOnly = emp.idNumber?.split('-')[1] || "";
+                document.getElementById("empId").innerText = idNumOnly;
                 document.getElementById("empJobRole").innerText = emp.jobRole;
                 document.getElementById("empDepartment").innerText = emp.department;
                 document.getElementById("empType").innerText = emp.employeeType;
@@ -263,4 +274,82 @@ else
             searchBtn();
         }
     });
+
+        (function () {
+
+        function toComparable(text, type) {
+            const v = (text ?? "").toString().trim();
+
+            if (type === "number") {
+                const n = parseInt(v.replace(/[^\d\-]/g, ""), 10);
+                return Number.isFinite(n) ? n : -1;
+            }
+
+            return v.toLowerCase(); // string
+        }
+
+        function getValue(row, key) {
+            const tds = row.querySelectorAll("td");
+            if (!tds.length) return "";
+
+            // Employee Management table columns:
+            // 0 = ID, 1 = Name, 2 = Phone, 3 = Email, 4 = menu
+            switch (key) {
+                case "id": return tds[0]?.innerText ?? "";
+                case "name": return tds[1]?.innerText ?? "";
+                case "phone": return tds[2]?.innerText ?? "";
+                case "email": return tds[3]?.innerText ?? "";
+            }
+            return "";
+        }
+
+        function sortTable(th) {
+            const table = th.closest("table");
+            const tbody = table?.querySelector("tbody");
+            if (!table || !tbody) return;
+
+            const key = th.dataset.sort;
+            const type = th.dataset.type || "string";
+
+            // toggle direction
+            const current = th.getAttribute("data-dir") || "none";
+            const dir = current === "asc" ? "desc" : "asc";
+            th.setAttribute("data-dir", dir);
+
+            // reset other headers in same table
+            table.querySelectorAll("th.th-sort").forEach(h => {
+                if (h !== th) h.setAttribute("data-dir", "none");
+            });
+
+            const rows = Array.from(tbody.querySelectorAll("tr"));
+
+            // keep "no records" row at bottom
+            const emptyRow = rows.find(r => r.querySelector("td[colspan]"));
+            const dataRows = rows.filter(r => r !== emptyRow);
+
+            dataRows.sort((a, b) => {
+                const av = toComparable(getValue(a, key), type);
+                const bv = toComparable(getValue(b, key), type);
+
+                if (av < bv) return dir === "asc" ? -1 : 1;
+                if (av > bv) return dir === "asc" ? 1 : -1;
+                return 0;
+            });
+
+            tbody.innerHTML = "";
+            dataRows.forEach(r => tbody.appendChild(r));
+            if (emptyRow) tbody.appendChild(emptyRow);
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll("th.th-sort").forEach(th => {
+                th.addEventListener("click", (e) => {
+                    // prevent any accidental selection highlight
+                    e.preventDefault();
+                    sortTable(th);
+                });
+            });
+        });
+
+    })();
 </script>

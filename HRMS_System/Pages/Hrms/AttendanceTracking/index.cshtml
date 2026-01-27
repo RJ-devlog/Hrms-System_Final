@@ -58,12 +58,12 @@
             <table class="attendance-table">
                 <thead>
                     <tr>
-                        <th>ID No.</th>
-                        <th>Name</th>
-                        <th>Date</th>
-                        <th>Time In</th>
-                        <th>Time Out</th>
-                        <th>Status</th>
+                        <th class="th-sort" data-sort="id" data-type="number">ID No. <span class="sort-icon"></span></th>
+                        <th class="th-sort" data-sort="name" data-type="string">Name <span class="sort-icon"></span></th>
+                        <th class="th-sort" data-sort="date" data-type="date">Date <span class="sort-icon"></span></th>
+                        <th class="th-sort" data-sort="timein" data-type="time">Time In <span class="sort-icon"></span></th>
+                        <th class="th-sort" data-sort="timeout" data-type="time">Time Out <span class="sort-icon"></span></th>
+                        <th class="th-sort" data-sort="status" data-type="string">Status <span class="sort-icon"></span></th>
                     </tr>
                 </thead>
                 <tbody id="timeTbody">
@@ -72,7 +72,7 @@
                         var status = GetAttendanceStatus(a.TimeIn, a.TimeOut);
 
                         <tr>
-                            <td>@a.User.EmployeeNumber</td>
+                            <td>@a.User.EmployeeNumber.Split('-')[1]</td>
                             <td>@a.User.FirstName @a.User.LastName</td>
                             <td>@a.AttendanceDate.ToString("MMMM d, yyyy")</td>
                             <td>@(a.TimeIn?.ToString("hh:mm tt") ?? "-")</td>
@@ -135,18 +135,18 @@
             <table class="attendance-table">
                 <thead>
                     <tr>
-                        <th>ID No.</th>
-                        <th>Name</th>
-                        <th>On-Time</th>
-                        <th>Late</th>
-                        <th>Absent</th>
+                        <th class="th-sort" data-sort="id" data-type="number">ID No. <span class="sort-icon"></span></th>
+                        <th class="th-sort" data-sort="name" data-type="string">Name <span class="sort-icon"></span></th>
+                        <th class="th-sort" data-sort="ontime" data-type="number">On-Time <span class="sort-icon"></span></th>
+                        <th class="th-sort" data-sort="late" data-type="number">Late <span class="sort-icon"></span></th>
+                        <th class="th-sort" data-sort="absent" data-type="number">Absent <span class="sort-icon"></span></th>
                     </tr>
                 </thead>
                 <tbody id="summaryTbody">
                     @foreach (var s in Model.AttendanceSummary)
                     {
                         <tr>
-                            <td>@s.EmployeeNumber</td>
+                            <td>@s.EmployeeNumber.Split('-')[1]</td>
                             <td>@s.FullName</td>
                             <td class="text-green">@s.OnTime</td>
                             <td class="text-orange">@s.Late</td>
@@ -186,15 +186,34 @@
             <table class="attendance-table">
                 <thead>
                     <tr>
-                        <th>ID No.</th>
-                        <th>Name</th>
-                        <th>Date</th>
-                        <th>Time In</th>
-                        <th>Time Out</th>
-                        <th>Status</th> 
-                        <th>Attendance Log</th> 
+                        <th class="th-sort" data-sort="id" data-type="number">
+                            ID No. <span class="sort-icon"></span>
+                        </th>
+
+                        <th class="th-sort" data-sort="name" data-type="string">
+                            Name <span class="sort-icon"></span>
+                        </th>
+
+                        <th class="th-sort" data-sort="date" data-type="date">
+                            Date <span class="sort-icon"></span>
+                        </th>
+
+                        <th class="th-sort" data-sort="timein" data-type="time">
+                            Time In <span class="sort-icon"></span>
+                        </th>
+
+                        <th class="th-sort" data-sort="timeout" data-type="time">
+                            Time Out <span class="sort-icon"></span>
+                        </th>
+
+                        <th class="th-sort" data-sort="status" data-type="string">
+                            Status <span class="sort-icon"></span>
+                        </th>
+
+                        <th>Attendance Log</th>
                     </tr>
                 </thead>
+
 
                 <tbody id="dateTbody">
                     @foreach (var a in Model.DateRangeAttendance)
@@ -202,7 +221,7 @@
                         var status = GetAttendanceStatus(a.TimeIn, a.TimeOut);
 
                         <tr>
-                            <td>@a.User.EmployeeNumber</td>
+                            <td>@a.User.EmployeeNumber.Split('-')[1]</td>
                             <td>@a.User.FirstName @a.User.LastName</td>
                             <td>@a.AttendanceDate.ToString("MMMM d, yyyy")</td>
                             <td>@(a.TimeIn?.ToString("hh:mm tt") ?? "-")</td>
@@ -269,12 +288,24 @@
         <table class="attendance-table">
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Time In</th>
-                    <th>Time Out</th>
-                    <th>Status</th>
+                    <th class="th-sort" data-sort="log-date" data-type="date">
+                        Date <span class="sort-icon"></span>
+                    </th>
+
+                    <th class="th-sort" data-sort="log-timein" data-type="time">
+                        Time In <span class="sort-icon"></span>
+                    </th>
+
+                    <th class="th-sort" data-sort="log-timeout" data-type="time">
+                        Time Out <span class="sort-icon"></span>
+                    </th>
+
+                    <th class="th-sort" data-sort="log-status" data-type="string">
+                        Status <span class="sort-icon"></span>
+                    </th>
                 </tr>
             </thead>
+
             <tbody id="logTbody">
                 <tr><td colspan="4">Loading...</td></tr>
             </tbody>
@@ -500,6 +531,120 @@
             document.getElementById("logTbody").innerHTML =
                 `<tr><td colspan="4" style="text-align:center;color:#6b7280;">No employee selected.</td></tr>`;
         }
+                (function () {
+            function parseTimeToMinutes(text) {
+                text = (text || "").trim();
+                if (!text || text === "-") return -1;
+
+                const m = text.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+                if (!m) return -1;
+
+                let h = parseInt(m[1], 10);
+                const mins = parseInt(m[2], 10);
+                const ap = m[3].toUpperCase();
+
+                if (ap === "PM" && h !== 12) h += 12;
+                if (ap === "AM" && h === 12) h = 0;
+
+                return h * 60 + mins;
+            }
+
+            function toComparable(text, type) {
+                const v = (text ?? "").toString().trim();
+
+                if (type === "number") {
+                    const n = parseInt(v.replace(/[^\d\-]/g, ""), 10);
+                    return Number.isFinite(n) ? n : -1;
+                }
+
+                if (type === "date") {
+                    const d = Date.parse(v); // "January 27, 2026"
+                    return Number.isFinite(d) ? d : -1;
+                }
+
+                if (type === "time") {
+                    return parseTimeToMinutes(v);
+                }
+
+                return v.toLowerCase(); // string
+            }
+
+            function getValue(row, key) {
+                const tds = row.querySelectorAll("td");
+                if (!tds.length) return "";
+
+                // Common tables
+                // Time/Date: 0=id,1=name,2=date,3=timein,4=timeout,5=status
+                // Summary:   0=id,1=name,2=ontime,3=late,4=absent
+
+                switch (key) {
+                    case "id": return tds[0]?.innerText ?? "";
+                    case "name": return tds[1]?.innerText ?? "";
+                    case "date": return tds[2]?.innerText ?? "";
+                    case "timein": return tds[3]?.innerText ?? "";
+                    case "timeout": return tds[4]?.innerText ?? "";
+                    case "status": return tds[5]?.innerText ?? "";
+
+                    case "ontime": return tds[2]?.innerText ?? "";
+                    case "late": return tds[3]?.innerText ?? "";
+                    case "absent": return tds[4]?.innerText ?? "";
+
+                    // View Log modal (Date, Time In, Time Out, Status)
+                    case "log-date": return tds[0]?.innerText ?? "";
+                    case "log-timein": return tds[1]?.innerText ?? "";
+                    case "log-timeout": return tds[2]?.innerText ?? "";
+                    case "log-status": return tds[3]?.innerText ?? "";
+
+                }
+
+                return "";
+            }
+
+            function sortTable(th) {
+                const table = th.closest("table");
+                const tbody = table?.querySelector("tbody");
+                if (!table || !tbody) return;
+
+                const key = th.dataset.sort;
+                const type = th.dataset.type || "string";
+
+                // toggle direction
+                const current = th.getAttribute("data-dir") || "none";
+                const dir = current === "asc" ? "desc" : "asc";
+                th.setAttribute("data-dir", dir);
+
+                // reset other headers in this same table
+                table.querySelectorAll("th.th-sort").forEach(h => {
+                    if (h !== th) h.setAttribute("data-dir", "none");
+                });
+
+                const rows = Array.from(tbody.querySelectorAll("tr"));
+
+                // keep "No records found" rows at bottom
+                const emptyRow = rows.find(r => r.querySelector("td[colspan]"));
+                const dataRows = rows.filter(r => r !== emptyRow);
+
+                dataRows.sort((a, b) => {
+                    const av = toComparable(getValue(a, key), type);
+                    const bv = toComparable(getValue(b, key), type);
+
+                    if (av < bv) return dir === "asc" ? -1 : 1;
+                    if (av > bv) return dir === "asc" ? 1 : -1;
+                    return 0;
+                });
+
+                tbody.innerHTML = "";
+                dataRows.forEach(r => tbody.appendChild(r));
+                if (emptyRow) tbody.appendChild(emptyRow);
+            }
+
+            document.addEventListener("DOMContentLoaded", () => {
+                document.querySelectorAll("th.th-sort").forEach(th => {
+                    th.addEventListener("click", () => sortTable(th));
+                });
+            });
+        })();
+
 
     </script>
 }

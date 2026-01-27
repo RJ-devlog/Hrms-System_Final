@@ -102,14 +102,16 @@
                 <span asp-validation-for="Employee.JobRole" class="text-danger"></span>
             </div>
             <div class="col-md-4 mb-3">
-                <label asp-for="Employee.Department"></label>
-                <select asp-for="Employee.Department"
-                        class="form-control"
-                        id="Department"
-                        asp-items="Model.DepartmentOptions">
+                <label asp-for="Employee.DepartmentId"></label>
+                <select asp-for="Employee.DepartmentId"
+                        asp-items="Model.DepartmentOptions"
+                        class="form-select">
                 </select>
-                <span asp-validation-for="Employee.Department" class="text-danger"></span>
+                <span asp-validation-for="Employee.DepartmentId" class="text-danger"></span>
+
+                <span asp-validation-for="Employee.DepartmentId" class="text-danger"></span>
             </div>
+
 
             <div class="col-md-4 mb-3">
                 <label asp-for="Employee.StartDate"></label>

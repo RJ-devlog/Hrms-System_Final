@@ -70,10 +70,11 @@ namespace HRMS_System.Pages.Hrms.ReportManagement
             PerformanceRows = rows.Select(x =>
             {
                 var avg = Avg5(x.WorkQuality, x.Productivity, x.Teamwork, x.Attendance, x.Communication);
+
                 return new PerformanceRowVM
                 {
                     EvaluationDate = x.EvaluationDate,
-                    EmployeeDisplay = x.UserId.HasValue ? $"User #{x.UserId}" : "Unknown",
+                    EmployeeDisplay = $"User #{x.UserId}",
                     Period = x.Period ?? "",
                     WorkQuality = x.WorkQuality,
                     Productivity = x.Productivity,
@@ -81,9 +82,10 @@ namespace HRMS_System.Pages.Hrms.ReportManagement
                     Attendance = x.Attendance,
                     Communication = x.Communication,
                     AvgScore = avg,
-                    OverallRating = x.OverallRating ?? "-"
+                    OverallRating = string.IsNullOrWhiteSpace(x.OverallRating) ? "-" : x.OverallRating
                 };
             }).ToList();
+
 
             PerformanceSummary.TotalEvaluations = PerformanceRows.Count;
             PerformanceSummary.AvgScore = PerformanceRows.Count == 0 ? 0 : PerformanceRows.Average(r => r.AvgScore);

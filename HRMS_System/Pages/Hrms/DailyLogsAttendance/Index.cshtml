@@ -1,0 +1,153 @@
+﻿@page
+@model HRMS_System.Pages.Hrms.DailyLogsAttendance.IndexModel
+@{
+    ViewData["Title"] = "Daily Logs Attendance";
+    Layout = null;
+}
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="~/css/site.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+    }
+</style>
+<div class="dla2-page">
+    <main class="dla2-content">
+        <div class="dla2-hero">
+            <h1 class="dla2-title">Daily Logs Attendance</h1>
+
+            <div class="dla2-divider" aria-hidden="true">
+                <span class="dla2-red"></span>
+                <span class="dla2-blue"></span>
+            </div>
+        </div>
+
+        <div class="dla2-time" id="dlaClock" aria-live="polite">@Model.CurrentTime</div>
+
+        <section class="dla2-card">
+            <div class="dla2-card-topbar" aria-hidden="true"></div>
+
+            <form method="post" class="dla2-form" autocomplete="off">
+                <div class="dla2-grid">
+                    <div class="dla2-field">
+                        <label asp-for="Input.IdNumber">Enter ID Num:</label>
+                        <input asp-for="Input.IdNumber" id="empNo" placeholder="ID number" />
+                        <span asp-validation-for="Input.IdNumber" class="dla2-error"></span>
+                    </div>
+
+                    <div class="dla2-field">
+                        <label asp-for="Input.DisplayName">Display Name:</label>
+                        <input asp-for="Input.DisplayName" id="displayName" placeholder="Display Name" readonly/>
+                        <span asp-validation-for="Input.DisplayName" class="dla2-error"></span>
+                    </div>
+                </div>
+
+                <div class="dla2-row">
+                    <div class="dla2-field dla2-inline">
+                        <label asp-for="Input.Action">Time In/Out :</label>
+                        <select asp-for="Input.Action" id="actionSelect">
+                            <option value="">--Select--</option>
+                            <option value="Time In">--Time In--</option>
+                            <option value="Time Out">--Time Out--</option>
+                        </select>
+                        <span asp-validation-for="Input.Action" class="dla2-error"></span>
+                    </div>
+                </div>
+
+                <div class="dla2-actions">
+                    <button type="submit" class="dla2-btn" id="submitBtn">
+                        Time In
+                    </button>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(Model.StatusMessage))
+                {
+                    <div class="dla2-status" role="status">@Model.StatusMessage</div>
+                }
+            </form>
+        </section>
+
+    </main>
+</div>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+<script>
+    // THE CLOCK
+    (function () {
+        const clock = document.getElementById("dlaClock");
+        if (!clock) return;
+
+        function updateClock() {
+            const now = new Date();
+            let h = now.getHours();
+            const m = String(now.getMinutes()).padStart(2, "0");
+            const s = String(now.getSeconds()).padStart(2, "0");
+            const ampm = h >= 12 ? "PM" : "AM";
+
+            h = h % 12;
+            h = h ? h : 12;
+
+            clock.textContent = `${h}:${m}:${s} ${ampm}`;
+        }
+
+        updateClock();
+        setInterval(updateClock, 1000);
+    })();
+    // REAL TIME DISPLAY NAME
+    (function () {
+        const empNo = document.getElementById("empNo");
+        const displayName = document.getElementById("displayName");
+        if (!empNo || !displayName) return;
+
+        let t;
+
+        async function lookup(no) {
+            const res = await fetch(`@Url.Page(null, "EmployeeName")&employeeNumber=${encodeURIComponent(no)}`);
+            if (!res.ok) return null;
+            return await res.json();
+        }
+
+        empNo.addEventListener("input", function () {
+            clearTimeout(t);
+
+            const value = empNo.value.trim();
+            if (value.length < 5) {
+                displayName.value = "";
+                return;
+            }
+
+            t = setTimeout(async () => {
+                const data = await lookup(value);
+                displayName.value = (data && data.found) ? data.fullName.toUpperCase() : "";
+            }, 300);
+        });
+    })();
+    // DROP DOWN SELECTION TIME IN/OUT
+     (function () {
+        const select = document.getElementById("actionSelect");
+        const button = document.getElementById("submitBtn");
+
+        if (!select || !button) return;
+
+        function updateButton() {
+            if (select.value === "Time Out") {
+                button.textContent = "Time Out";
+            } else {
+                button.textContent = "Time In";
+            }
+        }
+
+        // Run on change
+        select.addEventListener("change", updateButton);
+
+        // Run once on page load (important after validation errors)
+        updateButton();
+    })();
+</script>

@@ -1,14 +1,19 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HRMS_System.Models.Evaluation
 {
     public class EvaluationModel
     {
         [Key]
-        public int Id { get; set; } 
+        public int Id { get; set; }
+
+        [ForeignKey(nameof(UserId))]
+        public UserInformationModel? User { get; set; }
+
         [Required]
-        public int? UserId { get; set; }
+        public int UserId { get; set; }
 
         [Required]
         [StringLength(20)]
@@ -47,7 +52,6 @@ namespace HRMS_System.Models.Evaluation
         public string? Comments { get; set; }
 
         /* ===== OVERALL ===== */
-        [StringLength(10)]
         public string? OverallRating { get; set; }
     }
 }

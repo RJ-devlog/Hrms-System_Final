@@ -11,7 +11,8 @@ namespace HRMS_System.Pages
             //     return RedirectToPage("/Hrms/EmployeeManagement/Index");   // EmployeeManagement
             //   return RedirectToPage("/Hrms/AttendanceTracking/index");     // AttendanceTracking
             //  return RedirectToPage("/Hrms/DailyLogs/DailyLogsUpload/Index");  // Supervisor Dashboard
-                 return RedirectToPage("/Hrms/TrainingandSeminar/Index");   // EmployeeManagement
+            //     return RedirectToPage("/Hrms/TrainingandSeminar/Index");   // EmployeeManagement
+                return RedirectToPage("/Hrms/DailyLogsAttendance/Index");   // DailyLogsAttendance
 
         }
     }

@@ -46,6 +46,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSHJtc1xBdHRlbmRhbmNlVHJhY2tpbmdcaW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/rieln/source/repos/HRMS_System/HRMS_System/Pages/Hrms/DailyLogsAttendance/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSHJtc1xEYWlseUxvZ3NBdHRlbmRhbmNlXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/rieln/source/repos/HRMS_System/HRMS_System/Pages/Hrms/DailyLogs/DailyLogsUpload/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSHJtc1xEYWlseUxvZ3NcRGFpbHlMb2dzVXBsb2FkXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 

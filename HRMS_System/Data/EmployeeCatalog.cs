@@ -5,7 +5,7 @@ namespace HRMS_System.Data
     public static class EmployeeCatalog
     {
         // Job Roles (with OptGroup)
-        public static List<SelectListItem> JobRoles => BuildJobRoles();
+        public static List<SelectListItem> JobRoles => BuildJobRoles();        
         public static List<SelectListItem> Departments => BuildDepartments();
         private static List<SelectListItem> BuildDepartments()
         {
@@ -20,6 +20,7 @@ namespace HRMS_System.Data
                 new SelectListItem { Value = "Finance", Text = "Finance" },
                 new SelectListItem { Value = "General Manager", Text = "General Manager" },
                 new SelectListItem { Value = "Legal", Text = "Legal" },
+                new SelectListItem { Value = "....", Text = "...." }
             };
         }
         private static List<SelectListItem> BuildJobRoles()
