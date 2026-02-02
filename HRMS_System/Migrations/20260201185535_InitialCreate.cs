@@ -12,27 +12,16 @@ namespace HRMS_System.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Evaluations",
+                name: "Departments",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    Period = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    EvaluationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    WorkQuality = table.Column<int>(type: "int", nullable: true),
-                    Productivity = table.Column<int>(type: "int", nullable: true),
-                    Teamwork = table.Column<int>(type: "int", nullable: true),
-                    Attendance = table.Column<int>(type: "int", nullable: true),
-                    Communication = table.Column<int>(type: "int", nullable: true),
-                    Strengths = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
-                    Improvements = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
-                    Comments = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
-                    OverallRating = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Evaluations", x => x.Id);
+                    table.PrimaryKey("PK_Departments", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -83,12 +72,13 @@ namespace HRMS_System.Migrations
                 {
                     id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    DepartmentId = table.Column<int>(type: "int", nullable: false),
                     EmployeeNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     MiddleName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     JobRole = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Department = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Department = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     EmploymentStatus = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Status = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -145,6 +135,36 @@ namespace HRMS_System.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Evaluations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Period = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    EvaluationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    WorkQuality = table.Column<int>(type: "int", nullable: true),
+                    Productivity = table.Column<int>(type: "int", nullable: true),
+                    Teamwork = table.Column<int>(type: "int", nullable: true),
+                    Attendance = table.Column<int>(type: "int", nullable: true),
+                    Communication = table.Column<int>(type: "int", nullable: true),
+                    Strengths = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    Improvements = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    Comments = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    OverallRating = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Evaluations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Evaluations_UserInformation_UserId",
+                        column: x => x.UserId,
+                        principalTable: "UserInformation",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "TrainingRecords",
                 columns: table => new
                 {
@@ -182,6 +202,11 @@ namespace HRMS_System.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Evaluations_UserId",
+                table: "Evaluations",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TrainingRecords_TrainingSessionId",
                 table: "TrainingRecords",
                 column: "TrainingSessionId");
@@ -203,6 +228,9 @@ namespace HRMS_System.Migrations
         {
             migrationBuilder.DropTable(
                 name: "AttendanceTrackings");
+
+            migrationBuilder.DropTable(
+                name: "Departments");
 
             migrationBuilder.DropTable(
                 name: "Evaluations");

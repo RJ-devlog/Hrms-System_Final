@@ -39,19 +39,29 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
 
             JobRoleOptions = EmployeeCatalog.JobRoles;
 
-            // Load from DB (with Add new department...)
+            // ✅ Seed catalog departments into DB so they appear
+            await _deptService.EnsureCatalogSeededAsync();
+
+            // ✅ Now load dropdown from DB (includes seeded + added)
             DepartmentOptions = await _deptService.GetDepartmentOptionsAsync();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
             JobRoleOptions = EmployeeCatalog.JobRoles;
+            await _deptService.EnsureCatalogSeededAsync();
             DepartmentOptions = await _deptService.GetDepartmentOptionsAsync();
 
-            if (!ModelState.IsValid)
-                return Page();
+            Employee.Department = await _context.Departments
+                .Where(d => d.Id == Employee.DepartmentId)
+                .Select(d => d.Name)
+                .FirstOrDefaultAsync();         
+            // Debug
+            foreach (var entry in ModelState)
+                foreach (var err in entry.Value.Errors)
+                    Console.WriteLine($"ModelState Error: {entry.Key} -> {err.ErrorMessage}");
 
-            // handle Add new department
+            // If user selected "+ Add new..."
             if (Employee.DepartmentId == DepartmentSelectService.AddNewValue)
             {
                 if (string.IsNullOrWhiteSpace(NewDepartmentName))
@@ -60,24 +70,34 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
                     return Page();
                 }
 
+                // Create the new department (or reuse existing)
                 Employee.DepartmentId = await _deptService.GetOrCreateDepartmentIdAsync(NewDepartmentName);
+
+                // ✅ IMPORTANT: set the string name too
+                Employee.Department = NewDepartmentName.Trim();
+            }
+            else
+            {
+                // ✅ If existing department selected, pull its name
+                if (Employee.DepartmentId.HasValue)
+                {
+                    Employee.Department = await _context.Departments
+                        .Where(d => d.Id == Employee.DepartmentId.Value)
+                        .Select(d => d.Name)
+                        .FirstOrDefaultAsync();
+                }
             }
 
-            try
-            {
-                Employee.EmployeeNumber = GenerateNextEmployeeNumber();
 
-                _context.UserInformation.Add(Employee);
-                await _context.SaveChangesAsync();
-
-                return RedirectToPage("./Index");
-            }
-            catch
-            {
-                ModelState.AddModelError(string.Empty, "Unable to save employee. Possible duplicate or invalid data.");
+            if (!ModelState.IsValid)
                 return Page();
-            }
+
+            _context.UserInformation.Add(Employee);
+            await _context.SaveChangesAsync();
+            return RedirectToPage("./Index");
         }
+
+
 
         private string GenerateNextEmployeeNumber()
         {

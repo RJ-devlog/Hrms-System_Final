@@ -69,17 +69,16 @@
                     .OrderBy(u => u.LastName)
                     .ToListAsync();
 
-                //Time In/Out tab data (REAL current month)
-                TimeInOutMonthAttendance = await _context.AttendanceTrackings
-                    .AsNoTracking()
-                    .Include(a => a.User) // optional but safe
-                    .Where(a => a.AttendanceDate >= realMonthStart && a.AttendanceDate < realMonthEndExclusive)
-                    .OrderByDescending(a => a.AttendanceDate)
-                    .ThenByDescending(a => a.TimeIn)
-                    .ToListAsync();
+            //Time In/Out tab data (REAL current month)
+            TimeInOutMonthAttendance = await _context.AttendanceTrackings
+                .AsNoTracking()
+                .Include(a => a.User)
+                .OrderByDescending(a => a.AttendanceDate)
+                .ThenByDescending(a => a.TimeIn)
+                .ToListAsync();
 
-                // -------------------- DATE TRACKING RANGE --------------------
-                DateTime rangeStart;
+            // -------------------- DATE TRACKING RANGE --------------------
+            DateTime rangeStart;
                 DateTime rangeEndExclusive;
 
                 if (from.HasValue || to.HasValue)
@@ -89,9 +88,9 @@
                 }
                 else
                 {
-                    // default = summary month (or you can use real month, your choice)
-                    rangeStart = summaryMonthStart;
-                    rangeEndExclusive = summaryMonthEndExclusive;
+                    // default = ALL records if no date selected
+                    rangeStart = DateTime.MinValue.Date;
+                    rangeEndExclusive = DateTime.MaxValue.Date;
                 }
 
                 DateRangeAttendance = await _context.AttendanceTrackings
@@ -172,16 +171,45 @@
                     })
                     .ToListAsync();
 
-                // Format in memory (C# safe) 
-                var logs = rawLogs.Select(a => new
+            // Format in memory (C# safe) 
+            var cutoff = new TimeSpan(8, 0, 0); // 8:00 AM
+
+            static string FormatLate(int minutes)
+            {
+                if (minutes <= 0) return "0m";
+                if (minutes < 60) return $"{minutes}m";
+
+                var h = minutes / 60;
+                var m = minutes % 60;
+                return m == 0 ? $"{h}h" : $"{h}h {m}m";
+            }
+
+            var logs = rawLogs.Select(a =>
+            {
+                int lateMinutes = 0;
+
+                if (a.TimeIn.HasValue)
+                {
+                    var diff = a.TimeIn.Value.TimeOfDay - cutoff;
+                    if (diff.TotalMinutes > 0)
+                        lateMinutes = (int)Math.Round(diff.TotalMinutes);
+                }
+
+                return new
                 {
                     date = a.AttendanceDate.ToString("MMMM d, yyyy"),
                     timeIn = a.TimeIn.HasValue ? a.TimeIn.Value.ToString("hh:mm tt") : null,
                     timeOut = a.TimeOut.HasValue ? a.TimeOut.Value.ToString("hh:mm tt") : null,
-                    status = a.AttendanceStatus ?? "Absent"
-                });
+                    status = a.AttendanceStatus ?? "Absent",
 
-                return new JsonResult(new
+                    // 👇 NEW FIELDS
+                    lateMinutes = lateMinutes,
+                    lateDisplay = lateMinutes > 0 ? FormatLate(lateMinutes) : "0m"
+                };
+            });
+
+
+            return new JsonResult(new
                 {
                     EmployeeNumber = emp.EmployeeNumber,
                     fullName = emp.FirstName + " " + emp.LastName,

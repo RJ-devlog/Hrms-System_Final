@@ -1,10 +1,11 @@
 ﻿using HRMS_System.Data;
 using HRMS_System.Models;
+using HRMS_System.Services;
+using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Humanizer;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace HRMS_System.Pages.Hrms.EmployeeManagement
@@ -17,12 +18,14 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
         private readonly IWebHostEnvironment _environment;
         public List<SelectListItem> JobRoleOptions { get; set; } = new();
         public List<SelectListItem> DepartmentOptions { get; set; } = new();
-        public EditEmployeeInfoModel(
-            ApplicationDbContext context,
-            IWebHostEnvironment environment)
+        private readonly DepartmentSelectService _deptService;
+        public EditEmployeeInfoModel(ApplicationDbContext context,
+                                     IWebHostEnvironment environment,
+                                     DepartmentSelectService deptService)
         {
             _context = context;
             _environment = environment;
+            _deptService = deptService;
         }
 
         [BindProperty]
@@ -30,17 +33,41 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
 
         [BindProperty]
         public UserInformationModel Employee { get; set; } = new();
+
+        [BindProperty]
+        public string? NewDepartmentName { get; set; }
         public async Task<IActionResult> OnGetAsync(int id)
         {
             //Load dropdowns
             JobRoleOptions = EmployeeCatalog.JobRoles;
-            DepartmentOptions = EmployeeCatalog.Departments;
+            await _deptService.EnsureCatalogSeededAsync();
+            DepartmentOptions = await _deptService.GetDepartmentOptionsAsync();
+            // If user selected "+ Add new..."
+            if (Employee.DepartmentId == DepartmentSelectService.AddNewValue)
+            {
+                if (string.IsNullOrWhiteSpace(NewDepartmentName))
+                {
+                    ModelState.AddModelError(nameof(NewDepartmentName), "Please enter a department name.");
+                    return Page();
+                }
 
+                Employee.DepartmentId = await _deptService.GetOrCreateDepartmentIdAsync(NewDepartmentName);
+                Employee.Department = NewDepartmentName.Trim();
+            }
+            else
+            {
+                if (Employee.DepartmentId.HasValue)
+                {
+                    Employee.Department = await _context.Departments
+                        .Where(d => d.Id == Employee.DepartmentId.Value)
+                        .Select(d => d.Name)
+                        .FirstOrDefaultAsync();
+                }
+            }
             Employee = await _context.UserInformation.FirstOrDefaultAsync(e => e.id == id);
 
             if (Employee == null)
                 return NotFound();
-
             return Page();
         }
         /* ========================= POST ========================= */
@@ -48,7 +75,31 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
         {
             //Load dropdowns
             JobRoleOptions = EmployeeCatalog.JobRoles;
-            DepartmentOptions = EmployeeCatalog.Departments;
+            await _deptService.EnsureCatalogSeededAsync();
+            DepartmentOptions = await _deptService.GetDepartmentOptionsAsync();
+            // Handle "+ Add new department..."
+            if (Employee.DepartmentId == DepartmentSelectService.AddNewValue)
+            {
+                if (string.IsNullOrWhiteSpace(NewDepartmentName))
+                {
+                    ModelState.AddModelError(nameof(NewDepartmentName), "Please enter a department name.");
+                    return Page();
+                }
+
+                Employee.DepartmentId = await _deptService.GetOrCreateDepartmentIdAsync(NewDepartmentName);
+                Employee.Department = NewDepartmentName.Trim();
+            }
+            else
+            {
+                // If existing department selected, set the name from DB
+                if (Employee.DepartmentId.HasValue)
+                {
+                    Employee.Department = await _context.Departments
+                        .Where(d => d.Id == Employee.DepartmentId.Value)
+                        .Select(d => d.Name)
+                        .FirstOrDefaultAsync();
+                }
+            }
             if (!ModelState.IsValid)
                 return Page();
 
@@ -96,6 +147,7 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
             employeeInDb.Address = Employee.Address;
             employeeInDb.JobRole = Employee.JobRole;
             employeeInDb.Department = Employee.Department;
+            employeeInDb.DepartmentId = Employee.DepartmentId;
             employeeInDb.EmploymentStatus = Employee.EmploymentStatus;
             employeeInDb.Status = Employee.Status;
             employeeInDb.StartDate = Employee.StartDate;

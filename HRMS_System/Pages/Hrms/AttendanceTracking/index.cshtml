@@ -40,7 +40,7 @@
     <div class="attendance-topbar">
         <div class="attendance-tabs">
             <div class="attendance-tab active" data-tab="time">Time In/Out</div>
-            <div class="attendance-tab" data-tab="date">Date Tracking</div>
+            <div class="attendance-tab" data-tab="date">Date Tracking</div> 
             <div class="attendance-tab" data-tab="summary">Attendance Summary</div>
         </div>
 
@@ -67,32 +67,23 @@
                     </tr>
                 </thead>
                 <tbody id="timeTbody">
-                    @foreach (var a in Model.DateRangeAttendance)
+                    @foreach (var a in Model.TimeInOutMonthAttendance)
                     {
                         var status = GetAttendanceStatus(a.TimeIn, a.TimeOut);
-
                         <tr>
                             <td>@a.User.EmployeeNumber.Split('-')[1]</td>
                             <td>@a.User.FirstName @a.User.LastName</td>
                             <td>@a.AttendanceDate.ToString("MMMM d, yyyy")</td>
                             <td>@(a.TimeIn?.ToString("hh:mm tt") ?? "-")</td>
                             <td>@(a.TimeOut?.ToString("hh:mm tt") ?? "-")</td>
-                            <td>
-                                <span class="status-badge @GetStatusClass(status)">@status</span>
-                            </td>
-                     @*        <td style="position: relative; text-align: center;">
-                                <i class="bi bi-three-dots-vertical table-options"></i>
-                                <div class="table-dropdown">
-                                    <a href="javascript:void(0)" onclick="openLog(@a.UserId)">View Log</a>
-                                </div>
-                            </td> *@
+                            <td><span class="status-badge @GetStatusClass(status)">@status</span></td>
                         </tr>
                     }
 
-                    @if (!Model.DateRangeAttendance.Any())
+                    @if (!Model.TimeInOutMonthAttendance.Any())
                     {
                         <tr>
-                            <td colspan="7" style="text-align:center;color:#6b7280;">No records found.</td>
+                            <td colspan="6" style="text-align:center;color:#6b7280;">No records found.</td>
                         </tr>
                     }
                 </tbody>
@@ -299,9 +290,11 @@
                     <th class="th-sort" data-sort="log-timeout" data-type="time">
                         Time Out <span class="sort-icon"></span>
                     </th>
-
                     <th class="th-sort" data-sort="log-status" data-type="string">
                         Status <span class="sort-icon"></span>
+                    </th>
+                    <th class="th-sort" data-sort="log-late" data-type="number">
+                        Late (mins) <span class="sort-icon"></span>
                     </th>
                 </tr>
             </thead>
@@ -504,6 +497,7 @@
                                 <td>${x.timeIn ?? "-"}</td>
                                 <td>${x.timeOut ?? "-"}</td>
                                 <td><span class="status-badge ${statusClass}">${x.status}</span></td>
+                                <td>${x.lateDisplay ?? "-"}</td>
                             </tr>
                         `);
                     });
@@ -553,10 +547,19 @@
                 const v = (text ?? "").toString().trim();
 
                 if (type === "number") {
-                    const n = parseInt(v.replace(/[^\d\-]/g, ""), 10);
-                    return Number.isFinite(n) ? n : -1;
-                }
+                    // Supports: 45m, 1h, 1h 20m, 0m, -
+                    if (!v || v === "-" ) return 0;
 
+                    let minutes = 0;
+
+                    const hMatch = v.match(/(\d+)\s*h/i);
+                    const mMatch = v.match(/(\d+)\s*m/i);
+
+                    if (hMatch) minutes += parseInt(hMatch[1], 10) * 60;
+                    if (mMatch) minutes += parseInt(mMatch[1], 10);
+
+                    return minutes;
+                }
                 if (type === "date") {
                     const d = Date.parse(v); // "January 27, 2026"
                     return Number.isFinite(d) ? d : -1;
@@ -589,11 +592,12 @@
                     case "late": return tds[3]?.innerText ?? "";
                     case "absent": return tds[4]?.innerText ?? "";
 
-                    // View Log modal (Date, Time In, Time Out, Status)
+                    // View Log modal (Date, Time In, Time Out, Status,Late(mins))
                     case "log-date": return tds[0]?.innerText ?? "";
                     case "log-timein": return tds[1]?.innerText ?? "";
                     case "log-timeout": return tds[2]?.innerText ?? "";
                     case "log-status": return tds[3]?.innerText ?? "";
+                    case "log-late": return tds[4]?.innerText ?? "";
 
                 }
 

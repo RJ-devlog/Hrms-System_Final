@@ -10,12 +10,47 @@ namespace HRMS_System.Services
         private readonly ApplicationDbContext _context;
 
         public const int AddNewValue = -1;
+
         public DepartmentSelectService(ApplicationDbContext context)
         {
             _context = context;
         }
 
-        public async Task<List<SelectListItem>> GetDepartmentOptionsAsync(bool includeAddNew = true)
+        // ✅ Ensure EmployeeCatalog.Departments exists in DB (so dropdown shows them)
+        public async Task EnsureCatalogSeededAsync()
+        {
+            // Build a clean list from catalog
+            var catalogNames = EmployeeCatalog.Departments
+                .Where(x => !string.IsNullOrWhiteSpace(x.Value) &&
+                            x.Value != "...." &&
+                            x.Value != "-- Select Department --")
+                .Select(x => x.Value.Trim())
+                .Distinct()
+                .ToList();
+
+            // Get existing names from DB
+            var existingNames = await _context.Departments
+                .Select(d => d.Name)
+                .ToListAsync();
+
+            var existingSet = existingNames
+                .Select(n => n.Trim())
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            // Insert missing ones
+            var toAdd = catalogNames
+                .Where(n => !existingSet.Contains(n))
+                .Select(n => new Department { Name = n })
+                .ToList();
+
+            if (toAdd.Count > 0)
+            {
+                _context.Departments.AddRange(toAdd);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<SelectListItem>> GetDepartmentOptionsAsync()
         {
             var items = await _context.Departments
                 .OrderBy(d => d.Name)
@@ -27,21 +62,16 @@ namespace HRMS_System.Services
                 .ToListAsync();
 
             items.Insert(0, new SelectListItem { Value = "", Text = "-- Select Department --" });
-
-            if (includeAddNew)
-                items.Add(new SelectListItem { Value = AddNewValue.ToString(), Text = "Add new department..." });
-
+            items.Add(new SelectListItem { Value = AddNewValue.ToString(), Text = "+ Add new department..." });
             return items;
         }
 
-        public async Task<int> GetOrCreateDepartmentIdAsync(string newDepartmentName)
+        public async Task<int> GetOrCreateDepartmentIdAsync(string departmentName)
         {
-            var name = (newDepartmentName ?? "").Trim();
-            if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("Department name is required.");
+            var name = departmentName.Trim();
 
             var existing = await _context.Departments
-                .FirstOrDefaultAsync(d => d.Name == name);
+                .FirstOrDefaultAsync(d => d.Name.ToLower() == name.ToLower());
 
             if (existing != null)
                 return existing.Id;

@@ -140,14 +140,36 @@
 
             </div>
             <div class="col-md-4 mb-3">
-                <label asp-for="Employee.Department"></label>
-                <select asp-for="Employee.Department"
-                        class="form-control"
-                        id="Department"
-                        asp-items="Model.DepartmentOptions">
+                <label asp-for="Employee.DepartmentId" class="form-label">Department</label>
+                <select asp-for="Employee.DepartmentId"
+                        asp-items="Model.DepartmentOptions"
+                        class="form-select"
+                        id="DepartmentId">
                 </select>
-                <span asp-validation-for="Employee.Department" class="text-danger"></span>
+                <span asp-validation-for="Employee.DepartmentId" class="text-danger"></span>
+
+                <div class="mt-2" id="newDeptWrap" style="display:none;">
+                    <label class="form-label">New Department Name</label>
+                    <input asp-for="NewDepartmentName" class="form-control" />
+                    <span asp-validation-for="NewDepartmentName" class="text-danger"></span>
+                </div>
             </div>
+
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const deptSelect = document.getElementById("DepartmentId");
+                    const wrap = document.getElementById("newDeptWrap");
+                    const addNewValue = "@HRMS_System.Services.DepartmentSelectService.AddNewValue";
+
+                    function toggle() {
+                        wrap.style.display = (deptSelect.value === addNewValue) ? "block" : "none";
+                    }
+
+                    deptSelect.addEventListener("change", toggle);
+                    toggle();
+                });
+            </script>
+
             <div class="col-md-4 mb-3">
                 <label asp-for="Employee.StartDate"></label>
                 <input asp-for="Employee.StartDate" type="date" class="form-control" />

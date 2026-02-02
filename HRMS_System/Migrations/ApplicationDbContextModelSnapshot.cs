@@ -303,7 +303,6 @@ namespace HRMS_System.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Department")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 

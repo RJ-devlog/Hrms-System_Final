@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRMS_System.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260126181731_AddDepartmentsTable")]
-    partial class AddDepartmentsTable
+    [Migration("20260201185535_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -99,8 +99,7 @@ namespace HRMS_System.Migrations
                         .HasColumnType("nvarchar(1000)");
 
                     b.Property<string>("OverallRating")
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Period")
                         .IsRequired()
@@ -124,6 +123,8 @@ namespace HRMS_System.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Evaluations");
                 });
@@ -305,7 +306,6 @@ namespace HRMS_System.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Department")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -378,6 +378,17 @@ namespace HRMS_System.Migrations
                 });
 
             modelBuilder.Entity("HRMS_System.Models.AttendanceTrackingModel", b =>
+                {
+                    b.HasOne("HRMS_System.Models.UserInformationModel", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("HRMS_System.Models.Evaluation.EvaluationModel", b =>
                 {
                     b.HasOne("HRMS_System.Models.UserInformationModel", "User")
                         .WithMany()

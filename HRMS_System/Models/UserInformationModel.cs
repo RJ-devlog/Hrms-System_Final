@@ -35,7 +35,6 @@ namespace HRMS_System.Models
         [StringLength(50)]
         public string? JobRole { get; set; }
 
-        [Required(ErrorMessage = "Department is required.")]
         [StringLength(50)]
         public string? Department { get; set; }
 

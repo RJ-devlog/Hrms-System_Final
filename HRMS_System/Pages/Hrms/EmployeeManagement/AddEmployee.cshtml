@@ -102,15 +102,38 @@
                 <span asp-validation-for="Employee.JobRole" class="text-danger"></span>
             </div>
             <div class="col-md-4 mb-3">
-                <label asp-for="Employee.DepartmentId"></label>
+                <label asp-for="Employee.DepartmentId" class="form-label">Department</label>
+
                 <select asp-for="Employee.DepartmentId"
                         asp-items="Model.DepartmentOptions"
-                        class="form-select">
+                        class="form-select"
+                        id="DepartmentId">
                 </select>
-                <span asp-validation-for="Employee.DepartmentId" class="text-danger"></span>
 
                 <span asp-validation-for="Employee.DepartmentId" class="text-danger"></span>
+
+                <div class="mt-2" id="newDeptWrap" style="display:none;">
+                    <label class="form-label">New Department Name</label>
+                    <input asp-for="NewDepartmentName" class="form-control" placeholder="Enter new department" />
+                    <span asp-validation-for="NewDepartmentName" class="text-danger"></span>
+                </div>
             </div>
+
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const deptSelect = document.getElementById("DepartmentId");
+                    const wrap = document.getElementById("newDeptWrap");
+                    const addNewValue = "@HRMS_System.Services.DepartmentSelectService.AddNewValue";
+
+                    function toggle() {
+                        wrap.style.display = (deptSelect.value === addNewValue) ? "block" : "none";
+                    }
+
+                    deptSelect.addEventListener("change", toggle);
+                    toggle();
+                });
+            </script>
+
 
 
             <div class="col-md-4 mb-3">

@@ -1,133 +1,102 @@
+using HRMS_System.Data;
+using HRMS_System.Models.PromotionML;
+using HRMS_System.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using HRMS_System.Models.PromotionML;
-using HRMS_System.Services;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace HRMS_System.Pages.Hrms.PromotionManagement
 {
-    // This is the PageModel class referenced by:
-    // @model HRMS_System.Pages.Hrms.PromotionManagement.IndexModel
     public class IndexModel : PageModel
     {
-        /* ===================== UI BINDINGS (INPUTS FROM FORM) ===================== */
+        /* ===================== DB + SERVICES ===================== */
+        private readonly ApplicationDbContext _context;
+        private readonly PromotionPredictionService _mlService;
 
-        // This holds the selected employee id from the dropdown
+        public IndexModel(ApplicationDbContext context, IWebHostEnvironment env)
+        {
+            _context = context;
+
+            // App_Data/ml/promotion-model.zip (absolute path)
+            var modelPath = Path.Combine(env.ContentRootPath, "App_Data", "ml", "promotion-model.zip");
+            _mlService = new PromotionPredictionService(modelPath);
+        }
+
+        /* ===================== UI BINDINGS (INPUTS FROM FORM) ===================== */
         [BindProperty]
         public int? SelectedUserId { get; set; }
 
-        // This holds the role typed in the "manual promotion" box
         [BindProperty]
         public string? ProposedRole { get; set; }
 
         /* ===================== DATA FOR UI DISPLAY ===================== */
-
-        // Dropdown list items (Employee select)
         public List<SelectListItem> EmployeeOptions { get; set; } = new();
-
-        // Table rows (Employee list)
         public List<EmployeeRowVM> EmployeeRows { get; set; } = new();
 
         /* ===================== PREDICTION OUTPUT (RIGHT SIDE PANEL) ===================== */
-
-        // True if we already predicted (so UI shows result instead of message)
         public bool PredictionAvailable { get; set; }
-
-        // True if predicted promotable
         public bool PredictedPromoted { get; set; }
-
-        // Confidence value (0-1)
         public float PredictionProbability { get; set; }
-
-        // Display name for UI
         public string PredictionEmployeeName { get; set; } = "—";
-
-        // Text recommendation shown in UI
         public string RecommendationText { get; set; } = "—";
 
-        /* ===================== ML SERVICE ===================== */
-
-        // ML service handles training + prediction
-        private readonly PromotionPredictionService _mlService;
-
-        public IndexModel()
-        {
-            // Model file will be stored here:
-            // App_Data/ml/promotion-model.zip
-            var modelPath = Path.Combine("App_Data", "ml", "promotion-model.zip");
-            _mlService = new PromotionPredictionService(modelPath);
-        }
-
         /* ===================== GET (PAGE LOAD) ===================== */
-
-        public void OnGet()
+        public async Task OnGetAsync()
         {
-            // Load employee dropdown + table
-            LoadEmployees();
+            await LoadEmployeesAsync();
         }
 
         /* ===================== POST: TRAIN MODEL ===================== */
-
-        // Triggered by: asp-page-handler="TrainModel"
-        public IActionResult OnPostTrainModel()
+        public async Task<IActionResult> OnPostTrainModelAsync()
         {
-            // Load UI data so page won't break after post
-            LoadEmployees();
+            await LoadEmployeesAsync();
 
-            // Build training dataset (replace with DB later)
-            var trainingRows = BuildTrainingRowsFromDb();
+            var trainingRows = BuildTrainingRowsFromDb(); // still mock (replace later)
 
-            // If no data, stop training
             if (!trainingRows.Any())
             {
                 TempData["Error"] = "No training data found. Add promotion history first.";
                 return Page();
             }
 
-            // Train and save the ML model
             _mlService.TrainAndSaveModel(trainingRows);
 
             TempData["Success"] = "Model trained successfully!";
             return RedirectToPage();
         }
+
         /* ===================== POST: PREDICT PROMOTION ===================== */
-
-        // Triggered by: asp-page-handler="Predict"
-        public IActionResult OnPostPredict()
+        public async Task<IActionResult> OnPostPredictAsync()
         {
-            // Load UI data so table + dropdown still show after post
-            LoadEmployees();
+            await LoadEmployeesAsync();
 
-            // Validate selected employee
             if (!SelectedUserId.HasValue)
             {
                 TempData["Error"] = "Please select an employee first.";
                 return Page();
             }
 
-            // Build the features for this selected employee (replace with DB later)
-            var featureRow = BuildFeatureRowForUser(SelectedUserId.Value);
+            // Show selected employee text on the right panel
+            PredictionEmployeeName =
+                EmployeeOptions.FirstOrDefault(x => x.Value == SelectedUserId.Value.ToString())?.Text
+                ?? "Selected Employee";
 
-            // Get employee name from dropdown text for UI display
-            PredictionEmployeeName = EmployeeOptions.FirstOrDefault(x => x.Value == SelectedUserId.Value.ToString())?.Text?? "Selected Employee";
+            var featureRow = BuildFeatureRowForUser(SelectedUserId.Value); // still mock (replace later)
 
-            // Run ML prediction
             try
             {
                 var result = _mlService.Predict(featureRow);
 
-                // Mark that prediction exists (so UI shows output)
                 PredictionAvailable = true;
-
-                // Store output
                 PredictedPromoted = result.PredictedLabel;
                 PredictionProbability = result.Probability;
 
-                // Friendly recommendation message
                 RecommendationText = PredictedPromoted
                     ? "Recommended for promotion review (strong indicators: performance, attendance, growth)."
                     : "Not yet recommended. Improve evaluation, reduce absences/lates, and attend more trainings/certifications.";
@@ -141,11 +110,9 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
         }
 
         /* ===================== POST: CREATE PROMOTION RECORD (MANUAL) ===================== */
-
-        // Triggered by: asp-page-handler="CreatePromotion"
-        public IActionResult OnPostCreatePromotion()
+        public async Task<IActionResult> OnPostCreatePromotionAsync()
         {
-            LoadEmployees();
+            await LoadEmployeesAsync();
 
             if (!SelectedUserId.HasValue)
             {
@@ -164,29 +131,43 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
             return RedirectToPage();
         }
 
-        /* ===================== MOCK DATA (REPLACE WITH DB QUERIES LATER) ===================== */
-
-        private void LoadEmployees()
+        /* ===================== DB LOADING (DROPDOWN + TABLE) ===================== */
+        private async Task LoadEmployeesAsync()
         {
-            // TODO: Replace with EF query from UserInformation table
-            EmployeeOptions = new List<SelectListItem>
-            {
-                new SelectListItem("EMP-001 - Juan Dela Cruz", "1"),
-                new SelectListItem("EMP-002 - Maria Santos", "2"),
-            };
+            var employees = await _context.UserInformation
+                .AsNoTracking()
+                .OrderBy(e => e.EmployeeNumber)
+                .Select(e => new
+                {
+                    e.id,
+                    e.EmployeeNumber,
+                    e.FirstName,
+                    e.LastName,
+                    DepartmentName = string.IsNullOrWhiteSpace(e.Department) ? "—" : e.Department
+                })
+                .ToListAsync();
 
-            EmployeeRows = new List<EmployeeRowVM>
+            EmployeeOptions = employees.Select(e => new SelectListItem
             {
-                new EmployeeRowVM { EmployeeNumber="EMP-001", FullName="Juan Dela Cruz", Department="IT", TenureMonths=18, LatestEvalAvg=4.2f },
-                new EmployeeRowVM { EmployeeNumber="EMP-002", FullName="Maria Santos", Department="HR", TenureMonths=10, LatestEvalAvg=3.6f },
-            };
+                Value = e.id.ToString(),
+                Text = $"{e.EmployeeNumber} - {e.FirstName} {e.LastName}"
+            }).ToList();
+
+            EmployeeRows = employees.Select(e => new EmployeeRowVM
+            {
+                EmployeeNumber = e.EmployeeNumber ?? "",
+                FullName = $"{e.FirstName} {e.LastName}",
+                Department = e.DepartmentName,
+                TenureMonths = 0,   // (optional, compute later if you have StartDate)
+                LatestEvalAvg = 0f  // (optional, compute later)
+            }).ToList();
         }
 
+
+
+        /* ===================== MOCK DATA (REPLACE WITH DB QUERIES LATER) ===================== */
         private List<PromotionTrainingRow> BuildTrainingRowsFromDb()
         {
-            // IMPORTANT:
-            // Training needs HISTORICAL promotion outcomes:
-            // WasPromoted = true/false (label)
             return new List<PromotionTrainingRow>
             {
                 new PromotionTrainingRow { TenureMonths=18, AbsenceRate=0.02f, LateRate=0.05f, TrainingCount=4, CertificationCount=2, AvgEvaluationScore=4.3f, WasPromoted=true },
@@ -196,7 +177,6 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
 
         private PromotionTrainingRow BuildFeatureRowForUser(int userId)
         {
-            // TODO: Replace with real computed aggregates from DB for this specific userId
             return new PromotionTrainingRow
             {
                 TenureMonths = 18,
@@ -209,16 +189,13 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
         }
 
         /* ===================== VIEWMODEL FOR TABLE ===================== */
-
         public class EmployeeRowVM
         {
             public string EmployeeNumber { get; set; } = "";
             public string FullName { get; set; } = "";
-            public string Department { get; set; } = "";
+            public string? Department { get; set; }
             public int TenureMonths { get; set; }
             public float LatestEvalAvg { get; set; }
-
-            // Used by your JS search/filter
             public string SearchText => $"{EmployeeNumber} {FullName} {Department}";
         }
     }

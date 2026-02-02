@@ -1996,9 +1996,10 @@ emp-Status:active {
 }
 
 .badge-promo {
-    border-color: rgba(31,94,255,.35);
-    background: rgba(31,94,255,.08);
-    color: #1f5eff;
+    border: none;
+    background-color: #48cae4;
+    color: #ffffff;
+    font-weight: 700;
 }
 
 .notif-title {
