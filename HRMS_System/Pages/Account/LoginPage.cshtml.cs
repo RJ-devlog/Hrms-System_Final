@@ -64,7 +64,10 @@ namespace HRMS_System.Pages.Account
                 return Redirect("/Hrms/EmployeeManagement");
 
             if (roleValue == "Supervisor") 
-                return Redirect("/Hrms/DailyLogs/DailyLogsUpload"); 
+                return Redirect("/Hrms/DailyLogs/DailyLogsUpload");
+
+            if (roleValue == "Manager")
+                return Redirect("/Hrms/EmployeeManagement");
 
             //fallback
             return Redirect("/Dashboard");

@@ -280,38 +280,6 @@
 
         <div id="recordsEmpty" class="ts-empty-state ts-hidden">No results found.</div>
 
-@*         <!-- OPTIONAL: Quick Assign Record (creates TrainingRecord; cert id auto when Completed) -->
-        <div style="padding:12px 14px; border-top:1px solid #8a8a8a;">
-            <div style="font-weight:700; margin-bottom:8px;">Quick Add Record (Optional)</div>
-            <form method="post" asp-page-handler="CreateRecord" style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:10px; align-items:end;">
-                <div class="ts-field" style="margin:0;">
-                    <label>Employee UserId</label>
-                    <input asp-for="CreateRecord.UserId" type="number" placeholder="e.g. 1" />
-                </div>
-                <div class="ts-field" style="margin:0;">
-                    <label>Session Id</label>
-                    <input asp-for="CreateRecord.TrainingSessionId" type="number" placeholder="e.g. 2" />
-                </div>
-                <div class="ts-field" style="margin:0;">
-                    <label>Duration</label>
-                    <input asp-for="CreateRecord.Duration" placeholder="e.g. 8 hours" />
-                </div>
-                <div class="ts-field" style="margin:0;">
-                    <label>Progress</label>
-                    <select asp-for="CreateRecord.Progress">
-                        <option value="NotStarted">NotStarted</option>
-                        <option value="InProgress">InProgress</option>
-                        <option value="Completed">Completed</option>
-                    </select>
-                </div>
-                <div style="grid-column: 1 / -1; display:flex; justify-content:flex-end;">
-                    <button type="submit" class="ts-btn primary">Add Record</button>
-                </div>
-            </form>
-            <div style="font-size:12px; color:#666; margin-top:6px;">
-                *Certification ID is generated automatically when Progress = Completed and is NOT editable.
-            </div>
-        </div> *@
     </section>
 
     <!-- ================= SESSIONS ================= -->

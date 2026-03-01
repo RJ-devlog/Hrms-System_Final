@@ -25,6 +25,26 @@ namespace HRMS_System.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PromotionNotifications",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EmployeeId = table.Column<int>(type: "int", nullable: false),
+                    EmployeeName = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(600)", maxLength: 600, nullable: false),
+                    StatusKey = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    IsRead = table.Column<bool>(type: "bit", nullable: false),
+                    IsArchived = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PromotionNotifications", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ReportFilters",
                 columns: table => new
                 {
@@ -89,7 +109,8 @@ namespace HRMS_System.Migrations
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
                     TenureMonths = table.Column<int>(type: "int", nullable: true),
-                    ProfileImagePath = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true)
+                    ProfileImagePath = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    Pin = table.Column<string>(type: "nvarchar(6)", maxLength: 6, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -234,6 +255,9 @@ namespace HRMS_System.Migrations
 
             migrationBuilder.DropTable(
                 name: "Evaluations");
+
+            migrationBuilder.DropTable(
+                name: "PromotionNotifications");
 
             migrationBuilder.DropTable(
                 name: "ReportFilters");

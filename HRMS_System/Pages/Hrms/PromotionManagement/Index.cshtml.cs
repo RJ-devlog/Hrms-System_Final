@@ -1,4 +1,5 @@
-using HRMS_System.Data;
+ï»¿using HRMS_System.Data;
+using HRMS_System.Models;
 using HRMS_System.Models.PromotionML;
 using HRMS_System.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -38,25 +39,32 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
         /* ===================== DATA FOR UI DISPLAY ===================== */
         public List<SelectListItem> EmployeeOptions { get; set; } = new();
         public List<EmployeeRowVM> EmployeeRows { get; set; } = new();
+        public List<SelectListItem> RoleOptions { get; set; } = new();
 
         /* ===================== PREDICTION OUTPUT (RIGHT SIDE PANEL) ===================== */
         public bool PredictionAvailable { get; set; }
         public bool PredictedPromoted { get; set; }
         public float PredictionProbability { get; set; }
-        public string PredictionEmployeeName { get; set; } = "—";
-        public string RecommendationText { get; set; } = "—";
+        public string PredictionEmployeeName { get; set; } = "â€”";
+        public string RecommendationText { get; set; } = "â€”";
+        private void LoadRoleOptions()
+        {
+            // Uses your static catalog
+            RoleOptions = HRMS_System.Data.EmployeeCatalog.JobRoles;
+        }
 
         /* ===================== GET (PAGE LOAD) ===================== */
         public async Task OnGetAsync()
         {
             await LoadEmployeesAsync();
+            LoadRoleOptions();
         }
 
         /* ===================== POST: TRAIN MODEL ===================== */
         public async Task<IActionResult> OnPostTrainModelAsync()
         {
             await LoadEmployeesAsync();
-
+            LoadRoleOptions();
             var trainingRows = BuildTrainingRowsFromDb(); // still mock (replace later)
 
             if (!trainingRows.Any())
@@ -75,7 +83,7 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
         public async Task<IActionResult> OnPostPredictAsync()
         {
             await LoadEmployeesAsync();
-
+            LoadRoleOptions();
             if (!SelectedUserId.HasValue)
             {
                 TempData["Error"] = "Please select an employee first.";
@@ -100,6 +108,27 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
                 RecommendationText = PredictedPromoted
                     ? "Recommended for promotion review (strong indicators: performance, attendance, growth)."
                     : "Not yet recommended. Improve evaluation, reduce absences/lates, and attend more trainings/certifications.";
+
+                /* ===================== CREATE NOTIFICATION ===================== */
+                _context.PromotionNotifications.Add(new PromotionNotificationModel
+                {
+                    EmployeeId = SelectedUserId.Value,
+                    EmployeeName = PredictionEmployeeName,
+                    Title = PredictedPromoted
+                        ? "Promotion Prediction: HIGH"
+                        : "Promotion Prediction: LOW",
+                    Message = PredictedPromoted
+                        ? $"Predicted promotable with {PredictionProbability:P0} confidence."
+                        : $"Predicted not promotable ({PredictionProbability:P0}). Improve evaluations and attendance.",
+                    StatusKey = PredictedPromoted ? "predicted_yes" : "predicted_no",
+                    IsRead = false,
+                    IsArchived = false,
+                    CreatedAt = DateTime.Now
+                });
+
+                await _context.SaveChangesAsync();
+                TempData["NewNotif"] = true;
+                /* =============================================================== */
             }
             catch (Exception ex)
             {
@@ -113,6 +142,7 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
         public async Task<IActionResult> OnPostCreatePromotionAsync()
         {
             await LoadEmployeesAsync();
+            LoadRoleOptions();
 
             if (!SelectedUserId.HasValue)
             {
@@ -122,14 +152,28 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
 
             if (string.IsNullOrWhiteSpace(ProposedRole))
             {
-                TempData["Error"] = "Please enter the proposed role.";
+                TempData["Error"] = "Please select the proposed role.";
                 return Page();
             }
 
-            // TODO: Save promotion record into database here (PromotionRecord table)
-            TempData["Success"] = "Promotion record created (placeholder).";
+            var emp = await _context.UserInformation
+                .FirstOrDefaultAsync(x => x.id == SelectedUserId.Value);
+
+            if (emp == null)
+            {
+                TempData["Error"] = "Employee not found.";
+                return Page();
+            }
+
+            // âœ… APPLY NEW ROLE (change 'JobRole' to your real column name if different)
+            emp.JobRole = ProposedRole;
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = $"Employee role updated to: {ProposedRole}.";
             return RedirectToPage();
         }
+
 
         /* ===================== DB LOADING (DROPDOWN + TABLE) ===================== */
         private async Task LoadEmployeesAsync()
@@ -143,7 +187,7 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
                     e.EmployeeNumber,
                     e.FirstName,
                     e.LastName,
-                    DepartmentName = string.IsNullOrWhiteSpace(e.Department) ? "—" : e.Department
+                    DepartmentName = string.IsNullOrWhiteSpace(e.Department) ? "â€”" : e.Department
                 })
                 .ToListAsync();
 

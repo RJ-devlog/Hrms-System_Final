@@ -15,13 +15,39 @@ namespace HRMS_System.Pages.Hrms.DailyLogsAttendance
         {
             _context = context;
         }
+        public class AttendanceInput
+        {
+            [Required(ErrorMessage = "ID Number is required.")]
+            [StringLength(30)]
+            public string? IdNumber { get; set; }
 
+            [Required(ErrorMessage = "Display Name is required.")]
+            [StringLength(60)]
+            public string? DisplayName { get; set; }
+
+            [Required(ErrorMessage = "Please select Time In or Time Out.")]
+            public string? Action { get; set; }
+
+            [Required(ErrorMessage = "PIN is required.")]
+            [RegularExpression(@"^\d{6}$", ErrorMessage = "PIN must be exactly 6 digits.")]
+            public string? Pin { get; set; }
+        }
         [BindProperty]
         public AttendanceInput Input { get; set; } = new();
 
         public string CurrentTime { get; private set; } = "";
         public string? StatusMessage { get; private set; }
 
+        [Required(ErrorMessage = "ID Number is required.")]
+        [StringLength(30)]
+        public string? IdNumber { get; set; }
+
+        [Required(ErrorMessage = "Display Name is required.")]
+        [StringLength(60)]
+        public string? DisplayName { get; set; }
+
+        [Required(ErrorMessage = "Please select Time In or Time Out.")]
+        public string? Action { get; set; }
         public void OnGet()
         {
             CurrentTime = DateTime.Now.ToString("h:mm tt");
@@ -37,11 +63,11 @@ namespace HRMS_System.Pages.Hrms.DailyLogsAttendance
                 return Page();
             }
 
-            // 1) Find the employee by employee number (your Input.IdNumber holds EMP-000001)
+            //Find the employee by employee number (your Input.IdNumber holds EMP-000001)
             var user = await _context.UserInformation
                 .AsNoTracking()
                 .Where(u => u.EmployeeNumber == Input.IdNumber)
-                .Select(u => new { u.id }) // UserInformationModel PK
+                .Select(u => new { u.id, u.Pin }) // <-- make sure u.Pin exists in your model
                 .FirstOrDefaultAsync();
 
             if (user == null)
@@ -50,7 +76,12 @@ namespace HRMS_System.Pages.Hrms.DailyLogsAttendance
                 StatusMessage = "Employee number not found.";
                 return Page();
             }
-
+            if (string.IsNullOrWhiteSpace(user.Pin) || user.Pin != Input.Pin)
+            {
+                ModelState.AddModelError("Input.Pin", "Invalid PIN.");
+                StatusMessage = "Invalid PIN.";
+                return Page();
+            }
             // 2) Find or create today's attendance row for that user
             var today = DateTime.Today;
 
@@ -112,20 +143,6 @@ namespace HRMS_System.Pages.Hrms.DailyLogsAttendance
             Input = new AttendanceInput();
 
             return Page();
-        }
-
-        public class AttendanceInput
-        {
-            [Required(ErrorMessage = "ID Number is required.")]
-            [StringLength(30)]
-            public string? IdNumber { get; set; }
-
-            [Required(ErrorMessage = "Display Name is required.")]
-            [StringLength(60)]
-            public string? DisplayName { get; set; }
-
-            [Required(ErrorMessage = "Please select Time In or Time Out.")]
-            public string? Action { get; set; }
         }
 
         // Your existing AJAX lookup (keep it)

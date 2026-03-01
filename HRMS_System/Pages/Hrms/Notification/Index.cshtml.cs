@@ -1,12 +1,24 @@
+using HRMS_System.Data;
+using HRMS_System.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace HRMS_System.Pages.Hrms.Notification
 {
     public class IndexModel : PageModel
     {
+        private readonly ApplicationDbContext _context;
+
+        public IndexModel(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
         // The list of promotion notifications shown on the UI
         public List<PromotionNotifVM> PromotionNotifications { get; set; } = new();
 
@@ -14,37 +26,90 @@ namespace HRMS_System.Pages.Hrms.Notification
         [BindProperty]
         public int? SelectedId { get; set; }
 
-        public void OnGet()
+        public async Task OnGetAsync()
         {
-            // Demo data (replace with DB later)
-            PromotionNotifications = new()
+            // Load from DB (not demo)
+            var items = await _context.PromotionNotifications
+                .AsNoTracking()
+                .Where(n => !n.IsArchived)
+                .OrderByDescending(n => n.CreatedAt)
+                .ToListAsync();
+
+            PromotionNotifications = items.Select(n => new PromotionNotifVM
             {
-                new PromotionNotifVM(1, "Juan Dela Cruz", "Promotion Prediction: HIGH", "Predicted promotable with 82% confidence.", DateTime.Now.AddMinutes(-15), false, "predicted_yes"),
-                new PromotionNotifVM(2, "Maria Santos", "Promotion Prediction: LOW", "Predicted not promotable (35%). Improve evaluations and attendance.", DateTime.Now.AddHours(-2), true, "predicted_no"),
-                new PromotionNotifVM(3, "Juan Dela Cruz", "Promotion Record Created", "A promotion record was created for review: Team Lead.", DateTime.Now.AddDays(-1), true, "created"),
-                new PromotionNotifVM(4, "Maria Santos", "Promotion Approved", "Promotion approved. New role: Senior Staff.", DateTime.Now.AddDays(-4), true, "approved"),
-                new PromotionNotifVM(5, "Employee EMP-010", "Promotion Rejected", "Promotion rejected due to insufficient evaluation score.", DateTime.Now.AddDays(-7), true, "rejected")
-            };
+                Id = n.Id,
+                EmployeeName = n.EmployeeName,
+                Title = n.Title,
+                Message = n.Message,
+                CreatedAt = n.CreatedAt,
+                IsRead = n.IsRead,
+                StatusKey = n.StatusKey
+            }).ToList();
         }
 
-        // Mark all notifications as read (placeholder)
-        public IActionResult OnPostMarkAllRead()
+        // Mark all notifications as read
+        public async Task<IActionResult> OnPostMarkAllReadAsync()
         {
-            TempData["Success"] = "All promotion notifications marked as read (placeholder).";
+            var notifs = await _context.PromotionNotifications
+                .Where(n => !n.IsArchived && !n.IsRead)
+                .ToListAsync();
+
+            foreach (var n in notifs)
+                n.IsRead = true;
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "All promotion notifications marked as read.";
             return RedirectToPage();
         }
 
-        // Mark selected notification as read (placeholder)
-        public IActionResult OnPostMarkRead()
+        // Mark selected notification as read
+        public async Task<IActionResult> OnPostMarkReadAsync()
         {
-            TempData["Success"] = $"Notification #{SelectedId} marked as read (placeholder).";
+            if (!SelectedId.HasValue)
+            {
+                TempData["Error"] = "Select a notification first.";
+                return RedirectToPage();
+            }
+
+            var notif = await _context.PromotionNotifications
+                .FirstOrDefaultAsync(n => n.Id == SelectedId.Value);
+
+            if (notif == null)
+            {
+                TempData["Error"] = "Notification not found.";
+                return RedirectToPage();
+            }
+
+            notif.IsRead = true;
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = $"Notification #{SelectedId} marked as read.";
             return RedirectToPage();
         }
 
-        // Archive selected notification (placeholder)
-        public IActionResult OnPostArchive()
+        // Archive selected notification
+        public async Task<IActionResult> OnPostArchiveAsync()
         {
-            TempData["Success"] = $"Notification #{SelectedId} archived (placeholder).";
+            if (!SelectedId.HasValue)
+            {
+                TempData["Error"] = "Select a notification first.";
+                return RedirectToPage();
+            }
+
+            var notif = await _context.PromotionNotifications
+                .FirstOrDefaultAsync(n => n.Id == SelectedId.Value);
+
+            if (notif == null)
+            {
+                TempData["Error"] = "Notification not found.";
+                return RedirectToPage();
+            }
+
+            notif.IsArchived = true;
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = $"Notification #{SelectedId} archived.";
             return RedirectToPage();
         }
 
@@ -57,12 +122,10 @@ namespace HRMS_System.Pages.Hrms.Notification
             public DateTime CreatedAt { get; set; }
             public bool IsRead { get; set; }
 
-            // Used by filter dropdown and CSS status pill
             public string StatusKey { get; set; } = "created";
 
             public string CreatedAtText => CreatedAt.ToString("yyyy-MM-dd hh:mm tt");
 
-            // Friendly label shown on UI
             public string StatusLabel =>
                 StatusKey switch
                 {
@@ -73,19 +136,6 @@ namespace HRMS_System.Pages.Hrms.Notification
                     "rejected" => "Rejected",
                     _ => "Update"
                 };
-
-            public PromotionNotifVM() { }
-
-            public PromotionNotifVM(int id, string emp, string title, string msg, DateTime created, bool isRead, string statusKey)
-            {
-                Id = id;
-                EmployeeName = emp;
-                Title = title;
-                Message = msg;
-                CreatedAt = created;
-                IsRead = isRead;
-                StatusKey = statusKey;
-            }
         }
     }
 }

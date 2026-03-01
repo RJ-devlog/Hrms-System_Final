@@ -7,19 +7,115 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="~/css/site.css" rel="stylesheet"/>
+<link href="~/css/site.css" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+
 <style>
     html, body {
         height: 100%;
         margin: 0;
         overflow: hidden;
+        font-family: Poppins, sans-serif;
+    }
+
+    /* Modal */
+    .dla2-modal {
+        position: fixed;
+        inset: 0;
+        display: none;
+        z-index: 9999;
+    }
+
+        .dla2-modal.show {
+            display: block;
+        }
+
+    .dla2-modal-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,.55);
+        backdrop-filter: blur(2px);
+    }
+
+    .dla2-modal-card {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: min(440px, 92vw);
+        background: #fff;
+        border-radius: 18px;
+        padding: 18px;
+        box-shadow: 0 18px 50px rgba(0,0,0,.25);
+    }
+
+    .dla2-modal-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .dla2-modal-title {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .dla2-iconbtn {
+        border: none;
+        background: transparent;
+        font-size: 18px;
+        cursor: pointer;
+        padding: 6px 10px;
+        border-radius: 10px;
+    }
+
+        .dla2-iconbtn:hover {
+            background: rgba(0,0,0,.06);
+        }
+
+    .dla2-modal-sub {
+        margin: 6px 0 14px;
+        opacity: .85;
+    }
+
+    .dla2-pin {
+        width: 100%;
+        padding: 14px 14px;
+        border-radius: 14px;
+        border: 1px solid #d7d7d7;
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: 10px;
+        text-align: center;
+        outline: none;
+    }
+
+        .dla2-pin:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37,99,235,.15);
+        }
+
+    .dla2-modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 14px;
+    }
+
+    .dla2-btn-ghost {
+        background: transparent !important;
+        border: 1px solid #d7d7d7 !important;
+        color: #111 !important;
     }
 </style>
+
 <div class="dla2-page">
     <main class="dla2-content">
+
         <div class="dla2-hero">
-            <h1 class="dla2-title">Daily Logs Attendance</h1>
+            <h1 class="dla2-title">Daily Logs & Attendance</h1>
 
             <div class="dla2-divider" aria-hidden="true">
                 <span class="dla2-red"></span>
@@ -32,7 +128,7 @@
         <section class="dla2-card">
             <div class="dla2-card-topbar" aria-hidden="true"></div>
 
-            <form method="post" class="dla2-form" autocomplete="off">
+            <form method="post" class="dla2-form" autocomplete="off" id="dlaForm">
                 <div class="dla2-grid">
                     <div class="dla2-field">
                         <label asp-for="Input.IdNumber">Enter ID Num:</label>
@@ -42,7 +138,7 @@
 
                     <div class="dla2-field">
                         <label asp-for="Input.DisplayName">Display Name:</label>
-                        <input asp-for="Input.DisplayName" id="displayName" placeholder="Display Name" readonly/>
+                        <input asp-for="Input.DisplayName" id="displayName" placeholder="Display Name" readonly />
                         <span asp-validation-for="Input.DisplayName" class="dla2-error"></span>
                     </div>
                 </div>
@@ -52,34 +148,66 @@
                         <label asp-for="Input.Action">Time In/Out :</label>
                         <select asp-for="Input.Action" id="actionSelect">
                             <option value="">--Select--</option>
-                            <option value="Time In">--Time In--</option>
-                            <option value="Time Out">--Time Out--</option>
+                            <option value="Time In">Time In</option>
+                            <option value="Time Out">Time Out</option>
                         </select>
                         <span asp-validation-for="Input.Action" class="dla2-error"></span>
                     </div>
                 </div>
 
                 <div class="dla2-actions">
-                    <button type="submit" class="dla2-btn" id="submitBtn">
-                        Time In
-                    </button>
+                    <!-- MUST be button so modal opens first -->
+                    <button type="button" class="dla2-btn" id="openPinBtn">Time In</button>
                 </div>
 
                 @if (!string.IsNullOrWhiteSpace(Model.StatusMessage))
                 {
                     <div class="dla2-status" role="status">@Model.StatusMessage</div>
                 }
+
+                <!-- PIN MODAL (INSIDE FORM) -->
+                <div class="dla2-modal" id="pinModal" aria-hidden="true">
+                    <div class="dla2-modal-backdrop" data-close="1"></div>
+
+                    <div class="dla2-modal-card" role="dialog" aria-modal="true" aria-labelledby="pinTitle">
+                        <div class="dla2-modal-head">
+                            <h2 id="pinTitle" class="dla2-modal-title">Confirm with PIN</h2>
+                            <button type="button" class="dla2-iconbtn" id="pinCloseBtn" aria-label="Close">✕</button>
+                        </div>
+
+                        <p class="dla2-modal-sub">Enter your <b>6-digit PIN</b> to continue.</p>
+
+                        <div class="dla2-field">
+                            <label asp-for="Input.Pin">PIN</label>
+                            <input asp-for="Input.Pin"
+                                   id="pinInput"
+                                   class="dla2-pin"
+                                   inputmode="numeric"
+                                   type="password"
+                                   autocomplete="one-time-code"
+                                   maxlength="6"
+                                   placeholder="••••••" />
+                            <span asp-validation-for="Input.Pin" class="dla2-error"></span>
+                        </div>
+
+                        <div class="dla2-modal-actions">
+                            <button type="button" class="dla2-btn dla2-btn-ghost" id="pinCancelBtn">Cancel</button>
+                            <button type="submit" class="dla2-btn" id="pinConfirmBtn">Confirm</button>
+                        </div>
+                    </div>
+                </div>
             </form>
         </section>
 
     </main>
 </div>
+
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
 
 <script>
-    // THE CLOCK
+    // CLOCK
     (function () {
         const clock = document.getElementById("dlaClock");
         if (!clock) return;
@@ -90,16 +218,14 @@
             const m = String(now.getMinutes()).padStart(2, "0");
             const s = String(now.getSeconds()).padStart(2, "0");
             const ampm = h >= 12 ? "PM" : "AM";
-
-            h = h % 12;
-            h = h ? h : 12;
-
+            h = h % 12; h = h ? h : 12;
             clock.textContent = `${h}:${m}:${s} ${ampm}`;
         }
 
         updateClock();
         setInterval(updateClock, 1000);
     })();
+
     // REAL TIME DISPLAY NAME
     (function () {
         const empNo = document.getElementById("empNo");
@@ -107,7 +233,6 @@
         if (!empNo || !displayName) return;
 
         let t;
-
         async function lookup(no) {
             const res = await fetch(`@Url.Page(null, "EmployeeName")&employeeNumber=${encodeURIComponent(no)}`);
             if (!res.ok) return null;
@@ -116,12 +241,8 @@
 
         empNo.addEventListener("input", function () {
             clearTimeout(t);
-
             const value = empNo.value.trim();
-            if (value.length < 5) {
-                displayName.value = "";
-                return;
-            }
+            if (value.length < 5) { displayName.value = ""; return; }
 
             t = setTimeout(async () => {
                 const data = await lookup(value);
@@ -129,25 +250,64 @@
             }, 300);
         });
     })();
-    // DROP DOWN SELECTION TIME IN/OUT
-     (function () {
+
+    // BUTTON LABEL
+    (function () {
         const select = document.getElementById("actionSelect");
-        const button = document.getElementById("submitBtn");
+        const btn = document.getElementById("openPinBtn");
+        if (!select || !btn) return;
 
-        if (!select || !button) return;
+        function update() { btn.textContent = (select.value === "Time Out") ? "Time Out" : "Time In"; }
+        select.addEventListener("change", update);
+        update();
+    })();
 
-        function updateButton() {
-            if (select.value === "Time Out") {
-                button.textContent = "Time Out";
-            } else {
-                button.textContent = "Time In";
+    // PIN MODAL
+    (function () {
+        const openBtn = document.getElementById("openPinBtn");
+        const modal = document.getElementById("pinModal");
+        const pinInput = document.getElementById("pinInput");
+        const cancelBtn = document.getElementById("pinCancelBtn");
+        const closeBtn = document.getElementById("pinCloseBtn");
+        const backdrop = modal?.querySelector(".dla2-modal-backdrop");
+        const select = document.getElementById("actionSelect");
+
+        if (!openBtn || !modal || !pinInput || !cancelBtn || !select) return;
+
+        function openModal() {
+            const empNo = document.getElementById("empNo")?.value?.trim();
+            const dn = document.getElementById("displayName")?.value?.trim();
+            const act = select.value;
+
+            if (!empNo || !dn || !act) {
+                alert("Please enter ID number, wait for Display Name, and select Time In/Out.");
+                return;
             }
+
+            document.body.style.overflow = "hidden";
+            modal.classList.add("show");
+            modal.setAttribute("aria-hidden", "false");
+            pinInput.value = "";
+            setTimeout(() => pinInput.focus(), 50);
         }
 
-        // Run on change
-        select.addEventListener("change", updateButton);
+        function closeModal() {
+            modal.classList.remove("show");
+            modal.setAttribute("aria-hidden", "true");
+            document.body.style.overflow = "";
+        }
 
-        // Run once on page load (important after validation errors)
-        updateButton();
+        pinInput.addEventListener("input", () => {
+            pinInput.value = pinInput.value.replace(/\D/g, "").slice(0, 6);
+        });
+
+        openBtn.addEventListener("click", openModal);
+        cancelBtn.addEventListener("click", closeModal);
+        closeBtn?.addEventListener("click", closeModal);
+        backdrop?.addEventListener("click", closeModal);
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && modal.classList.contains("show")) closeModal();
+        });
     })();
 </script>

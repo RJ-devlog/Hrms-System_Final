@@ -27,11 +27,11 @@
 
     @if (TempData["Success"] != null)
     {
-        <div class="alert success">@TempData["Success"]</div>
+        <div class="alert success" id="flashMsg" data-kind="success">@TempData["Success"]</div>
     }
     @if (TempData["Error"] != null)
     {
-        <div class="alert error">@TempData["Error"]</div>
+        <div class="alert error" id="flashMsg" data-kind="error">@TempData["Error"]</div>
     }
 
     <div class="card-grid">
@@ -195,5 +195,66 @@
         }
 
         [searchBox, filterRead, filterStatus].forEach(el => el?.addEventListener("input", applyFilters));
+
+        (function () {
+            const msg = document.getElementById("flashMsg");
+            if (!msg) return;
+
+            // Save to localStorage so it survives navigation/refresh
+            const payload = {
+                kind: msg.getAttribute("data-kind"),
+                text: msg.textContent.trim()
+            };
+            localStorage.setItem("hrms_notif_flash", JSON.stringify(payload));
+
+            // Add close button
+            const close = document.createElement("button");
+            close.textContent = "×";
+            close.style.marginLeft = "10px";
+            close.style.border = "none";
+            close.style.background = "transparent";
+            close.style.cursor = "pointer";
+            close.style.fontSize = "18px";
+            close.style.fontWeight = "900";
+            msg.appendChild(close);
+
+            close.addEventListener("click", () => {
+                localStorage.removeItem("hrms_notif_flash");
+                msg.remove();
+            });
+        })();
+
+        (function () {
+            const saved = localStorage.getItem("hrms_notif_flash");
+            if (!saved) return;
+
+            // If server already rendered one, don’t duplicate
+            if (document.getElementById("flashMsg")) return;
+
+            const data = JSON.parse(saved);
+            const div = document.createElement("div");
+            div.id = "flashMsg";
+            div.className = "alert " + (data.kind === "error" ? "error" : "success");
+            div.textContent = data.text;
+
+            const close = document.createElement("button");
+            close.textContent = "×";
+            close.style.marginLeft = "10px";
+            close.style.border = "none";
+            close.style.background = "transparent";
+            close.style.cursor = "pointer";
+            close.style.fontSize = "18px";
+            close.style.fontWeight = "900";
+            div.appendChild(close);
+
+            close.addEventListener("click", () => {
+                localStorage.removeItem("hrms_notif_flash");
+                div.remove();
+            });
+
+            // Insert at top of page (after header)
+            const header = document.querySelector(".page-header");
+            header?.insertAdjacentElement("afterend", div);
+        })();
     </script>
 }

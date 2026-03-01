@@ -130,10 +130,14 @@
                 <div class="card-subtitle">Manual Promotion Action</div>
                 <form method="post" asp-page-handler="CreatePromotion">
                     <input type="hidden" name="SelectedUserId" value="@Model.SelectedUserId" />
-                    <div class="form-group">
+                    <div class="form-group mb-3">
                         <label class="form-label">Proposed New Role</label>
-                        <input class="form-control" asp-for="ProposedRole" placeholder="e.g., Senior Staff / Team Lead" /><br>
+                        <select class="form-control role-select"
+                                asp-for="ProposedRole"
+                                asp-items="Model.RoleOptions">
+                        </select>
                     </div>
+
                     <button class="btn btn-primary" type="submit">Create Promotion Record</button>
                 </form>
             </div>
@@ -143,7 +147,24 @@
 </div>
 
 @section Scripts {
+    <!-- Select2 (searchable dropdown) -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script>
+        $(function () {
+            // Make ProposedRole dropdown searchable + match your UI
+            $('.role-select').select2({
+                width: '100%',
+                placeholder: '-- Select Job Role --',
+                allowClear: true
+            });
+        });
+    </script>
+
+    <script>
+        // your existing search/filter script (if you have one)
         const search = document.getElementById("searchBox");
         const rows = document.querySelectorAll(".emp-row");
 

@@ -3,6 +3,7 @@
     public enum UserRole
     {
         HR = 1,
-        Supervisor = 2
+        Supervisor = 2,
+        Manager = 3,
     }
 }

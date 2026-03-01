@@ -18,6 +18,7 @@ namespace HRMS_System.Models
         [StringLength(20)]
         public string EmployeeNumber { get; set; } = string.Empty;
 
+
         [Required(ErrorMessage = "First Name is required.")]
         [StringLength(50)]
         public string? FirstName { get; set; }
@@ -81,6 +82,8 @@ namespace HRMS_System.Models
         [StringLength(255)]
         public string? ProfileImagePath { get; set; }
 
+        [StringLength(6)]
+        public string? Pin { get; set; }
 
     }
 }

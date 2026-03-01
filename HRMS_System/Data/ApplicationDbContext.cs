@@ -20,7 +20,7 @@ namespace HRMS_System.Data
         public DbSet<TrainingRecord> TrainingRecords { get; set; }
         public DbSet<ReportFilterModel> ReportFilters { get; set; }
         public DbSet<EvaluationModel> Evaluations { get; set; } = null!;
-
+        public DbSet<HRMS_System.Models.PromotionNotificationModel> PromotionNotifications { get; set; }
         /*        public DbSet<DepartmentSelectService> Departments { get; set; }*/
         public DbSet<Department> Departments { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
