@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using HRMS_System.Infrastructure;
 
 namespace HRMS_System.Pages.Hrms.Evaluation
 {
+    [RoleAuthorize(UserRole.Supervisor)]
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;

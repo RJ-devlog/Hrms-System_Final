@@ -281,6 +281,7 @@ C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\rjsmcshtml.
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\scopedcss\Pages\Shared\_Layout.cshtml.rz.scp.css
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\scopedcss\bundle\HRMS_System.styles.css
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\scopedcss\projectbundle\HRMS_System.bundle.scp.css
+C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\compressed\rj5vysaa5p-{0}-nwcj95b3nn-nwcj95b3nn.gz
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\compressed\49c51o8lbs-{0}-61n19gt1b8-61n19gt1b8.gz
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\compressed\pjpqn0sabm-{0}-2tu3cgg87e-2tu3cgg87e.gz
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\compressed\arpa7fddou-{0}-xtxxf3hu2r-xtxxf3hu2r.gz
@@ -357,4 +358,3 @@ C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\refint\HRMS
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\HRMS_System.pdb
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\HRMS_System.genruntimeconfig.cache
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\ref\HRMS_System.dll
-C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\compressed\rj5vysaa5p-{0}-04e8tsaoeg-04e8tsaoeg.gz

@@ -37,21 +37,26 @@
     <div class="title-line"></div>
 
     <!-- TOP BAR -->
-    <div class="attendance-topbar">
-        <div class="attendance-tabs">
-            <div class="attendance-tab active" data-tab="time">Time In/Out</div>
-            <div class="attendance-tab" data-tab="date">Date Tracking</div> 
-            <div class="attendance-tab" data-tab="summary">Attendance Summary</div>
+    <div class="at2-toolbar">
+        <div class="at2-tabs">
+            <div class="at2-tab active attendance-tab" data-tab="time">
+                <i class="bi bi-clock"></i> Time In/Out
+            </div>
+            <div class="at2-tab attendance-tab" data-tab="date">
+                <i class="bi bi-calendar3"></i> Date Tracking
+            </div>
+            <div class="at2-tab attendance-tab" data-tab="summary">
+                <i class="bi bi-bar-chart"></i> Attendance Summary
+            </div>
         </div>
 
-        <input type="text"
-               class="attendance-search"
-               id="attendanceSearch"
-               placeholder="Search Employee" />
+        <div class="at2-search">
+            <input type="text" id="attendanceSearch" placeholder="Search employee..." />
+        </div>
     </div>
 
     <!-- TAB CONTENT WRAPPER -->
-    <div class="attendance-content-wrapper">
+    <div class="at2-card">
 
         <!-- TIME IN / TIME OUT VIEW -->
         <div class="tab-content active" id="tab-time">
@@ -152,7 +157,9 @@
 
         <!-- DATE TRACKING VIEW -->
         <div class="tab-content" id="tab-date">
-
+            <div id="dateFilterMsg" class="alert alert-warning" style="display:none; margin: 12px 16px;">
+                Please fill in both <strong>Date From</strong> and <strong>Date To</strong> before filtering.
+            </div>
             <!-- FILTER BAR -->
             <form method="get" class="date-tracking-bar">
                 <input type="hidden" name="tab" value="date" />
@@ -200,8 +207,7 @@
                         <th class="th-sort" data-sort="status" data-type="string">
                             Status <span class="sort-icon"></span>
                         </th>
-
-                        <th>Attendance Log</th>
+                        <th class="log-col">Attendance Log</th>
                     </tr>
                 </thead>
 
@@ -220,7 +226,7 @@
                             <td>
                                 <span class="status-badge @GetStatusClass(status)">@status</span>
                             </td>
-                            <td style="position: relative; text-align: center;">
+                            <td class="log-col log-actions-cell">
                                 <i class="bi bi-three-dots-vertical table-options"></i>
                                 <div class="table-dropdown">
                                     <a href="javascript:void(0)" onclick="openLog(@a.UserId)">View Log</a>
@@ -312,6 +318,30 @@
 
         document.addEventListener("DOMContentLoaded", function () {
 
+            // Date Tracking filter validation (require both dates)
+            const dateForm = document.querySelector('#tab-date form.date-tracking-bar');
+            const dateMsg = document.getElementById('dateFilterMsg');
+
+            if (dateForm) {
+                dateForm.addEventListener('submit', function (e) {
+                    const fromVal = document.getElementById("dateFrom")?.value;
+                    const toVal = document.getElementById("dateTo")?.value;
+
+                    // one filled, one empty -> block
+                    if ((fromVal && !toVal) || (!fromVal && toVal)) {
+                        e.preventDefault();
+                        if (dateMsg) dateMsg.style.display = "block";
+                        return;
+                    }
+
+                    // both empty -> you can allow or block (your choice)
+                    // if you want to block empty-empty also:
+                    // if (!fromVal && !toVal) { e.preventDefault(); ... }
+
+                    // valid -> hide message
+                    if (dateMsg) dateMsg.style.display = "none";
+                });
+            }
             // Tabs
             const tabs = document.querySelectorAll(".attendance-tab");
             const contents = {
@@ -547,18 +577,22 @@
                 const v = (text ?? "").toString().trim();
 
                 if (type === "number") {
-                    // Supports: 45m, 1h, 1h 20m, 0m, -
-                    if (!v || v === "-" ) return 0;
+                    if (!v || v === "-") return -1;
 
+                    // ✅ plain numbers (Employee No., counts, etc.)
+                    const digitsOnly = v.replace(/[^\d-]/g, "");
+                    if (/^-?\d+$/.test(digitsOnly)) return parseInt(digitsOnly, 10);
+
+                    // ✅ fallback: supports 45m, 1h, 1h 20m
                     let minutes = 0;
-
                     const hMatch = v.match(/(\d+)\s*h/i);
                     const mMatch = v.match(/(\d+)\s*m/i);
 
                     if (hMatch) minutes += parseInt(hMatch[1], 10) * 60;
                     if (mMatch) minutes += parseInt(mMatch[1], 10);
 
-                    return minutes;
+                    // if nothing matched, push to bottom
+                    return minutes || -1;
                 }
                 if (type === "date") {
                     const d = Date.parse(v); // "January 27, 2026"

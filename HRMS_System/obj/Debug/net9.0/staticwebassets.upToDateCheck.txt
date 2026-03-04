@@ -1,3 +1,4 @@
+wwwroot\css\site.css
 wwwroot\favicon.ico
 wwwroot\Icons\AttendanceLog.png
 wwwroot\Icons\Logo.png
@@ -94,7 +95,7 @@ wwwroot\uploads\dded5d45-33f9-4d35-b8a1-0aa4dc8f8d44.jpg
 wwwroot\uploads\e06c5249-017e-40ef-9647-931d345cc14d.jpg
 wwwroot\uploads\f8a231aa-f3c3-443a-9a41-e4b50db02d2f.jpg
 wwwroot\uploads\fbab066f-9680-45d7-bec6-d6c1f3e98ca6.png
-wwwroot\css\site.css
+C:\Users\rieln\source\repos\HRMS_System\HRMS_System\wwwroot\css\site.css
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\wwwroot\favicon.ico
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\wwwroot\Icons\sort.svg
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\wwwroot\js\site.js
@@ -157,4 +158,3 @@ C:\Users\rieln\source\repos\HRMS_System\HRMS_System\wwwroot\lib\jquery\dist\jque
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\wwwroot\lib\jquery\dist\jquery.slim.min.js
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\wwwroot\lib\jquery\dist\jquery.slim.min.map
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\wwwroot\lib\jquery\LICENSE.txt
-C:\Users\rieln\source\repos\HRMS_System\HRMS_System\wwwroot\css\site.css

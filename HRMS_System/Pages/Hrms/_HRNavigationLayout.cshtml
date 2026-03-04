@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using HRMS_System.Models
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -14,6 +15,18 @@
 <body>
     @{
         bool bellAnimate = TempData["NewNotif"] != null;
+
+        // Read role from claims
+        var roleClaim = User.FindFirst("UserRole")?.Value;
+        Enum.TryParse<UserRole>(roleClaim, out var role);
+
+        bool isHR = role == UserRole.HR;
+        bool isSupervisor = role == UserRole.Supervisor;
+        bool isManager = role == UserRole.Manager;
+        bool isCEO = role == UserRole.CEO;
+
+        // Helper: show item if HR OR role is allowed
+        bool Can(params UserRole[] allowed) => isHR || allowed.Contains(role);
     }
 
     <div class="app-container">
@@ -25,68 +38,111 @@
             </div>
 
             <ul class="sidebar-menu">
-                <li class="menu-item">
-                    <a asp-page="/Hrms/EmployeeManagement/Index">
-                        <i class="bi bi-person"></i>
-                        <span>Employee Management</span>
-                    </a>
-                </li>
 
-                <li class="menu-item">
-                    <a asp-page="/Hrms/AttendanceTracking/Index">
-                        <i class="bi bi-clock-history"></i>
-                        <span>Attendance Tracking</span>
-                    </a>
-                </li>
+                @* Employee Management: HR only *@
+                @if (Can())  @* HR only because allowed list is empty and HR always passes *@
+                {
+                    <li class="menu-item">
+                        <a asp-page="/Hrms/EmployeeManagement/Index">
+                            <i class="bi bi-person"></i>
+                            <span>Employee Management</span>
+                        </a>
+                    </li>
 
-                <li class="menu-item">
-                    <a asp-page="/Hrms/TrainingandSeminar/Index">
-                        <i class="bi bi-mortarboard"></i>
-                        <span>Training & Seminars</span>
-                    </a>
-                </li>
+                    <li class="menu-item">
+                        <a asp-page="/Hrms/TrainingandSeminar/Index">
+                            <i class="bi bi-mortarboard"></i>
+                            <span>Training & Seminars</span>
+                        </a>
+                    </li>
+                }
 
-                <li class="menu-item">
-                    <a asp-page="/Hrms/Evaluation/Index">
-                        <i class="bi bi-card-checklist"></i>
-                        <span>Evaluation</span>
-                    </a>
-                </li>
+                @* Attendance Tracking: Manager (and HR) *@
+                @if (Can(UserRole.Manager))
+                {
+                    <li class="menu-item">
+                        <a asp-page="/Hrms/AttendanceTracking/Index">
+                            <i class="bi bi-clock-history"></i>
+                            <span>Attendance Tracking</span>
+                        </a>
+                    </li>
+                }
 
-                <li class="menu-item">
-                    <a asp-page="/Hrms/ReportManagement/Index">
-                        <i class="bi bi-file-earmark-text"></i>
-                        <span>Report Management</span>
-                    </a>
-                </li>
+                @* Evaluation: Supervisor (and HR) *@
+                @if (Can(UserRole.Supervisor))
+                {
+                    <li class="menu-item">
+                        <a asp-page="/Hrms/Evaluation/Index">
+                            <i class="bi bi-card-checklist"></i>
+                            <span>Evaluation</span>
+                        </a>
+                    </li>
+                }
 
-                <li class="menu-item">
-                    <a asp-page="/Hrms/PromotionManagement/Index">
-                        <i class="bi bi-arrow-up-right-circle"></i>
-                        <span>Promotion Management</span>
-                    </a>
-                </li>
+                @* Report Management: Manager + CEO (and HR) *@
+                @if (Can(UserRole.Manager, UserRole.CEO))
+                {
+                    <li class="menu-item">
+                        <a asp-page="/Hrms/ReportManagement/Index">
+                            <i class="bi bi-file-earmark-text"></i>
+                            <span>Report Management</span>
+                        </a>
+                    </li>
+                }
 
-                <!-- 🔔 Notification with animation -->
-                <li class="menu-item">
-                    <a asp-page="/Hrms/Notification/Index">
-                        <span class="bell @(bellAnimate ? "bell-animate" : "")">
-                            <i class="bi bi-bell"></i>
-                            @if (bellAnimate)
-                            {
-                                <span class="notif-dot"></span>
-                            }
-                        </span>
-                        <span>Notification</span>
-                    </a>
-                </li>
+                @* Promotion Management: CEO (and HR) *@
+                @if (Can(UserRole.CEO))
+                {
+                    <li class="menu-item">
+                        <a asp-page="/Hrms/PromotionManagement/Index">
+                            <i class="bi bi-arrow-up-right-circle"></i>
+                            <span>Promotion Management</span>
+                        </a>
+                    </li>
+                }
+
+                @* Notification: Manager (and HR) *@
+                @if (Can(UserRole.Manager))
+                {
+                    <li class="menu-item">
+                        <a asp-page="/Hrms/Notification/Index">
+                            <span class="bell @(bellAnimate ? "bell-animate" : "")">
+                                <i class="bi bi-bell"></i>
+                                @if (bellAnimate)
+                                {
+                                    <span class="notif-dot"></span>
+                                }
+                            </span>
+                            <span>Notification</span>
+                        </a>
+                    </li>
+                }
             </ul>
 
-            <div class="sidebar-footer">
-                <i class="bi bi-person-circle"></i>
-                <span>Admin</span>
+            <div class="sidebar-footer dropdown">
+                <a href="#"
+                   class="sidebar-footer-trigger"
+                   data-bs-toggle="dropdown"
+                   aria-expanded="false">
+                    <i class="bi bi-person-circle"></i>
+                    <span>@(User.FindFirst("UserRole")?.Value ?? "Account")</span>
+                </a>
+
+                <ul class="dropdown-menu dropdown-menu-end sidebar-dd">
+                    <li>
+                        <a class="dropdown-item sidebar-dd-item" asp-page="/Account/LogoutPage">
+                            <i class="bi bi-box-arrow-right me-2"></i> Logout
+                        </a>
+                    </li>
+                </ul>
             </div>
+        </div> <!-- ✅ sidebar -->
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            @RenderBody()
         </div>
+
+    </div> <!-- ✅ app-container -->
 
         <!-- MAIN CONTENT -->
         <div class="main-content">

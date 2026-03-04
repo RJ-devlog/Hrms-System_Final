@@ -20,7 +20,6 @@ namespace HRMS_System.Pages.Account
 
         [BindProperty]
         public User Users { get; set; } = new User();
-
         public async Task<IActionResult> OnPostAsync()
         {
             if (string.IsNullOrWhiteSpace(Users.Username) || string.IsNullOrWhiteSpace(Users.Password))
@@ -29,7 +28,6 @@ namespace HRMS_System.Pages.Account
                 return Page();
             }
 
-            // DB check
             var user = await _context.Users
                 .FirstOrDefaultAsync(u => u.Username == Users.Username && u.Password == Users.Password);
 
@@ -39,38 +37,33 @@ namespace HRMS_System.Pages.Account
                 return Page();
             }
 
-            // Build claims (Login + Role)
-            // If your Role is enum: user.Role.ToString()
-            // If your Role is string already: user.Role
             var roleValue = user.Role.ToString();
 
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role, roleValue)
+
+                new Claim(ClaimTypes.Role, roleValue),
+                new Claim("UserRole", roleValue)
             };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
 
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                principal
-            );
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-            //Redirect based on role
-            if (roleValue == "HR") 
-                return Redirect("/Hrms/EmployeeManagement");
+            // Redirect based on role
+            if (roleValue == "HR")
+                return RedirectToPage("/Hrms/EmployeeManagement/Index");
 
-            if (roleValue == "Supervisor") 
-                return Redirect("/Hrms/DailyLogs/DailyLogsUpload");
+            if (roleValue == "Supervisor")
+                return RedirectToPage("/Hrms/Evaluation/Index");
 
             if (roleValue == "Manager")
-                return Redirect("/Hrms/EmployeeManagement");
+                return RedirectToPage("/Hrms/AttendanceTracking/Index");
 
-            //fallback
-            return Redirect("/Dashboard");
+            return RedirectToPage("/Account/LoginPage");
         }
     }
 }

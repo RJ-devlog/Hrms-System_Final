@@ -73,27 +73,52 @@
             TimeInOutMonthAttendance = await _context.AttendanceTrackings
                 .AsNoTracking()
                 .Include(a => a.User)
+                .Where(a => a.AttendanceDate >= realMonthStart && a.AttendanceDate < realMonthEndExclusive)
                 .OrderByDescending(a => a.AttendanceDate)
                 .ThenByDescending(a => a.TimeIn)
                 .ToListAsync();
 
             // -------------------- DATE TRACKING RANGE --------------------
+            // -------------------- DATE TRACKING RANGE (SAFE) --------------------
             DateTime rangeStart;
-                DateTime rangeEndExclusive;
+            DateTime rangeEndExclusive;
 
-                if (from.HasValue || to.HasValue)
-                {
-                    rangeStart = (from ?? DateTime.MinValue).Date;
-                    rangeEndExclusive = (to ?? DateTime.MaxValue).Date.AddDays(1);
-                }
-                else
-                {
-                    // default = ALL records if no date selected
-                    rangeStart = DateTime.MinValue.Date;
-                    rangeEndExclusive = DateTime.MaxValue.Date;
-                }
+            if (from.HasValue && to.HasValue)
+            {
+                rangeStart = from.Value.Date;
+                rangeEndExclusive = to.Value.Date.AddDays(1);
 
-                DateRangeAttendance = await _context.AttendanceTrackings
+                // optional: if user swapped them, fix automatically
+                if (rangeEndExclusive <= rangeStart)
+                {
+                    // swap
+                    var tmp = rangeStart;
+                    rangeStart = to.Value.Date;
+                    rangeEndExclusive = from.Value.Date.AddDays(1);
+
+                    TempData["DateError"] = "Date To was earlier than Date From. Dates were adjusted.";
+                }
+            }
+            else if (from.HasValue && !to.HasValue)
+            {
+                // from only -> up to today (or you can use DateTime.Today)
+                rangeStart = from.Value.Date;
+                rangeEndExclusive = DateTime.Today.AddDays(1);
+            }
+            else if (!from.HasValue && to.HasValue)
+            {
+                // to only -> from earliest records
+                rangeStart = DateTime.MinValue.Date;
+                rangeEndExclusive = to.Value.Date.AddDays(1);
+            }
+            else
+            {
+                // no filter
+                rangeStart = DateTime.MinValue.Date;
+                rangeEndExclusive = DateTime.Today.AddDays(1);
+            }
+
+            DateRangeAttendance = await _context.AttendanceTrackings
                     .AsNoTracking()
                     .Include(a => a.User)
                     .Where(a => a.AttendanceDate >= rangeStart && a.AttendanceDate < rangeEndExclusive)
