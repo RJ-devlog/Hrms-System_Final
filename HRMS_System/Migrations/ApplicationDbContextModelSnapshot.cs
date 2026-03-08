@@ -88,6 +88,9 @@ namespace HRMS_System.Migrations
                     b.Property<int?>("Communication")
                         .HasColumnType("int");
 
+                    b.Property<int>("EvaluationCUrrentYear")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("EvaluationDate")
                         .HasColumnType("datetime2");
 

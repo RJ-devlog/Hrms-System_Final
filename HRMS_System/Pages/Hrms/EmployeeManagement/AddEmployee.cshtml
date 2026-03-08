@@ -5,193 +5,383 @@
     Layout = null;
 }
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
 <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
 
+<style>
+    :root {
+        --blue: #0B3D91;
+        --bg: #F6F8FB;
+        --text: #0F172A;
+        --muted: #667085;
+        --border: rgba(15, 23, 42, 0.12);
+        --focus: rgba(11, 61, 145, 0.18);
+        --shadow: 0 18px 50px rgba(2, 6, 23, 0.10);
+    }
 
-<div class="container mt-4" style="max-height: 85vh; overflow-y: auto;">
-    <h3 class="mb-3">Add New Employee</h3>
-    <hr />
+    html, body {
+        height: 100%;
+    }
 
-    <form method="post">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <!-- ID NUMBER -->
-        <div class="mb-3">
-            <label asp-for="Employee.EmployeeNumber" class="form-label"></label>
-            <input asp-for="Employee.EmployeeNumber" class="form-control" readonly />
-            <span asp-validation-for="Employee.EmployeeNumber" class="text-danger"></span>
+    body {
+        margin: 0;
+        font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        color: var(--text);
+        background: linear-gradient(180deg, #FFFFFF 0%, var(--bg) 100%);
+    }
+
+    /* Full screen shell */
+    .addemp-shell {
+        min-height: 100vh;
+        padding: 18px 18px 90px; /* bottom space for sticky actions */
+    }
+
+    /* Max width container (still feels “full”, but readable) */
+    .addemp-card {
+        width: 100%;
+        max-width: 1400px;
+        margin: 0 auto;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    .addemp-head {
+        padding: 18px 22px;
+        border-bottom: 1px solid rgba(15,23,42,0.08);
+    }
+
+    .addemp-title {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 800;
+    }
+
+    .addemp-sub {
+        margin: 6px 0 0;
+        font-size: 13px;
+        color: var(--muted);
+    }
+
+    .addemp-body {
+        padding: 18px 22px 18px;
+    }
+
+    /* Labels + inputs (lively but clean) */
+    label {
+        font-weight: 700;
+        font-size: 12px;
+        color: #344054;
+        margin-bottom: 6px;
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 1px solid rgba(15,23,42,0.14);
+        padding: 12px 12px;
+        font-size: 14px;
+        outline: none;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: rgba(11,61,145,0.45);
+            box-shadow: 0 0 0 4px var(--focus);
+        }
+
+    input[readonly] {
+        background: rgba(11,61,145,.06);
+        border-color: rgba(11,61,145,.28);
+        font-weight: 800;
+        color: var(--blue);
+    }
+
+    /* Section titles */
+    h6 {
+        font-weight: 900;
+        color: #344054;
+        margin-top: 18px;
+        padding-top: 14px;
+        border-top: 1px solid rgba(15,23,42,.08);
+    }
+
+    /* Sticky action bar */
+    .addemp-actions {
+        position: sticky;
+        bottom: 0;
+        background: rgba(255,255,255,.92);
+        backdrop-filter: blur(6px);
+        border-top: 1px solid rgba(15,23,42,.08);
+        padding: 12px 22px;
+        margin: 18px -22px -18px; /* stretch inside card body */
+        display: flex;
+        gap: 12px;
+    }
+
+    .addemp-btn-primary {
+        flex: 1;
+        border: 0;
+        cursor: pointer;
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-weight: 800;
+        font-size: 14px;
+        color: #fff;
+        background: var(--blue);
+        box-shadow: 0 12px 26px rgba(11,61,145,.18);
+        transition: transform .12s ease, background .12s ease;
+    }
+
+        .addemp-btn-primary:hover {
+            background: #08357E;
+            transform: translateY(-1px);
+        }
+
+        .addemp-btn-primary:active {
+            transform: translateY(0px);
+        }
+
+    .addemp-btn-ghost {
+        flex: 1;
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-weight: 800;
+        font-size: 14px;
+        background: #fff;
+        border: 1px solid rgba(15,23,42,0.14);
+        color: #344054;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .addemp-btn-ghost:hover {
+            background: #f8fafc;
+        }
+
+    /* Select2 match */
+    .select2-container {
+        width: 100% !important;
+    }
+
+        .select2-container .select2-selection--single {
+            height: 44px !important;
+            border-radius: 10px !important;
+            border: 1px solid rgba(15,23,42,0.14) !important;
+            padding: 8px 10px !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+</style>
+
+<div class="addemp-shell">
+    <div class="addemp-card">
+
+        <div class="addemp-head">
+            <h3 class="addemp-title">Add New Employee</h3>
+            <p class="addemp-sub">Employee number auto-generates based on Job Role.</p>
         </div>
 
-        <!-- NAME -->
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label asp-for="Employee.FirstName"></label>
-                <input asp-for="Employee.FirstName" class="form-control" />
-                <span asp-validation-for="Employee.FirstName" class="text-danger"></span>
-            </div>
+        <div class="addemp-body">
 
-            <div class="col-md-4 mb-3">
-                <label asp-for="Employee.MiddleName"></label>
-                <input asp-for="Employee.MiddleName" class="form-control" />
-            </div>
+            <form method="post" novalidate>
+                <div asp-validation-summary="ModelOnly" class="text-danger" style="font-size:12px;"></div>
 
-            <div class="col-md-4 mb-3">
-                <label asp-for="Employee.LastName"></label>
-                <input asp-for="Employee.LastName" class="form-control" />
-                <span asp-validation-for="Employee.LastName" class="text-danger"></span>
-            </div>
-        </div>
-
-        <!-- EMAIL & PHONE -->
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label asp-for="Employee.Email"></label>
-                <input asp-for="Employee.Email" class="form-control" placeholder="example@gmail.com" />
-                <span asp-validation-for="Employee.Email" class="text-danger"></span>
-            </div>
-
-            <div class="col-md-6 mb-3">
-                <label asp-for="Employee.PhoneNumber"></label>
-                <input asp-for="Employee.PhoneNumber" class="form-control" />
-                <span asp-validation-for="Employee.PhoneNumber" class="text-danger"></span>
-            </div>
-        </div>
-
-        <!-- PERSONAL INFO -->
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label asp-for="Employee.BirthDate"></label>
-                <input asp-for="Employee.BirthDate" type="date" class="form-control" />
-                <span asp-validation-for="Employee.BirthDate" class="text-danger"></span>
-            </div>
-
-            <div class="col-md-4 mb-3">
-                <label asp-for="Employee.Gender"></label>
-                <select asp-for="Employee.Gender" class="form-control">
-                    <option value="">-- Select Gender --</option>
-                    <option>Male</option>
-                    <option>Female</option>
-                </select>
-                <span asp-validation-for="Employee.Gender" class="text-danger"></span>
-            </div>
-
-            <div class="col-md-4 mb-3">
-                <label asp-for="Employee.CivilStatus"></label>
-                <select asp-for="Employee.CivilStatus" class="form-control">
-                    <option value="">-- Select Status --</option>
-                    <option>Single</option>
-                    <option>Married</option>
-                    <option>Widowed</option>
-                </select>
-                <span asp-validation-for="Employee.CivilStatus" class="text-danger"></span>
-            </div>
-        </div>
-
-        <!-- WORK INFORMATION -->
-        <h6 class="mt-3">Working Information</h6>
-
-        <div class="row">
-            <div class="col-md-4 mb-3">
-                <label asp-for="Employee.JobRole"></label>
-                <select asp-for="Employee.JobRole"
-                        class="form-control"
-                        id="JobRole"
-                        asp-items="Model.JobRoleOptions">
-                </select>
-                <span asp-validation-for="Employee.JobRole" class="text-danger"></span>
-            </div>
-            <div class="col-md-4 mb-3">
-                <label asp-for="Employee.DepartmentId" class="form-label">Department</label>
-
-                <select asp-for="Employee.DepartmentId"
-                        asp-items="Model.DepartmentOptions"
-                        class="form-select"
-                        id="DepartmentId">
-                </select>
-
-                <span asp-validation-for="Employee.DepartmentId" class="text-danger"></span>
-
-                <div class="mt-2" id="newDeptWrap" style="display:none;">
-                    <label class="form-label">New Department Name</label>
-                    <input asp-for="NewDepartmentName" class="form-control" placeholder="Enter new department" />
-                    <span asp-validation-for="NewDepartmentName" class="text-danger"></span>
+                <!-- ID NUMBER -->
+                <div class="mb-3">
+                    <label asp-for="Employee.EmployeeNumber" class="form-label"></label>
+                    <input asp-for="Employee.EmployeeNumber" class="form-control" readonly />
+                    <span asp-validation-for="Employee.EmployeeNumber" class="text-danger"></span>
                 </div>
-            </div>
 
-            <script>
-                document.addEventListener("DOMContentLoaded", function () {
-                    const deptSelect = document.getElementById("DepartmentId");
-                    const wrap = document.getElementById("newDeptWrap");
-                    const addNewValue = "@HRMS_System.Services.DepartmentSelectService.AddNewValue";
+                <!-- NAME -->
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Employee.FirstName"></label>
+                        <input asp-for="Employee.FirstName" class="form-control" />
+                        <span asp-validation-for="Employee.FirstName" class="text-danger"></span>
+                    </div>
 
-                    function toggle() {
-                        wrap.style.display = (deptSelect.value === addNewValue) ? "block" : "none";
-                    }
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Employee.MiddleName"></label>
+                        <input asp-for="Employee.MiddleName" class="form-control" />
+                    </div>
 
-                    deptSelect.addEventListener("change", toggle);
-                    toggle();
-                });
-            </script>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Employee.LastName"></label>
+                        <input asp-for="Employee.LastName" class="form-control" />
+                        <span asp-validation-for="Employee.LastName" class="text-danger"></span>
+                    </div>
+                </div>
 
+                <!-- EMAIL & PHONE -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Employee.Email"></label>
+                        <input asp-for="Employee.Email" class="form-control" placeholder="example@gmail.com" />
+                        <span asp-validation-for="Employee.Email" class="text-danger"></span>
+                    </div>
 
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Employee.PhoneNumber"></label>
+                        <input asp-for="Employee.PhoneNumber" class="form-control" />
+                        <span asp-validation-for="Employee.PhoneNumber" class="text-danger"></span>
+                    </div>
+                </div>
 
-            <div class="col-md-4 mb-3">
-                <label asp-for="Employee.StartDate"></label>
-                <input asp-for="Employee.StartDate" type="date" class="form-control" />
-                <span asp-validation-for="Employee.StartDate" class="text-danger"></span>
-            </div>
+                <!-- PERSONAL INFO -->
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Employee.BirthDate"></label>
+                        <input asp-for="Employee.BirthDate" type="date" class="form-control" />
+                        <span asp-validation-for="Employee.BirthDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Employee.Gender"></label>
+                        <select asp-for="Employee.Gender" class="form-select">
+                            <option value="">-- Select Gender --</option>
+                            <option>Male</option>
+                            <option>Female</option>
+                        </select>
+                        <span asp-validation-for="Employee.Gender" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Employee.CivilStatus"></label>
+                        <select asp-for="Employee.CivilStatus" class="form-select">
+                            <option value="">-- Select Status --</option>
+                            <option>Single</option>
+                            <option>Married</option>
+                            <option>Widowed</option>
+                        </select>
+                        <span asp-validation-for="Employee.CivilStatus" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- WORK INFORMATION -->
+                <h6 class="mt-3">Working Information</h6>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Employee.JobRole"></label>
+                        <select asp-for="Employee.JobRole"
+                                class="form-select"
+                                id="JobRole"
+                                asp-items="Model.JobRoleOptions">
+                        </select>
+                        <span asp-validation-for="Employee.JobRole" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Employee.DepartmentId" class="form-label">Department</label>
+
+                        <select asp-for="Employee.DepartmentId"
+                                asp-items="Model.DepartmentOptions"
+                                class="form-select"
+                                id="DepartmentId">
+                        </select>
+
+                        <span asp-validation-for="Employee.DepartmentId" class="text-danger"></span>
+
+                        <div class="mt-2" id="newDeptWrap" style="display:none;">
+                            <label class="form-label">New Department Name</label>
+                            <input asp-for="NewDepartmentName" class="form-control" placeholder="Enter new department" />
+                            <span asp-validation-for="NewDepartmentName" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Employee.StartDate"></label>
+                        <input asp-for="Employee.StartDate" type="date" class="form-control" />
+                        <span asp-validation-for="Employee.StartDate" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- STATUS -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Employee.EmploymentStatus"></label>
+                        <select asp-for="Employee.EmploymentStatus" class="form-select">
+                            <option value="">-- Select Employment Status --</option>
+                            <option>Regular</option>
+                            <option>Probationary</option>
+                        </select>
+                        <span asp-validation-for="Employee.EmploymentStatus" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="Employee.Status"></label>
+                        <select asp-for="Employee.Status" class="form-select">
+                            <option>Active</option>
+                            <option>Inactive</option>
+                        </select>
+                        <span asp-validation-for="Employee.Status" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <!-- ADDRESS -->
+                <div class="mb-3">
+                    <label asp-for="Employee.Address"></label>
+                    <input asp-for="Employee.Address" class="form-control" />
+                    <span asp-validation-for="Employee.Address" class="text-danger"></span>
+                </div>
+
+                <!-- Sticky actions -->
+                <div class="addemp-actions">
+                    <button type="submit" class="addemp-btn-primary">Save Employee</button>
+                    <a asp-page="/Hrms/EmployeeManagement/Index" class="addemp-btn-ghost">Cancel</a>
+                </div>
+
+            </form>
         </div>
-
-        <!-- STATUS -->
-        <div class="row">
-            <div class="col-md-6 mb-3">
-                <label asp-for="Employee.EmploymentStatus"></label>
-                <select asp-for="Employee.EmploymentStatus" class="form-control">
-                    <option value="">-- Select Employment Status --</option>
-                    <option>Regular</option>
-                    <option>Probationary</option>
-                </select>
-                <span asp-validation-for="Employee.EmploymentStatus" class="text-danger"></span>
-            </div>
-
-            <div class="col-md-6 mb-3">
-                <label asp-for="Employee.Status"></label>
-                <select asp-for="Employee.Status" class="form-control">
-                    <option>Active</option>
-                    <option>Inactive</option>
-                </select>
-                <span asp-validation-for="Employee.Status" class="text-danger"></span>
-            </div>
-        </div>
-
-        <!-- ADDRESS -->
-        <div class="mb-3">
-            <label asp-for="Employee.Address"></label>
-            <input asp-for="Employee.Address" class="form-control" />
-            <span asp-validation-for="Employee.Address" class="text-danger"></span>
-        </div>
-
-        <button type="submit" class="btn btn-primary">
-            Save Employee
-        </button>
-        <a asp-page="/Hrms/EmployeeManagement/index" class="btn btn-secondary">
-            Cancel
-        </a>
-
-    </form>
+    </div>
 </div>
 
-@* @section Scripts {
-} *@
 <partial name="_ValidationScriptsPartial" />
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const deptSelect = document.getElementById("DepartmentId");
+        const wrap = document.getElementById("newDeptWrap");
+        const addNewValue = "@HRMS_System.Services.DepartmentSelectService.AddNewValue";
+
+        function toggle() {
+            wrap.style.display = (deptSelect.value === addNewValue) ? "block" : "none";
+        }
+
+        deptSelect.addEventListener("change", toggle);
+        toggle();
+    });
+
     $(document).ready(function () {
-        $('#JobRole').select2({
+        const $jobRole = $('#JobRole');
+
+        $jobRole.select2({
             width: '100%',
-            dropdownParent: $('.container')
+            dropdownParent: $('body')
         });
+
+        async function refreshEmpNo() {
+            const jobRole = $jobRole.val();
+            if (!jobRole) return;
+
+            const url = `?handler=GenerateEmployeeNumber&jobRole=${encodeURIComponent(jobRole)}`;
+            const res = await fetch(url);
+            const data = await res.json();
+
+            document.getElementById("Employee_EmployeeNumber").value = data.employeeNumber;
+        }
+
+        $jobRole.on('change', refreshEmpNo);
+        refreshEmpNo();
     });
 </script>

@@ -18,7 +18,7 @@ namespace HRMS_System.Data
                 new SelectListItem { Value = "Administration", Text = "Administration" },
                 new SelectListItem { Value = "Engineering", Text = "Engineering" },
                 new SelectListItem { Value = "Finance", Text = "Finance" },
-                new SelectListItem { Value = "General Manager", Text = "General Manager" },
+                new SelectListItem { Value = "General Manager's Office", Text = "General Manager's Office" },
                 new SelectListItem { Value = "Legal", Text = "Legal" },
                 new SelectListItem { Value = "....", Text = "...." }
             };
@@ -35,6 +35,7 @@ namespace HRMS_System.Data
             var logistics = new SelectListGroup { Name = "Logistics / Warehouse / Support" };
             var finance = new SelectListGroup { Name = "Finance / Claims / Insurance" };
             var misc = new SelectListGroup { Name = "Misc / Support Roles" };
+            var mngmt = new SelectListGroup { Name = "Management / Executive" };
 
             return new List<SelectListItem>
             {
@@ -161,6 +162,11 @@ namespace HRMS_System.Data
                 new SelectListItem { Value = "Operations & Monitoring Staff", Text = "Operations & Monitoring Staff", Group = misc },
                 new SelectListItem { Value = "OPN / Monitoring Staff", Text = "OPN / Monitoring Staff", Group = misc },
                 new SelectListItem { Value = "VOS", Text = "VOS", Group = misc },
+
+                // Management / Exucutive
+                new SelectListItem {Value = "General Manager", Text = "General Manager", Group = mngmt},
+                new SelectListItem {Value = "CEO", Text = "CEO", Group = mngmt}
+
             };
         }
     }

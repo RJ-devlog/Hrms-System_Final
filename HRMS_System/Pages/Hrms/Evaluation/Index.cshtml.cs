@@ -102,6 +102,7 @@ namespace HRMS_System.Pages.Hrms.Evaluation
                 .AsNoTracking()
                 .Include(e => e.User)
                 .OrderByDescending(e => e.EvaluationDate)
+                .OrderByDescending(e => e.EvaluationCUrrentYear)
                 .ThenByDescending(e => e.Id)
                 .Take(200) // limit for UI
                 .ToListAsync();

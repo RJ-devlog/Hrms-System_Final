@@ -28,10 +28,36 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
         public List<SelectListItem> JobRoleOptions { get; set; } = new();
         public List<SelectListItem> DepartmentOptions { get; set; } = new();
 
+        private static readonly Dictionary<string, string> GroupPrefixMap = new()
+        {
+            ["Operations / Port Operations"] = "OPE",
+            ["Technical / Engineering / Maintenance"] = "TEM",
+            ["Administrative / Office"] = "ADM",
+            ["IT / MIS / Systems"] = "ITM",
+            ["Drivers / Transport"] = "DRI",
+            ["Safety / Medical / Security"] = "SMS",
+            ["Logistics / Warehouse / Support"] = "LWS",
+            ["Finance / Claims / Insurance"] = "FCI",
+            ["Misc / Support Roles"] = "MSC",
+            // If you add Management/Executive later:
+            ["Management / Executive"] = "MEX",
+        };
 
+        private string GetPrefixFromJobRole(string? jobRole)
+        {
+            if (string.IsNullOrWhiteSpace(jobRole)) return "EMP";
+
+            var item = EmployeeCatalog.JobRoles.FirstOrDefault(x => x.Value == jobRole);
+            var groupName = item?.Group?.Name;
+
+            if (groupName != null && GroupPrefixMap.TryGetValue(groupName, out var prefix))
+                return prefix;
+
+            return "EMP"; // fallback
+        }
         public async Task OnGetAsync()
         {
-            Employee.EmployeeNumber = GenerateNextEmployeeNumber();
+            Employee.EmployeeNumber = ""; // generated after selecting job role
             Employee.StartDate = DateTime.Today;
             Employee.BirthDate = new DateTime(2000, 01, 01);
             Employee.EmploymentStatus = "Probationary";
@@ -39,11 +65,11 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
 
             JobRoleOptions = EmployeeCatalog.JobRoles;
 
-            // ✅ Seed catalog departments into DB so they appear
             await _deptService.EnsureCatalogSeededAsync();
-
-            // ✅ Now load dropdown from DB (includes seeded + added)
             DepartmentOptions = await _deptService.GetDepartmentOptionsAsync();
+
+            var prefix = GetPrefixFromJobRole(Employee.JobRole);
+            Employee.EmployeeNumber = await GenerateNextEmployeeNumberAsync(prefix);
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -55,13 +81,8 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
             Employee.Department = await _context.Departments
                 .Where(d => d.Id == Employee.DepartmentId)
                 .Select(d => d.Name)
-                .FirstOrDefaultAsync();         
-            // Debug
-            foreach (var entry in ModelState)
-                foreach (var err in entry.Value.Errors)
-                    Console.WriteLine($"ModelState Error: {entry.Key} -> {err.ErrorMessage}");
+                .FirstOrDefaultAsync();
 
-            // If user selected "+ Add new..."
             if (Employee.DepartmentId == DepartmentSelectService.AddNewValue)
             {
                 if (string.IsNullOrWhiteSpace(NewDepartmentName))
@@ -70,15 +91,11 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
                     return Page();
                 }
 
-                // Create the new department (or reuse existing)
                 Employee.DepartmentId = await _deptService.GetOrCreateDepartmentIdAsync(NewDepartmentName);
-
-                // ✅ IMPORTANT: set the string name too
                 Employee.Department = NewDepartmentName.Trim();
             }
             else
             {
-                // ✅ If existing department selected, pull its name
                 if (Employee.DepartmentId.HasValue)
                 {
                     Employee.Department = await _context.Departments
@@ -88,33 +105,72 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
                 }
             }
 
-
             if (!ModelState.IsValid)
                 return Page();
 
-            _context.UserInformation.Add(Employee);
-            await _context.SaveChangesAsync();
-            return RedirectToPage("./Index");
+            using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
+            {
+                _context.UserInformation.Add(Employee);
+                await _context.SaveChangesAsync();
+
+                var existingUser = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Username == Employee.EmployeeNumber);
+
+                if (existingUser == null)
+                {
+                    _context.Users.Add(new User
+                    {
+                        Username = Employee.EmployeeNumber,
+                        Password = Employee.EmployeeNumber,
+                        Role = UserRole.HR
+                    });
+                }
+                else
+                {
+                    existingUser.Password = Employee.EmployeeNumber;
+                }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return RedirectToPage("./Index");
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                ModelState.AddModelError(string.Empty, "Unable to save employee and login account.");
+                return Page();
+            }
         }
-
-
-
-        private string GenerateNextEmployeeNumber()
+        private async Task<string> GenerateNextEmployeeNumberAsync(string prefix)
         {
-            var lastEmp = _context.UserInformation
+            // Find the latest employee number for that prefix
+            var last = await _context.UserInformation
+                .AsNoTracking()
+                .Where(e => e.EmployeeNumber.StartsWith(prefix + "-"))
                 .OrderByDescending(e => e.id)
                 .Select(e => e.EmployeeNumber)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
 
             int nextNumber = 1;
 
-            if (!string.IsNullOrEmpty(lastEmp))
+            if (!string.IsNullOrWhiteSpace(last))
             {
-                var digits = int.Parse(System.Text.RegularExpressions.Regex.Replace(lastEmp, @"\D", ""));
-                nextNumber = digits + 1;
+                // last looks like "OPE-000123"
+                var parts = last.Split('-', 2);
+                if (parts.Length == 2 && int.TryParse(parts[1], out var n))
+                    nextNumber = n + 1;
             }
 
-            return $"EMP-{nextNumber:D6}";
+            return $"{prefix}-{nextNumber:D6}";
+        }
+        public async Task<JsonResult> OnGetGenerateEmployeeNumberAsync(string jobRole)
+        {
+            var prefix = GetPrefixFromJobRole(jobRole);
+            var empNo = await GenerateNextEmployeeNumberAsync(prefix);
+            return new JsonResult(new { employeeNumber = empNo, prefix });
         }
     }
 }

@@ -20,11 +20,51 @@ namespace HRMS_System.Pages.Account
 
         [BindProperty]
         public User Users { get; set; } = new User();
+
+        [BindProperty]
+        public string? SelectedModule { get; set; }
+
+        // STEP 1: Validate credentials only (AJAX call)
+        public async Task<JsonResult> OnPostValidateCredentialsAsync([FromBody] LoginRequest request)
+        {
+            if (request == null ||
+                string.IsNullOrWhiteSpace(request.Username) ||
+                string.IsNullOrWhiteSpace(request.Password))
+            {
+                return new JsonResult(new
+                {
+                    success = false,
+                    message = "Username and Password are required."
+                });
+            }
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Username == request.Username && u.Password == request.Password);
+
+            if (user == null)
+            {
+                return new JsonResult(new
+                {
+                    success = false,
+                    message = "Invalid username or password."
+                });
+            }
+
+            var roleValue = user.Role.ToString();
+
+            return new JsonResult(new
+            {
+                success = true,
+                role = roleValue
+            });
+        }
+
+        // STEP 2: Actual login after modal selection
         public async Task<IActionResult> OnPostAsync()
         {
             if (string.IsNullOrWhiteSpace(Users.Username) || string.IsNullOrWhiteSpace(Users.Password))
             {
-                ModelState.AddModelError("", "Username and Password are required");
+                ModelState.AddModelError("", "Username and Password are required.");
                 return Page();
             }
 
@@ -33,7 +73,7 @@ namespace HRMS_System.Pages.Account
 
             if (user == null)
             {
-                ModelState.AddModelError("", "Invalid username or password");
+                ModelState.AddModelError("", "Invalid username or password.");
                 return Page();
             }
 
@@ -43,7 +83,6 @@ namespace HRMS_System.Pages.Account
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Username),
-
                 new Claim(ClaimTypes.Role, roleValue),
                 new Claim("UserRole", roleValue)
             };
@@ -53,9 +92,17 @@ namespace HRMS_System.Pages.Account
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-            // Redirect based on role
+            // HR chooses destination from modal
             if (roleValue == "HR")
+            {
+                if (SelectedModule == "AttendanceDailyLogs")
+                    return RedirectToPage("/Hrms/DailyLogsAttendance/Index");
+
+                if (SelectedModule == "EmployeeManagement")
+                    return RedirectToPage("/Hrms/EmployeeManagement/Index");
+
                 return RedirectToPage("/Hrms/EmployeeManagement/Index");
+            }
 
             if (roleValue == "Supervisor")
                 return RedirectToPage("/Hrms/Evaluation/Index");
@@ -63,7 +110,16 @@ namespace HRMS_System.Pages.Account
             if (roleValue == "Manager")
                 return RedirectToPage("/Hrms/AttendanceTracking/Index");
 
+            if (roleValue == "CEO")
+                return RedirectToPage("/Hrms/AttendanceTracking/Index");
+
             return RedirectToPage("/Account/LoginPage");
+        }
+
+        public class LoginRequest
+        {
+            public string? Username { get; set; }
+            public string? Password { get; set; }
         }
     }
 }

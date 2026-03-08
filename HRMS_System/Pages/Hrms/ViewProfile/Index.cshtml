@@ -1,0 +1,146 @@
+﻿@page
+@model HRMS_System.Pages.Hrms.ViewProfile.IndexModel
+@{
+    ViewData["Title"] = "My Profile";
+    Layout = "/Pages/Hrms/_HRNavigationLayout.cshtml";
+}
+
+@functions {
+    int TenureMonths(DateTime startDate)
+    {
+        var today = DateTime.Today;
+        int months = (today.Year - startDate.Year) * 12 + (today.Month - startDate.Month);
+        if (today.Day < startDate.Day) months--;
+        return Math.Max(0, months);
+    }
+}
+
+<div class="dashboard-page vp3-page">
+    <h1 class="page-title">Admin Profile</h1>
+    <div class="title-line"></div>
+
+    @if (Model.ProfileNotFound)
+    {
+        <div class="alert alert-danger">
+            Profile not found for this account.
+        </div>
+    }
+    else
+    {
+        var p = Model.Profile!;
+        var avatar = string.IsNullOrWhiteSpace(p.ProfileImagePath) ? "/Icons/default-avatar.png" : p.ProfileImagePath;
+        var tenure = TenureMonths(p.StartDate);
+
+        <!-- Header Card -->
+        <div class="vp3-card vp3-header">
+            <div class="vp3-header-left">
+                <img class="vp3-avatar" src="@avatar" alt="Profile" />
+                <div>
+                    <div class="vp3-name">@p.FirstName @p.LastName</div>
+                    <div class="vp3-subline">
+                        <span class="vp3-pill">@p.EmployeeNumber</span>
+                        <span class="vp3-dot">•</span>
+                        <span>@p.JobRole</span>
+                        <span class="vp3-dot">•</span>
+                        <span>@p.Department</span>
+                    </div>
+                    <div class="vp3-muted">@p.Email</div>
+                </div>
+            </div>
+
+            <div class="vp3-header-right">
+                <div class="vp3-metric">
+                    <div class="vp3-metric-label">Account Status</div>
+                    <div class="vp3-metric-value @(p.Status == "Active" ? "vp3-green" : "vp3-red")">@p.Status</div>
+                </div>
+
+                <div class="vp3-metric">
+                    <div class="vp3-metric-label">Start Date</div>
+                    <div class="vp3-metric-value">@p.StartDate.ToString("MMMM d, yyyy")</div>
+                </div>
+
+                <div class="vp3-metric">
+                    <div class="vp3-metric-label">Tenure</div>
+                    <div class="vp3-metric-value">@(tenure == 1 ? "1 month" : $"{tenure} months")</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Two formal sections -->
+        <div class="vp3-grid">
+            <!-- Employment -->
+            <div class="vp3-card">
+                <div class="vp3-card-title">Employment Details</div>
+
+                <div class="vp3-rows">
+                    <div class="vp3-row">
+                        <div class="vp3-label">Employee Number</div>
+                        <div class="vp3-value">@p.EmployeeNumber</div>
+                    </div>
+
+                    <div class="vp3-row">
+                        <div class="vp3-label">Department</div>
+                        <div class="vp3-value">@p.Department</div>
+                    </div>
+
+                    <div class="vp3-row">
+                        <div class="vp3-label">Job Role</div>
+                        <div class="vp3-value">@p.JobRole</div>
+                    </div>
+
+                    <div class="vp3-row">
+                        <div class="vp3-label">Employment Status</div>
+                        <div class="vp3-value">@p.EmploymentStatus</div>
+                    </div>
+
+                    <div class="vp3-row">
+                        <div class="vp3-label">Account Status</div>
+                        <div class="vp3-value">@p.Status</div>
+                    </div>
+
+                    <div class="vp3-row">
+                        <div class="vp3-label">PIN</div>
+                        <div class="vp3-value">@(string.IsNullOrWhiteSpace(p.Pin) ? "-" : "******")</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personal -->
+            <div class="vp3-card">
+                <div class="vp3-card-title">Personal Details</div>
+
+                <div class="vp3-rows">
+                    <div class="vp3-row">
+                        <div class="vp3-label">Birth Date</div>
+                        <div class="vp3-value">@p.BirthDate.ToString("MMMM d, yyyy")</div>
+                    </div>
+
+                    <div class="vp3-row">
+                        <div class="vp3-label">Gender</div>
+                        <div class="vp3-value">@p.Gender</div>
+                    </div>
+
+                    <div class="vp3-row">
+                        <div class="vp3-label">Civil Status</div>
+                        <div class="vp3-value">@p.CivilStatus</div>
+                    </div>
+
+                    <div class="vp3-row">
+                        <div class="vp3-label">Email</div>
+                        <div class="vp3-value">@p.Email</div>
+                    </div>
+
+                    <div class="vp3-row">
+                        <div class="vp3-label">Phone Number</div>
+                        <div class="vp3-value">@p.PhoneNumber</div>
+                    </div>
+
+                    <div class="vp3-row">
+                        <div class="vp3-label">Address</div>
+                        <div class="vp3-value">@p.Address</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

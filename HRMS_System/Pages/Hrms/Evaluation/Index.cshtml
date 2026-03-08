@@ -59,21 +59,20 @@
                             <label class="form-label">Evaluation Period</label>
                             <select class="form-control" asp-for="Input.Period">
                                 <option value="">-- Select Period --</option>
-                                <option>Q1</option>
-                                <option>Q2</option>
-                                <option>Q3</option>
-                                <option>Q4</option>
-                                <option>Semi-Annual FH </option>
-                                <option>Semi-Annual SH </option>
+                                <option>Q1 Jan-March</option>
+                                <option>Q2 Apr-June</option>
+                                <option>Q3 July-Sept</option>
+                                <option>Q4 Oct-Dec</option>
+                                <option>Semi-Annual FH</option>
+                                <option>Semi-Annual SH</option>
                                 <option>Annual</option>
                             </select>
                             <span class="text-danger" asp-validation-for="Input.Period"></span>
                         </div>
-
                         <div class="form-group">
-                            <label class="form-label">Evaluation Date</label>
-                            <input type="date" class="form-control" asp-for="Input.EvaluationDate" />
-                            <span class="text-danger" asp-validation-for="Input.EvaluationDate"></span>
+                            <label class="form-label">Evaluation Year</label>
+                            <input type="number" class="form-control" asp-for="Input.EvaluationCUrrentYear" min="1990" max="3000" />
+                            <span class="text-danger" asp-validation-for="Input.EvaluationCUrrentYear"></span>
                         </div>
                     </div>
 

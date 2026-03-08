@@ -23,6 +23,8 @@ namespace HRMS_System.Models.Evaluation
         [DataType(DataType.Date)]
         public DateTime EvaluationDate { get; set; } = DateTime.Today;
 
+        public int EvaluationCUrrentYear { get; set; } = DateTime.Now.Year;
+
         /* ===== PERFORMANCE RATINGS ===== */
 
         [Range(1, 5, ErrorMessage = "Work Quality rating is required.")]

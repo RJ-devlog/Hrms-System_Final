@@ -30,6 +30,10 @@ build_property._RazorSourceGeneratorDebug =
 build_property.EffectiveAnalysisLevelStyle = 9.0
 build_property.EnableCodeStyleSeverity = 
 
+[C:/Users/rieln/source/repos/HRMS_System/HRMS_System/Pages/Account/ChangePassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudFxDaGFuZ2VQYXNzd29yZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/rieln/source/repos/HRMS_System/HRMS_System/Pages/Account/ForbiddenPage/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWNjb3VudFxGb3JiaWRkZW5QYWdlXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -100,6 +104,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/rieln/source/repos/HRMS_System/HRMS_System/Pages/Hrms/TrainingandSeminar/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSHJtc1xUcmFpbmluZ2FuZFNlbWluYXJcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/rieln/source/repos/HRMS_System/HRMS_System/Pages/Hrms/ViewProfile/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSHJtc1xWaWV3UHJvZmlsZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/rieln/source/repos/HRMS_System/HRMS_System/Pages/Hrms/_HRNavigationLayout.cshtml]

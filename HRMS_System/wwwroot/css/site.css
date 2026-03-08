@@ -3152,3 +3152,537 @@ body {
     justify-content: center;
     line-height: 1;
 }
+
+/* ================= View Profile ACCOUNT ================= */
+.vp-page .vp-title {
+    font-size: 38px;
+    font-weight: 800;
+    color: #bdbdbd;
+    letter-spacing: .2px;
+}
+
+.vp-top {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    margin: 14px 0 18px;
+}
+
+.vp-avatar {
+    width: 92px;
+    height: 92px;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: #fff;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+}
+
+    .vp-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .vp-avatar i {
+        font-size: 54px;
+        color: #777;
+    }
+
+.vp-meta {
+    line-height: 1.35;
+}
+
+.vp-name {
+    font-size: 16px;
+    color: #333;
+}
+
+.vp-empno {
+    font-weight: 700;
+    color: #333;
+}
+
+.vp-sub {
+    font-size: 13px;
+    color: #666;
+}
+
+.vp-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-top: 12px;
+}
+
+@media (max-width:980px) {
+    .vp-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.vp-card {
+    background: #fff;
+    border: 1px solid #cfcfcf;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.vp-card-tab {
+    display: inline-block;
+    margin: 10px 0 0 12px;
+    padding: 6px 12px;
+    background: #f3f4f6;
+    border: 1px solid #cfcfcf;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    font-weight: 700;
+    font-size: 13px;
+    color: #555;
+}
+
+.vp-form {
+    padding: 16px 16px 14px;
+    border-top: 1px solid #cfcfcf;
+    margin-top: -1px;
+}
+
+.vp-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 9px 0;
+}
+
+    .vp-row label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #555;
+    }
+
+.vp-input {
+    height: 36px;
+    border: 1px solid #cfcfcf;
+    border-radius: 6px;
+    padding: 6px 10px;
+    background: #f7f7f7;
+    color: #333;
+    font-size: 13px;
+}
+
+/* ================= Add Employee Modal (addemp-) ================= */
+.addemp-modal {
+    background: #fff;
+    border: 1px solid var(--hrms-border);
+    border-radius: 16px;
+    box-shadow: 0 18px 50px rgba(16,24,40,.12);
+    padding: 18px 18px 14px;
+}
+
+    .addemp-modal h3 {
+        font-weight: 900;
+        margin-bottom: 6px;
+    }
+
+    .addemp-modal hr {
+        border-color: var(--hrms-border);
+        opacity: 1;
+    }
+
+    /* section label */
+    .addemp-modal h6 {
+        font-weight: 900;
+        color: #344054;
+        margin-top: 18px;
+    }
+
+    /* inputs */
+    .addemp-modal .form-control,
+    .addemp-modal .form-select {
+        border-radius: 12px;
+        border: 1px solid var(--hrms-border);
+        padding: 10px 12px;
+        background: #fff;
+    }
+
+        .addemp-modal .form-control:focus,
+        .addemp-modal .form-select:focus {
+            border-color: rgba(31,94,255,.45);
+            box-shadow: 0 0 0 4px rgba(31,94,255,.14);
+        }
+
+    /* readonly employee number looks like a badge field */
+    .addemp-modal input[readonly] {
+        background: rgba(31,94,255,.06);
+        border-color: rgba(31,94,255,.25);
+        font-weight: 900;
+        color: #1f5eff;
+    }
+
+    /* labels */
+    .addemp-modal label {
+        font-weight: 800;
+        font-size: 13px;
+        color: #344054;
+        margin-bottom: 6px;
+    }
+
+    /* buttons */
+    .addemp-modal .btn {
+        border-radius: 12px;
+        padding: 10px 14px;
+        font-weight: 900;
+    }
+
+    .addemp-modal .btn-primary {
+        background: var(--hrms-blue);
+        border-color: var(--hrms-blue);
+    }
+
+        .addemp-modal .btn-primary:hover {
+            background: var(--hrms-blue-700);
+            border-color: var(--hrms-blue-700);
+        }
+
+    .addemp-modal .btn-secondary {
+        background: #fff;
+        color: #344054;
+        border: 1px solid var(--hrms-border);
+    }
+
+        .addemp-modal .btn-secondary:hover {
+            background: #fbfcff;
+            border-color: #d8deea;
+        }
+
+    /* Select2 styling to match */
+    .addemp-modal .select2-container .select2-selection--single {
+        height: 42px !important;
+        border-radius: 12px !important;
+        border: 1px solid var(--hrms-border) !important;
+        padding: 6px 10px !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+
+    .addemp-modal .select2-container--default .select2-selection--single:focus,
+    .addemp-modal .select2-container--default .select2-selection--single.select2-selection--focus {
+        border-color: rgba(31,94,255,.45) !important;
+        box-shadow: 0 0 0 4px rgba(31,94,255,.14) !important;
+    }
+
+.addemp-headline {
+    height: 4px;
+    width: 120px;
+    background: var(--hrms-blue);
+    border-radius: 999px;
+    margin: 8px 0 12px;
+}
+
+/* ===================== Profile Panel v2 ===================== */
+.profile-panel {
+    width: 420px;
+    background: #fff;
+    border-left: 1px solid #e6eaf2;
+    box-shadow: -20px 0 60px rgba(16,24,40,.12);
+    overflow-y: auto;
+}
+
+/* Header */
+.pp-head {
+    padding: 16px 18px 14px;
+    border-bottom: 1px solid #eef2f7;
+    background: linear-gradient(180deg, rgba(31,94,255,.10), rgba(31,94,255,0));
+}
+
+.pp-back {
+    border: none;
+    background: transparent;
+    padding: 6px 8px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+    .pp-back:hover {
+        background: rgba(0,0,0,.06);
+    }
+
+.pp-top {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-top: 10px;
+}
+
+.pp-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(31,94,255,.20);
+    background: #fff;
+}
+
+.pp-title {
+    flex: 1;
+}
+
+.pp-name {
+    font-size: 20px;
+    font-weight: 900;
+    margin: 0;
+    color: #101828;
+    line-height: 1.2;
+}
+
+/* Stats row */
+.pp-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 10px;
+}
+
+.pp-stat-label {
+    font-size: 12px;
+    color: #667085;
+    font-weight: 700;
+}
+
+.pp-stat-value {
+    font-size: 13px;
+    font-weight: 900;
+    color: #344054;
+    margin-top: 3px;
+}
+
+.status-active {
+    color: #12b76a !important;
+}
+
+.status-inactive {
+    color: #e53935 !important;
+}
+
+/* Body */
+.pp-body {
+    padding: 16px 18px 22px;
+}
+
+.pp-section {
+    margin-top: 14px;
+}
+
+.pp-section-title {
+    font-size: 16px;
+    font-weight: 900;
+    margin: 0 0 12px;
+    color: #101828;
+}
+
+/* List items */
+.pp-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.pp-item {
+    display: grid;
+    grid-template-columns: 22px 120px 1fr;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 10px;
+    border: 1px solid #eef2f7;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.pp-ico {
+    color: #1f5eff;
+    font-size: 16px;
+}
+
+.pp-label {
+    font-size: 13px;
+    color: #667085;
+    font-weight: 800;
+}
+
+.pp-value {
+    font-size: 13px;
+    font-weight: 900;
+    color: #344054;
+    text-align: left;
+    word-break: break-word;
+}
+
+/* ================= My Profile Formal (vp3-) ================= */
+.vp3-card {
+    background: #fff;
+    border: 1px solid #e6eaf2;
+    border-radius: 14px;
+    box-shadow: 0 1px 2px rgba(16,24,40,.04);
+    padding: 16px 18px;
+}
+
+.vp3-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 14px;
+}
+
+@media (max-width: 980px) {
+    .vp3-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.vp3-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.vp3-header-left {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+}
+
+.vp3-avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(31,94,255,.18);
+    background: #fff;
+}
+
+.vp3-name {
+    font-size: 20px;
+    font-weight: 900;
+    color: #101828;
+    line-height: 1.2;
+}
+
+.vp3-subline {
+    margin-top: 6px;
+    color: #667085;
+    font-size: 13px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.vp3-muted {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #667085;
+}
+
+.vp3-pill {
+    display: inline-flex;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid #e6eaf2;
+    background: #fbfcff;
+    font-weight: 900;
+    color: #344054;
+    font-size: 12px;
+}
+
+.vp3-dot {
+    opacity: .7;
+}
+
+.vp3-header-right {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(140px, 1fr));
+    gap: 12px;
+    min-width: 420px;
+}
+
+@media (max-width: 980px) {
+    .vp3-header-right {
+        grid-template-columns: 1fr;
+        min-width: unset;
+        width: 100%;
+    }
+}
+
+.vp3-metric {
+    border: 1px solid #eef2f7;
+    border-radius: 12px;
+    padding: 10px 12px;
+    background: #fff;
+}
+
+.vp3-metric-label {
+    font-size: 12px;
+    font-weight: 800;
+    color: #667085;
+}
+
+.vp3-metric-value {
+    margin-top: 4px;
+    font-size: 13px;
+    font-weight: 900;
+    color: #344054;
+}
+
+.vp3-green {
+    color: #12b76a;
+}
+
+.vp3-red {
+    color: #e53935;
+}
+
+.vp3-card-title {
+    font-size: 14px;
+    font-weight: 900;
+    color: #101828;
+    margin-bottom: 12px;
+}
+
+.vp3-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.vp3-row {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 12px;
+    padding: 10px 10px;
+    border: 1px solid #eef2f7;
+    border-radius: 12px;
+    background: #fff;
+}
+
+@media (max-width: 520px) {
+    .vp3-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.vp3-label {
+    font-size: 12px;
+    font-weight: 800;
+    color: #667085;
+}
+
+.vp3-value {
+    font-size: 13px;
+    font-weight: 900;
+    color: #344054;
+    word-break: break-word;
+}

@@ -30,8 +30,8 @@
         <table class="table-fixed">
             <thead>
                 <tr>
-                    <th class="th-sort" data-sort="id" data-type="number">
-                        ID No. <span class="sort-icon"></span>
+                    <th class="th-sort" data-sort="id" data-type="string">
+                        EMP No. <span class="sort-icon"></span>
                     </th>
                     <th class="th-sort" data-sort="name" data-type="string">
                         Name <span class="sort-icon"></span>
@@ -67,7 +67,7 @@ else
     @foreach (var emp in Model.employeeInfo)
     {
         <tr>
-            <td>@emp.EmployeeNumberDigits</td>
+            <td>@emp.EmployeeNumber</td>
             <td>@emp.FirstName @emp.LastName</td>
             <td>@emp.PhoneNumber</td>
             <td>@emp.Email</td>
@@ -96,97 +96,107 @@ else
 <!-- Profile Panel -->
 <div id="profilePanel" class="profile-panel">
 
-    <div class="profile-header">
-        <i class="bi bi-arrow-left back-icon" onclick="closeProfile()"></i>
+    <!-- Header -->
+    <div class="pp-head">
+        <button type="button" class="pp-back" onclick="closeProfile()" aria-label="Back">
+            <i class="bi bi-arrow-left"></i>
+        </button>
 
-        <div class="profile-header-row">
-            <img id="empAvatar"
-                 class="profile-avatar"
-                 src="/Icons/default-avatar.png" />
+        <div class="pp-top">
+            <img id="empAvatar" class="pp-avatar" src="/Icons/default-avatar.png" alt="Employee" />
 
-            <div class="profile-header-text">
-                <h2 id="empName" class="profile-name"></h2>
+            <div class="pp-title">
+                <div id="empName" class="pp-name">—</div>
 
-                <div class="profile-meta">
-                    <div>
-                        <span>Status</span>
-                        <strong id="empStatus" class="status-active"></strong>
+                <div class="pp-stats">
+                    <div class="pp-stat">
+                        <div class="pp-stat-label">Status</div>
+                        <div id="empStatus" class="pp-stat-value status-active">—</div>
                     </div>
-                    <div>
-                        <span>Start Date</span>
-                        <strong id="empStartDate"></strong>
+
+                    <div class="pp-stat">
+                        <div class="pp-stat-label">Start Date</div>
+                        <div id="empStartDate" class="pp-stat-value">—</div>
                     </div>
-                    <div>
-                        <span>Tenure</span>
-                        <strong id="empTenure">-</strong>
+
+                    <div class="pp-stat">
+                        <div class="pp-stat-label">Tenure</div>
+                        <div id="empTenure" class="pp-stat-value">—</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="profile-body">
+    <!-- Body -->
+    <div class="pp-body">
 
-        <h4 class="section-title">Working Information</h4>
+        <div class="pp-section">
+            <h4 class="pp-section-title">Working Information</h4>
 
-        <div class="info-list">
-            <div class="info-item">
-                <i class="bi bi-credit-card"></i>
-                <span>ID No.</span>
-                <strong id="empId"></strong>
+            <div class="pp-list">
+                <div class="pp-item">
+                    <i class="bi bi-credit-card pp-ico"></i>
+                    <div class="pp-label">ID No.</div>
+                    <div id="empId" class="pp-value">—</div>
+                </div>
+
+                <div class="pp-item">
+                    <i class="bi bi-briefcase pp-ico"></i>
+                    <div class="pp-label">Job Role</div>
+                    <div id="empJobRole" class="pp-value">—</div>
+                </div>
+
+                <div class="pp-item">
+                    <i class="bi bi-diagram-3 pp-ico"></i>
+                    <div class="pp-label">Department</div>
+                    <div id="empDepartment" class="pp-value">—</div>
+                </div>
+
+                <div class="pp-item">
+                    <i class="bi bi-person-badge pp-ico"></i>
+                    <div class="pp-label">Emp Status</div>
+                    <div id="empType" class="pp-value">—</div>
+                </div>
             </div>
+        </div>
 
-            <div class="info-item">
-                <i class="bi bi-briefcase"></i>
-                <span>Job Role</span>
-                <strong id="empJobRole"></strong>
-            </div>
-            <div class="info-item">
-                <i class="bi bi-diagram-3"></i>
-                <span>Department</span>
-                <strong id="empDepartment"></strong>
-            </div>
+        <div class="pp-section">
+            <h4 class="pp-section-title">Personal Information</h4>
 
-            <div class="info-item">
-                <i class="bi bi-person-badge"></i>
-                <span>Emp Status</span>
-                <strong id="empType"></strong>
+            <div class="pp-list">
+                <div class="pp-item">
+                    <i class="bi bi-gender-female pp-ico"></i>
+                    <div class="pp-label">Gender</div>
+                    <div id="empGender" class="pp-value">—</div>
+                </div>
+
+                <div class="pp-item">
+                    <i class="bi bi-heart pp-ico"></i>
+                    <div class="pp-label">Civil Status</div>
+                    <div id="empCivil" class="pp-value">—</div>
+                </div>
+
+                <div class="pp-item">
+                    <i class="bi bi-envelope pp-ico"></i>
+                    <div class="pp-label">Email</div>
+                    <div id="empEmail" class="pp-value">—</div>
+                </div>
+
+                <div class="pp-item">
+                    <i class="bi bi-telephone pp-ico"></i>
+                    <div class="pp-label">Phone</div>
+                    <div id="empPhone" class="pp-value">—</div>
+                </div>
+
+                <div class="pp-item">
+                    <i class="bi bi-geo-alt pp-ico"></i>
+                    <div class="pp-label">Address</div>
+                    <div id="empAddress" class="pp-value">—</div>
+                </div>
             </div>
         </div>
 
-        <h4 class="section-title">Personal Information</h4>
-
-        <div class="info-list">
-            <div class="info-item">
-                <i class="bi bi-gender-female"></i>
-                <span>Gender</span>
-                <strong id="empGender"></strong>
-            </div>
-
-            <div class="info-item">
-                <i class="bi bi-heart"></i>
-                <span>Civil Status</span>
-                <strong id="empCivil"></strong>
-            </div>
-
-            <div class="info-item">
-                <i class="bi bi-envelope"></i>
-                <span>Email</span>
-                <strong id="empEmail"></strong>
-            </div>
-
-            <div class="info-item">
-                <i class="bi bi-telephone"></i>
-                <span>Phone</span>
-                <strong id="empPhone"></strong>
-            </div>
-
-            <div class="info-item">
-                <i class="bi bi-geo-alt"></i>
-                <span>Address</span>
-                <strong id="empAddress"></strong>
-            </div>
-        </div>
     </div>
 </div>
 
@@ -238,7 +248,7 @@ else
                     document.getElementById("empTenure").innerText = "-";
                 }
                 const idNumOnly = emp.idNumber?.split('-')[1] || "";
-                document.getElementById("empId").innerText = idNumOnly;
+                document.getElementById("empId").innerText = emp.idNumber;
                 document.getElementById("empJobRole").innerText = emp.jobRole;
                 document.getElementById("empDepartment").innerText = emp.department;
                 document.getElementById("empType").innerText = emp.employeeType;

@@ -14,6 +14,7 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
 <style>
     :root {
         --blue: #0B3D91;
@@ -229,7 +230,168 @@
             opacity: .7;
         }
 
+    /* Modal */
+    .hrms-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.50);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        padding: 20px;
+    }
+
+        .hrms-modal-overlay.show {
+            display: flex;
+        }
+
+    .hrms-modal {
+        width: min(520px, 96vw);
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        box-shadow: 0 30px 60px rgba(2, 6, 23, 0.20);
+        overflow: hidden;
+        animation: modalPop .18s ease-out;
+    }
+
+    @@keyframes modalPop {
+        from {
+            opacity: 0;
+            transform: translateY(10px) scale(.98);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    .hrms-modal-head {
+        padding: 18px 22px 14px;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+        background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    }
+
+    .hrms-modal-title {
+        margin: 0;
+        font-size: 21px;
+        font-weight: 700;
+        color: var(--blue);
+    }
+
+    .hrms-modal-sub {
+        margin: 6px 0 0;
+        font-size: 13px;
+        color: var(--muted);
+    }
+
+    .hrms-modal-body {
+        padding: 22px;
+    }
+
+    .module-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+    }
+
+    .module-option {
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        border-radius: 14px;
+        padding: 18px 16px;
+        background: #fff;
+        cursor: pointer;
+        transition: all .15s ease;
+        text-align: left;
+    }
+
+        .module-option:hover {
+            border-color: rgba(11, 61, 145, 0.35);
+            box-shadow: 0 12px 24px rgba(11, 61, 145, 0.10);
+            transform: translateY(-2px);
+        }
+
+        .module-option.active {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 4px var(--focus);
+            background: #f8fbff;
+        }
+
+    .module-badge {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .3px;
+        text-transform: uppercase;
+        padding: 5px 9px;
+        border-radius: 999px;
+        margin-bottom: 12px;
+        color: #fff;
+        background: var(--blue);
+    }
+
+    .module-option.employee .module-badge {
+        background: var(--red);
+    }
+
+    .module-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text);
+        margin-bottom: 5px;
+    }
+
+    .module-desc {
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.5;
+    }
+
+    .hrms-modal-foot {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        padding: 16px 22px 22px;
+    }
+
+    .btn-modal {
+        border: 0;
+        border-radius: 10px;
+        padding: 11px 16px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: .15s ease;
+    }
+
+    .btn-cancel {
+        background: #eef2f7;
+        color: #344054;
+    }
+
+        .btn-cancel:hover {
+            background: #e4e9f1;
+        }
+
+    .btn-proceed {
+        background: var(--blue);
+        color: #fff;
+        box-shadow: 0 12px 26px rgba(11,61,145,.18);
+    }
+
+        .btn-proceed:hover {
+            background: #08357E;
+        }
+
+    @@media (max-width: 576px) {
+        .module-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
+
 <div class="login-shell">
     <header class="brand-bar">
         <div class="brand-left">
@@ -248,12 +410,15 @@
 
     <main class="login-main">
         <section class="login-card shadow-sm" aria-label="Login">
-            <div class="card-head" style="text-align:center" >
+            <div class="card-head" style="text-align:center">
                 <h1 class="card-title" style="font-size:25px">Sign in</h1>
                 <p class="card-sub" style="font-size:12px">Enter your credentials to access the system.</p>
             </div>
 
-            <form method="post" class="login-form" novalidate>
+            <form method="post" class="login-form" id="loginForm" novalidate>
+                @Html.AntiForgeryToken()
+                <input type="hidden" id="selectedModule" name="SelectedModule" value="" />
+
                 <div class="form-field">
                     <label class="field-label" for="username">Username</label>
                     <input id="username"
@@ -276,8 +441,8 @@
                 </div>
 
                 <div class="summary-wrap text-danger" asp-validation-summary="ModelOnly"></div>
-
-                <button class="btn-login" type="submit">Sign in</button>
+                <div id="loginError" class="text-danger" style="font-size:12px; display:none;"></div>
+                <button class="btn-login" type="button" id="openModuleModal">Sign in</button>
 
                 <div class="footnote">
                     Authorized personnel only.
@@ -292,3 +457,156 @@
         <span>All rights reserved</span>
     </footer>
 </div>
+
+<!-- Custom Modal -->
+<div class="hrms-modal-overlay" id="moduleModal">
+    <div class="hrms-modal" role="dialog" aria-modal="true" aria-labelledby="moduleModalTitle">
+        <div class="hrms-modal-head">
+            <h2 class="hrms-modal-title" id="moduleModalTitle">Select Destination</h2>
+            <p class="hrms-modal-sub">Choose which module to open after successful sign-in.</p>
+        </div>
+
+        <div class="hrms-modal-body">
+            <div class="module-grid">
+                <button type="button" class="module-option attendance" data-module="AttendanceDailyLogs">
+                    <span class="module-badge">Module 01</span>
+                    <div class="module-title">Attendance Daily Logs</div>
+                    <div class="module-desc">
+                        Proceed directly to attendance monitoring, daily time logs, and related records.
+                    </div>
+                </button>
+
+                <button type="button" class="module-option employee" data-module="EmployeeManagement">
+                    <span class="module-badge">Module 02</span>
+                    <div class="module-title">Employee Management</div>
+                    <div class="module-desc">
+                        Proceed to employee records, personnel information, and management functions.
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <div class="hrms-modal-foot">
+            <button type="button" class="btn-modal btn-cancel" id="cancelModal">Cancel</button>
+            <button type="button" class="btn-modal btn-proceed" id="confirmModule">Proceed</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (() => {
+        const form = document.getElementById('loginForm');
+        const openBtn = document.getElementById('openModuleModal');
+        const modal = document.getElementById('moduleModal');
+        const cancelBtn = document.getElementById('cancelModal');
+        const confirmBtn = document.getElementById('confirmModule');
+        const selectedModuleInput = document.getElementById('selectedModule');
+        const moduleOptions = document.querySelectorAll('.module-option');
+        const loginError = document.getElementById('loginError');
+
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+
+        let selectedModule = "";
+
+        function showModal() {
+            modal.classList.add('show');
+        }
+
+        function hideModal() {
+            modal.classList.remove('show');
+        }
+
+        function clearSelection() {
+            selectedModule = "";
+            selectedModuleInput.value = "";
+            moduleOptions.forEach(option => option.classList.remove('active'));
+        }
+
+        function showError(message) {
+            loginError.style.display = 'block';
+            loginError.textContent = message;
+        }
+
+        function clearError() {
+            loginError.style.display = 'none';
+            loginError.textContent = '';
+        }
+
+        openBtn.addEventListener('click', async function () {
+            clearError();
+
+            if (!usernameInput.value.trim() || !passwordInput.value.trim()) {
+                showError('Username and Password are required.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/Account/LoginPage?handler=ValidateCredentials', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': tokenInput.value
+                    },
+                    body: JSON.stringify({
+                        username: usernameInput.value.trim(),
+                        password: passwordInput.value.trim()
+                    })
+                });
+
+                if (!response.ok) {
+                    showError('Unable to validate login. Please try again.');
+                    return;
+                }
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    showError(result.message || 'Invalid username or password.');
+                    return;
+                }
+
+                if (result.role === "HR") {
+                    showModal();
+                } else {
+                    form.submit();
+                }
+            } catch (error) {
+                showError('An error occurred while validating your login.');
+                console.error(error);
+            }
+        });
+
+        moduleOptions.forEach(option => {
+            option.addEventListener('click', function () {
+                moduleOptions.forEach(x => x.classList.remove('active'));
+                this.classList.add('active');
+                selectedModule = this.dataset.module;
+                selectedModuleInput.value = selectedModule;
+            });
+        });
+
+        confirmBtn.addEventListener('click', function () {
+            if (!selectedModule) {
+                showError('Please select a module first.');
+                return;
+            }
+
+            clearError();
+            form.submit();
+        });
+
+        cancelBtn.addEventListener('click', function () {
+            hideModal();
+            clearSelection();
+        });
+
+        modal.addEventListener('click', function (e) {
+            if (e.target === modal) {
+                hideModal();
+                clearSelection();
+            }
+        });
+    })();
+</script>

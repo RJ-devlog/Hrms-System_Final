@@ -164,6 +164,7 @@ namespace HRMS_System.Migrations
                     UserId = table.Column<int>(type: "int", nullable: false),
                     Period = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     EvaluationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EvaluationCUrrentYear = table.Column<int>(type: "int", nullable: false),
                     WorkQuality = table.Column<int>(type: "int", nullable: true),
                     Productivity = table.Column<int>(type: "int", nullable: true),
                     Teamwork = table.Column<int>(type: "int", nullable: true),

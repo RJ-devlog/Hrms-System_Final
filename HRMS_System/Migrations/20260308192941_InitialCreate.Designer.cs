@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRMS_System.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260209173856_InitialCreate")]
+    [Migration("20260308192941_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -89,6 +89,9 @@ namespace HRMS_System.Migrations
                         .HasColumnType("nvarchar(1000)");
 
                     b.Property<int?>("Communication")
+                        .HasColumnType("int");
+
+                    b.Property<int>("EvaluationCUrrentYear")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("EvaluationDate")
