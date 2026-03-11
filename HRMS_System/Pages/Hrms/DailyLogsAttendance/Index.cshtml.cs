@@ -17,7 +17,7 @@ namespace HRMS_System.Pages.Hrms.DailyLogsAttendance
         }
         public class AttendanceInput
         {
-            [Required(ErrorMessage = "ID Number is required.")]
+            [Required(ErrorMessage = "Id Number is required.")]
             [StringLength(30)]
             public string? IdNumber { get; set; }
 
@@ -38,7 +38,7 @@ namespace HRMS_System.Pages.Hrms.DailyLogsAttendance
         public string CurrentTime { get; private set; } = "";
         public string? StatusMessage { get; private set; }
 
-        [Required(ErrorMessage = "ID Number is required.")]
+        [Required(ErrorMessage = "Id Number is required.")]
         [StringLength(30)]
         public string? IdNumber { get; set; }
 
@@ -67,7 +67,7 @@ namespace HRMS_System.Pages.Hrms.DailyLogsAttendance
             var user = await _context.UserInformation
                 .AsNoTracking()
                 .Where(u => u.EmployeeNumber == Input.IdNumber)
-                .Select(u => new { u.id, u.Pin }) // <-- make sure u.Pin exists in your model
+                .Select(u => new { u.Id, u.Pin }) // <-- make sure u.Pin exists in your model
                 .FirstOrDefaultAsync();
 
             if (user == null)
@@ -78,21 +78,21 @@ namespace HRMS_System.Pages.Hrms.DailyLogsAttendance
             }
             if (string.IsNullOrWhiteSpace(user.Pin) || user.Pin != Input.Pin)
             {
-                ModelState.AddModelError("Input.Pin", "Invalid PIN.");
-                StatusMessage = "Invalid PIN.";
+                ModelState.AddModelError("Input.Pin", "InvalId PIN.");
+                StatusMessage = "InvalId PIN.";
                 return Page();
             }
             // 2) Find or create today's attendance row for that user
             var today = DateTime.Today;
 
             var attendance = await _context.AttendanceTrackings
-                .FirstOrDefaultAsync(a => a.UserId == user.id && a.AttendanceDate == today);
+                .FirstOrDefaultAsync(a => a.UserId == user.Id && a.AttendanceDate == today);
 
             if (attendance == null)
             {
                 attendance = new AttendanceTrackingModel
                 {
-                    UserId = user.id,
+                    UserId = user.Id,
                     AttendanceDate = today
                 };
                 _context.AttendanceTrackings.Add(attendance);
@@ -162,8 +162,8 @@ namespace HRMS_System.Pages.Hrms.DailyLogsAttendance
             if (emp == null)
                 return new JsonResult(new { found = false });
 
-            string middle = string.IsNullOrWhiteSpace(emp.MiddleName) ? "" : $" {emp.MiddleName}";
-            string fullName = $"{emp.FirstName}{middle} {emp.LastName}".Trim();
+            string mIddle = string.IsNullOrWhiteSpace(emp.MiddleName) ? "" : $" {emp.MiddleName}";
+            string fullName = $"{emp.FirstName}{mIddle} {emp.LastName}".Trim();
 
             return new JsonResult(new { found = true, fullName });
         }

@@ -48,10 +48,10 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
         public async Task<IActionResult> OnGetEmployeeProfile(int id)
         {
             var emp = await _context.UserInformation
-                .Where(e => e.id == id)
+                .Where(e => e.Id == id)
                 .Select(e => new
                 {
-                    Id = e.id,
+                    Id = e.Id,
                     idNumber = e.EmployeeNumber,
                     fullName = e.FirstName + " " + e.LastName,
                     email = e.Email,

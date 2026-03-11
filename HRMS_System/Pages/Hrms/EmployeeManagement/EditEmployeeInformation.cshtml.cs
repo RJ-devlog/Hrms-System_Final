@@ -64,7 +64,7 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
                         .FirstOrDefaultAsync();
                 }
             }
-            Employee = await _context.UserInformation.FirstOrDefaultAsync(e => e.id == id);
+            Employee = await _context.UserInformation.FirstOrDefaultAsync(e => e.Id == id);
 
             if (Employee == null)
                 return NotFound();
@@ -104,7 +104,7 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
                 return Page();
 
             var employeeInDb = await _context.UserInformation
-                .FirstOrDefaultAsync(e => e.id == Employee.id);
+                .FirstOrDefaultAsync(e => e.Id == Employee.Id);
 
             if (employeeInDb == null)
                 return NotFound();

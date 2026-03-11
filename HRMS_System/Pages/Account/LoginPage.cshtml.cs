@@ -19,7 +19,13 @@ namespace HRMS_System.Pages.Account
         }
 
         [BindProperty]
-        public User Users { get; set; } = new User();
+        public LoginInputModel Users { get; set; } = new();
+
+        public class LoginInputModel
+        {
+            public string? EmployeeNumber { get; set; }
+            public string? Password { get; set; }
+        }
 
         [BindProperty]
         public string? SelectedModule { get; set; }
@@ -38,8 +44,8 @@ namespace HRMS_System.Pages.Account
                 });
             }
 
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Username == request.Username && u.Password == request.Password);
+            var user = await _context.loginModels
+                .FirstOrDefaultAsync(u => u.EmployeeNumber == request.Username && u.Password == request.Password);
 
             if (user == null)
             {
@@ -50,7 +56,7 @@ namespace HRMS_System.Pages.Account
                 });
             }
 
-            var roleValue = user.Role.ToString();
+            var roleValue = user.AccessRole.ToString();
 
             return new JsonResult(new
             {
@@ -62,14 +68,14 @@ namespace HRMS_System.Pages.Account
         // STEP 2: Actual login after modal selection
         public async Task<IActionResult> OnPostAsync()
         {
-            if (string.IsNullOrWhiteSpace(Users.Username) || string.IsNullOrWhiteSpace(Users.Password))
+            if (string.IsNullOrWhiteSpace(Users.EmployeeNumber) || string.IsNullOrWhiteSpace(Users.Password))
             {
                 ModelState.AddModelError("", "Username and Password are required.");
                 return Page();
             }
 
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Username == Users.Username && u.Password == Users.Password);
+            var user = await _context.loginModels
+                .FirstOrDefaultAsync(u => u.EmployeeNumber == Users.EmployeeNumber && u.Password == Users.Password);
 
             if (user == null)
             {
@@ -77,12 +83,12 @@ namespace HRMS_System.Pages.Account
                 return Page();
             }
 
-            var roleValue = user.Role.ToString();
+            var roleValue = user.AccessRole.ToString();
 
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.Name, user.EmployeeNumber),
                 new Claim(ClaimTypes.Role, roleValue),
                 new Claim("UserRole", roleValue)
             };

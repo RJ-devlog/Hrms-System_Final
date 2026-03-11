@@ -1,28 +1,31 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using HRMS_System.Pages.Account;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
+using HRMS_System.Enums;
 
 namespace HRMS_System.Models
 {
-    public class User 
+    public class LoginModel
     {
         [Key]
         public int Id { get; set; }
 
-        [DataType(DataType.Text)]
-        [Required(ErrorMessage = "Username is not valid")]
-        public string? Username { get; set; }
+        [Required]
+        public int UserInformationId { get; set; }
 
-        [Required(ErrorMessage = "Password is not valid")]
+        [ForeignKey(nameof(UserInformationId))]
+        public UserInformationModel UserInformation { get; set; } = null!;
+
+        [Required(ErrorMessage = "Employee Number is required")]
+        [StringLength(20)]
+        public string EmployeeNumber { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Password is required")]
         [DataType(DataType.Password)]
-        [Column ("Passwordd")]
-        public string? Password { get; set; }
+        [Column("Passwordd")]
+        [StringLength(100)]
+        public string Password { get; set; } = string.Empty;
 
         [Required]
-        public UserRole Role { get; set; }   
-
+        public AccessRole AccessRole { get; set; }
     }
 }

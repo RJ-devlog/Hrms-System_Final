@@ -1,15 +1,15 @@
 ﻿using HRMS_System.Data;
-using HRMS_System.Models;
 using HRMS_System.Models.Evaluation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HRMS_System.Infrastructure;
+using HRMS_System.Enums;
 
 namespace HRMS_System.Pages.Hrms.Evaluation
 {
-    [RoleAuthorize(UserRole.Supervisor)]
+    [RoleAuthorize(AccessRole.Supervisor)]
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -62,7 +62,7 @@ namespace HRMS_System.Pages.Hrms.Evaluation
 
             // validate employee exists
             var userExists = await _context.UserInformation
-                .AnyAsync(u => u.id == Input.UserId);
+                .AnyAsync(u => u.Id == Input.UserId);
 
             // ✅ compute overall
             Input.OverallRating = Math.Round( (decimal)(Input.WorkQuality + Input.Productivity + Input.Teamwork + Input.Attendance + Input.Communication) / 5m, 2).ToString("0.00");
@@ -90,7 +90,7 @@ namespace HRMS_System.Pages.Hrms.Evaluation
                 .ThenBy(u => u.FirstName)
                 .Select(u => new SelectListItem
                 {
-                    Value = u.id.ToString(),
+                    Value = u.Id.ToString(),
                     Text = $"{u.EmployeeNumber} - {u.FirstName} {u.LastName}"
                 })
                 .ToListAsync();

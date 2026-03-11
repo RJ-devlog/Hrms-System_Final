@@ -166,7 +166,7 @@
             {
                 var emp = await _context.UserInformation
                     .AsNoTracking()
-                    .FirstOrDefaultAsync(u => u.id == id);
+                    .FirstOrDefaultAsync(u => u.Id == id);
 
                 if (emp == null) return NotFound();
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using HRMS_System.Enums;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace HRMS_System.Data
 {
@@ -164,8 +165,8 @@ namespace HRMS_System.Data
                 new SelectListItem { Value = "VOS", Text = "VOS", Group = misc },
 
                 // Management / Exucutive
-                new SelectListItem {Value = "General Manager", Text = "General Manager", Group = mngmt},
-                new SelectListItem {Value = "CEO", Text = "CEO", Group = mngmt}
+                new SelectListItem { Value = "General Manager", Text = "General Manager", Group = mngmt },
+                new SelectListItem { Value = "CEO", Text = "CEO", Group = mngmt }
 
             };
         }

@@ -185,14 +185,13 @@
 
         <div class="addemp-head">
             <h3 class="addemp-title">Add New Employee</h3>
-            <p class="addemp-sub">Employee number auto-generates based on Job Role.</p>
+            <p class="addemp-sub">Employee number auto-generates based on the selected job role.</p>
         </div>
 
         <div class="addemp-body">
 
             <form method="post" novalidate>
-                <div asp-validation-summary="ModelOnly" class="text-danger" style="font-size:12px;"></div>
-
+                <div asp-validation-summary="All" class="text-danger" style="font-size:12px;"></div>
                 <!-- ID NUMBER -->
                 <div class="mb-3">
                     <label asp-for="Employee.EmployeeNumber" class="form-label"></label>
@@ -372,13 +371,17 @@
 
         async function refreshEmpNo() {
             const jobRole = $jobRole.val();
-            if (!jobRole) return;
+            if (!jobRole) {
+                document.getElementById("Employee_EmployeeNumber").value = "";
+                return;
+            }
 
             const url = `?handler=GenerateEmployeeNumber&jobRole=${encodeURIComponent(jobRole)}`;
             const res = await fetch(url);
-            const data = await res.json();
+            if (!res.ok) return;
 
-            document.getElementById("Employee_EmployeeNumber").value = data.employeeNumber;
+            const data = await res.json();
+            document.getElementById("Employee_EmployeeNumber").value = data.employeeNumber ?? "";
         }
 
         $jobRole.on('change', refreshEmpNo);

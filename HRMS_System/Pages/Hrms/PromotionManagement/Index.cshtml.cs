@@ -157,7 +157,7 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
             }
 
             var emp = await _context.UserInformation
-                .FirstOrDefaultAsync(x => x.id == SelectedUserId.Value);
+                .FirstOrDefaultAsync(x => x.Id == SelectedUserId.Value);
 
             if (emp == null)
             {
@@ -183,7 +183,7 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
                 .OrderBy(e => e.EmployeeNumber)
                 .Select(e => new
                 {
-                    e.id,
+                    e.Id,
                     e.EmployeeNumber,
                     e.FirstName,
                     e.LastName,
@@ -193,7 +193,7 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
 
             EmployeeOptions = employees.Select(e => new SelectListItem
             {
-                Value = e.id.ToString(),
+                Value = e.Id.ToString(),
                 Text = $"{e.EmployeeNumber} - {e.FirstName} {e.LastName}"
             }).ToList();
 

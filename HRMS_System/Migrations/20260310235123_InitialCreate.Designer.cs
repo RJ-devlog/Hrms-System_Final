@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRMS_System.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260308192941_InitialCreate")]
+    [Migration("20260310235123_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -130,6 +130,42 @@ namespace HRMS_System.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Evaluations");
+                });
+
+            modelBuilder.Entity("HRMS_System.Models.LoginModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccessRole")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EmployeeNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("Passwordd");
+
+                    b.Property<int>("UserInformationId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmployeeNumber")
+                        .IsUnique();
+
+                    b.HasIndex("UserInformationId")
+                        .IsUnique();
+
+                    b.ToTable("loginModels");
                 });
 
             modelBuilder.Entity("HRMS_System.Models.PromotionNotificationModel", b =>
@@ -308,7 +344,7 @@ namespace HRMS_System.Migrations
                     b.ToTable("TrainingSessions");
                 });
 
-            modelBuilder.Entity("HRMS_System.Models.User", b =>
+            modelBuilder.Entity("HRMS_System.Models.UserInformationModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -316,37 +352,15 @@ namespace HRMS_System.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("Passwordd");
-
-                    b.Property<int>("Role")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("HRMS_System.Models.UserInformationModel", b =>
-                {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
-
                     b.Property<string>("Address")
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
                     b.Property<DateTime>("BirthDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("Category")
+                        .HasColumnType("int");
 
                     b.Property<string>("CivilStatus")
                         .IsRequired()
@@ -386,8 +400,8 @@ namespace HRMS_System.Migrations
 
                     b.Property<string>("JobRole")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -421,7 +435,7 @@ namespace HRMS_System.Migrations
                     b.Property<int?>("TenureMonths")
                         .HasColumnType("int");
 
-                    b.HasKey("id");
+                    b.HasKey("Id");
 
                     b.HasIndex("EmployeeNumber")
                         .IsUnique();
@@ -451,6 +465,17 @@ namespace HRMS_System.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("HRMS_System.Models.LoginModel", b =>
+                {
+                    b.HasOne("HRMS_System.Models.UserInformationModel", "UserInformation")
+                        .WithOne("Login")
+                        .HasForeignKey("HRMS_System.Models.LoginModel", "UserInformationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UserInformation");
+                });
+
             modelBuilder.Entity("HRMS_System.Models.Training.TrainingRecord", b =>
                 {
                     b.HasOne("HRMS_System.Models.Training.TrainingSession", "Session")
@@ -473,6 +498,11 @@ namespace HRMS_System.Migrations
             modelBuilder.Entity("HRMS_System.Models.Training.TrainingSession", b =>
                 {
                     b.Navigation("Records");
+                });
+
+            modelBuilder.Entity("HRMS_System.Models.UserInformationModel", b =>
+                {
+                    b.Navigation("Login");
                 });
 #pragma warning restore 612, 618
         }

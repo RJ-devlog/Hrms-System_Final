@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using HRMS_System.Models;
+using HRMS_System.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -10,11 +10,11 @@ namespace HRMS_System.Infrastructure
     // you can use it as [RoleAuthorize(...)]
     public class RoleAuthorizeAttribute : Attribute, IPageFilter
     {
-        private readonly UserRole[] _allowed;
+        private readonly AccessRole[] _allowed;
 
-        public RoleAuthorizeAttribute(params UserRole[] allowedRoles)
+        public RoleAuthorizeAttribute(params AccessRole[] allowedRoles)
         {
-            _allowed = allowedRoles ?? Array.Empty<UserRole>();
+            _allowed = allowedRoles ?? Array.Empty<AccessRole>();
         }
 
         public void OnPageHandlerExecuting(PageHandlerExecutingContext context)
@@ -28,14 +28,14 @@ namespace HRMS_System.Infrastructure
                 return;
             }
 
-            if (!Enum.TryParse<UserRole>(roleClaim, out var role))
+            if (!Enum.TryParse<AccessRole>(roleClaim, out var role))
             {
                 context.Result = new RedirectToPageResult("/Account/ForbiddenPage/Index");
                 return;
             }
 
             // HR can access everything
-            if (role == UserRole.HR) return;
+            if (role == AccessRole.HR) return;
 
             // If page expects specific roles, enforce it
             if (_allowed.Length > 0 && !_allowed.Contains(role))

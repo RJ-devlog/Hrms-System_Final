@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using HRMS_System.Data;
+using HRMS_System.Enums;
 using HRMS_System.Infrastructure;
 using HRMS_System.Models;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -7,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HRMS_System.Pages.Hrms.ViewProfile
 {
-    [RoleAuthorize(UserRole.Supervisor, UserRole.Manager, UserRole.CEO)]
+    [RoleAuthorize(AccessRole.Supervisor, AccessRole.Manager, AccessRole.CEO)]
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;
@@ -33,7 +34,7 @@ namespace HRMS_System.Pages.Hrms.ViewProfile
             // Try load profile by matching id
             Profile = await _context.UserInformation
                 .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.id == userId);
+                .FirstOrDefaultAsync(u => u.Id == userId);
         }
     }
 }

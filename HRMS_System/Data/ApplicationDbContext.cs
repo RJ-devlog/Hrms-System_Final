@@ -13,14 +13,14 @@ namespace HRMS_System.Data
 
         }
 
-        public DbSet<User> Users { get; set; }
+        public DbSet<LoginModel> loginModels { get; set; }
         public DbSet<UserInformationModel> UserInformation { get; set; }
         public DbSet<AttendanceTrackingModel> AttendanceTrackings { get; set; }
         public DbSet<TrainingSession> TrainingSessions { get; set; }
         public DbSet<TrainingRecord> TrainingRecords { get; set; }
         public DbSet<ReportFilterModel> ReportFilters { get; set; }
         public DbSet<EvaluationModel> Evaluations { get; set; } = null!;
-        public DbSet<HRMS_System.Models.PromotionNotificationModel> PromotionNotifications { get; set; }
+        public DbSet<PromotionNotificationModel> PromotionNotifications { get; set; }
         /*        public DbSet<DepartmentSelectService> Departments { get; set; }*/
         public DbSet<Department> Departments { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -30,6 +30,16 @@ namespace HRMS_System.Data
             modelBuilder.Entity<UserInformationModel>()
                 .HasIndex(e => e.EmployeeNumber)
                 .IsUnique();
+
+            modelBuilder.Entity<LoginModel>()
+                .HasIndex(l => l.EmployeeNumber)
+                .IsUnique();
+
+            modelBuilder.Entity<UserInformationModel>()
+                .HasOne(u => u.Login)
+                .WithOne(l => l.UserInformation)
+                .HasForeignKey<LoginModel>(l => l.UserInformationId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
     }
