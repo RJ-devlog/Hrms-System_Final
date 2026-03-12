@@ -30,6 +30,9 @@ namespace HRMS_System.Pages.Account
         [BindProperty]
         public string? SelectedModule { get; set; }
 
+        [BindProperty]
+        public string? LoginErrorMessage { get; set; }
+
         // STEP 1: Validate credentials only (AJAX call)
         public async Task<JsonResult> OnPostValidateCredentialsAsync([FromBody] LoginRequest request)
         {
@@ -44,7 +47,7 @@ namespace HRMS_System.Pages.Account
                 });
             }
 
-            var user = await _context.loginModels
+            var user = await _context.Login
                 .FirstOrDefaultAsync(u => u.EmployeeNumber == request.Username && u.Password == request.Password);
 
             if (user == null)
@@ -68,13 +71,14 @@ namespace HRMS_System.Pages.Account
         // STEP 2: Actual login after modal selection
         public async Task<IActionResult> OnPostAsync()
         {
+
             if (string.IsNullOrWhiteSpace(Users.EmployeeNumber) || string.IsNullOrWhiteSpace(Users.Password))
             {
                 ModelState.AddModelError("", "Username and Password are required.");
                 return Page();
             }
 
-            var user = await _context.loginModels
+            var user = await _context.Login 
                 .FirstOrDefaultAsync(u => u.EmployeeNumber == Users.EmployeeNumber && u.Password == Users.Password);
 
             if (user == null)
@@ -82,12 +86,19 @@ namespace HRMS_System.Pages.Account
                 ModelState.AddModelError("", "Invalid username or password.");
                 return Page();
             }
-
             var roleValue = user.AccessRole.ToString();
+
+            var allowedRoles = new[] { "HR", "Supervisor", "Manager", "CEO"};
+
+            if (!allowedRoles.Contains(roleValue))
+            {
+                ModelState.AddModelError(string.Empty, "Your account is not authorized to access this system.");
+                return Page();
+            }
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.UserInformationId.ToString()),
                 new Claim(ClaimTypes.Name, user.EmployeeNumber),
                 new Claim(ClaimTypes.Role, roleValue),
                 new Claim("UserRole", roleValue)
@@ -98,7 +109,6 @@ namespace HRMS_System.Pages.Account
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-            // HR chooses destination from modal
             if (roleValue == "HR")
             {
                 if (SelectedModule == "AttendanceDailyLogs")
@@ -121,7 +131,6 @@ namespace HRMS_System.Pages.Account
 
             return RedirectToPage("/Account/LoginPage");
         }
-
         public class LoginRequest
         {
             public string? Username { get; set; }

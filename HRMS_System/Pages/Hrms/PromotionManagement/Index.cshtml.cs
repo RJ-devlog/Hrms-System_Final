@@ -1,16 +1,12 @@
 ﻿using HRMS_System.Data;
 using HRMS_System.Models;
 using HRMS_System.Models.PromotionML;
+using HRMS_System.Models.ViewModels;
 using HRMS_System.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace HRMS_System.Pages.Hrms.PromotionManagement
 {
@@ -19,14 +15,16 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
         /* ===================== DB + SERVICES ===================== */
         private readonly ApplicationDbContext _context;
         private readonly PromotionPredictionService _mlService;
+        private readonly PromotionFeatureBuilder _featureBuilder;
 
         public IndexModel(ApplicationDbContext context, IWebHostEnvironment env)
         {
             _context = context;
 
-            // App_Data/ml/promotion-model.zip (absolute path)
             var modelPath = Path.Combine(env.ContentRootPath, "App_Data", "ml", "promotion-model.zip");
             _mlService = new PromotionPredictionService(modelPath);
+
+            _featureBuilder = new PromotionFeatureBuilder(context);
         }
 
         /* ===================== UI BINDINGS (INPUTS FROM FORM) ===================== */
@@ -65,7 +63,7 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
         {
             await LoadEmployeesAsync();
             LoadRoleOptions();
-            var trainingRows = BuildTrainingRowsFromDb(); // still mock (replace later)
+            var trainingRows = _featureBuilder.BuildTrainingRows();
 
             if (!trainingRows.Any())
             {
@@ -95,8 +93,7 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
                 EmployeeOptions.FirstOrDefault(x => x.Value == SelectedUserId.Value.ToString())?.Text
                 ?? "Selected Employee";
 
-            var featureRow = BuildFeatureRowForUser(SelectedUserId.Value); // still mock (replace later)
-
+            var featureRow = _featureBuilder.BuildFeatureRow(SelectedUserId.Value);
             try
             {
                 var result = _mlService.Predict(featureRow);
@@ -207,40 +204,5 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
             }).ToList();
         }
 
-
-
-        /* ===================== MOCK DATA (REPLACE WITH DB QUERIES LATER) ===================== */
-        private List<PromotionTrainingRow> BuildTrainingRowsFromDb()
-        {
-            return new List<PromotionTrainingRow>
-            {
-                new PromotionTrainingRow { TenureMonths=18, AbsenceRate=0.02f, LateRate=0.05f, TrainingCount=4, CertificationCount=2, AvgEvaluationScore=4.3f, WasPromoted=true },
-                new PromotionTrainingRow { TenureMonths=8,  AbsenceRate=0.12f, LateRate=0.20f, TrainingCount=1, CertificationCount=0, AvgEvaluationScore=3.0f, WasPromoted=false }
-            };
-        }
-
-        private PromotionTrainingRow BuildFeatureRowForUser(int userId)
-        {
-            return new PromotionTrainingRow
-            {
-                TenureMonths = 18,
-                AbsenceRate = 0.02f,
-                LateRate = 0.05f,
-                TrainingCount = 4,
-                CertificationCount = 2,
-                AvgEvaluationScore = 4.3f
-            };
-        }
-
-        /* ===================== VIEWMODEL FOR TABLE ===================== */
-        public class EmployeeRowVM
-        {
-            public string EmployeeNumber { get; set; } = "";
-            public string FullName { get; set; } = "";
-            public string? Department { get; set; }
-            public int TenureMonths { get; set; }
-            public float LatestEvalAvg { get; set; }
-            public string SearchText => $"{EmployeeNumber} {FullName} {Department}";
-        }
     }
 }

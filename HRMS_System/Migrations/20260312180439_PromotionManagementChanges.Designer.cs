@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRMS_System.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260310235123_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260312180439_PromotionManagementChanges")]
+    partial class PromotionManagementChanges
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -165,7 +165,7 @@ namespace HRMS_System.Migrations
                     b.HasIndex("UserInformationId")
                         .IsUnique();
 
-                    b.ToTable("loginModels");
+                    b.ToTable("Login");
                 });
 
             modelBuilder.Entity("HRMS_System.Models.PromotionNotificationModel", b =>
@@ -359,7 +359,7 @@ namespace HRMS_System.Migrations
                     b.Property<DateTime>("BirthDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("Category")
+                    b.Property<int?>("Category")
                         .HasColumnType("int");
 
                     b.Property<string>("CivilStatus")

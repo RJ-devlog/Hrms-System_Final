@@ -254,8 +254,7 @@
                 <input type="hidden" asp-for="Employee.EmployeeNumber" />
                 <input type="hidden" asp-for="Employee.Id" />
 
-                <div asp-validation-summary="ModelOnly" class="text-danger" style="font-size:12px;"></div>
-
+                <div asp-validation-summary="All" class="text-danger" style="font-size:12px;"></div>
                 <!-- PROFILE IMAGE -->
                 <div class="mb-4">
                     <label class="form-label">Profile Image (Optional)</label>
@@ -279,7 +278,7 @@
                 <!-- EMPLOYEE NUMBER (display only) -->
                 <div class="mb-3">
                     <label class="form-label">Employee Number</label>
-                    <input class="form-control" value="@Model.Employee.EmployeeNumber" readonly />
+                    <input id="EmployeeNumberPreview" class="form-control" value="@Model.Employee.EmployeeNumber" readonly />
                 </div>
 
                 <!-- NAME -->
@@ -488,9 +487,40 @@
     });
 
     $(document).ready(function () {
-        $('#JobRole').select2({
+        const $jobRole = $('#JobRole');
+        const employeeId = document.getElementById("Employee_Id").value;
+        const previewInput = document.getElementById("EmployeeNumberPreview");
+        const hiddenInput = document.getElementById("Employee_EmployeeNumber");
+
+        $jobRole.select2({
             width: '100%',
             dropdownParent: $('body')
         });
+
+        async function refreshEmployeeNumberPreview() {
+            const jobRole = $jobRole.val();
+
+            if (!jobRole || !employeeId) {
+                return;
+            }
+
+            try {
+                const url = `?handler=PreviewEmployeeNumber&jobRole=${encodeURIComponent(jobRole)}&employeeId=${encodeURIComponent(employeeId)}`;
+                const res = await fetch(url);
+
+                if (!res.ok) return;
+
+                const data = await res.json();
+
+                if (data.employeeNumber) {
+                    previewInput.value = data.employeeNumber;
+                    hiddenInput.value = data.employeeNumber;
+                }
+            } catch (err) {
+                console.error("Failed to preview employee number:", err);
+            }
+        }
+
+        $jobRole.on('change', refreshEmployeeNumberPreview);
     });
 </script>

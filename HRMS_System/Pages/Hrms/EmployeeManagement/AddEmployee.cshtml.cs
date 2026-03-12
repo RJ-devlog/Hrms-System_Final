@@ -122,12 +122,12 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
 
                 var accessRole = GetAccessRoleFromJobRole(Employee.JobRole);
 
-                var existingUser = await _context.loginModels
+                var existingUser = await _context.Login
                     .FirstOrDefaultAsync(u => u.EmployeeNumber == Employee.EmployeeNumber);
 
                 if (existingUser == null)
                 {
-                    _context.loginModels.Add(new LoginModel
+                    _context.Login.Add(new LoginModel
                     {
                         UserInformationId = Employee.Id,
                         EmployeeNumber = Employee.EmployeeNumber,

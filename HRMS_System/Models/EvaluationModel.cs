@@ -9,11 +9,10 @@ namespace HRMS_System.Models.Evaluation
         [Key]
         public int Id { get; set; }
 
-        [ForeignKey(nameof(UserId))]
-        public UserInformationModel? User { get; set; }
-
         [Required]
         public int UserId { get; set; }
+        [ForeignKey(nameof(UserId))]
+        public UserInformationModel? User { get; set; }
 
         [Required]
         [StringLength(20)]
@@ -22,6 +21,7 @@ namespace HRMS_System.Models.Evaluation
         [Required]
         [DataType(DataType.Date)]
         public DateTime EvaluationDate { get; set; } = DateTime.Today;
+
 
         public int EvaluationCUrrentYear { get; set; } = DateTime.Now.Year;
 

@@ -54,7 +54,7 @@ namespace HRMS_System.Pages.Account
             if (!int.TryParse(idStr, out var userId))
                 return RedirectToPage("/Account/LoginPage");
 
-            var user = await _context.loginModels.FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await _context.Login.FirstOrDefaultAsync(u => u.Id == userId);
             if (user == null)
                 return RedirectToPage("/Account/LoginPage");
 

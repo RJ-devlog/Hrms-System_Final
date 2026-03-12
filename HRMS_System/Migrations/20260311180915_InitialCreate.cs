@@ -97,7 +97,7 @@ namespace HRMS_System.Migrations
                     FirstName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     MiddleName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Category = table.Column<int>(type: "int", nullable: false),
+                    Category = table.Column<int>(type: "int", nullable: true),
                     JobRole = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Department = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     EmploymentStatus = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
@@ -173,7 +173,7 @@ namespace HRMS_System.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "loginModels",
+                name: "Login",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -185,9 +185,9 @@ namespace HRMS_System.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_loginModels", x => x.Id);
+                    table.PrimaryKey("PK_Login", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_loginModels_UserInformation_UserInformationId",
+                        name: "FK_Login_UserInformation_UserInformationId",
                         column: x => x.UserInformationId,
                         principalTable: "UserInformation",
                         principalColumn: "Id",
@@ -237,14 +237,14 @@ namespace HRMS_System.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_loginModels_EmployeeNumber",
-                table: "loginModels",
+                name: "IX_Login_EmployeeNumber",
+                table: "Login",
                 column: "EmployeeNumber",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_loginModels_UserInformationId",
-                table: "loginModels",
+                name: "IX_Login_UserInformationId",
+                table: "Login",
                 column: "UserInformationId",
                 unique: true);
 
@@ -278,7 +278,7 @@ namespace HRMS_System.Migrations
                 name: "Evaluations");
 
             migrationBuilder.DropTable(
-                name: "loginModels");
+                name: "Login");
 
             migrationBuilder.DropTable(
                 name: "PromotionNotifications");

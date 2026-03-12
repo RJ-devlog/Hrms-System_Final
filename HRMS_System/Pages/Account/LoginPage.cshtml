@@ -414,7 +414,7 @@
                 <h1 class="card-title" style="font-size:25px">Sign in</h1>
                 <p class="card-sub" style="font-size:12px">Enter your credentials to access the system.</p>
             </div>
-
+    @*         <div asp-validation-summary="All" class="text-danger"></div> *@
             <form method="post" class="login-form" id="loginForm" novalidate>
                 @Html.AntiForgeryToken()
                 <input type="hidden" id="selectedModule" name="SelectedModule" value="" />

@@ -1,11 +1,12 @@
 ﻿using HRMS_System.Data;
+using HRMS_System.Enums;
+using HRMS_System.Infrastructure;
+using HRMS_System.Models;
 using HRMS_System.Models.Evaluation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HRMS_System.Infrastructure;
-using HRMS_System.Enums;
 
 namespace HRMS_System.Pages.Hrms.Evaluation
 {
@@ -21,10 +22,11 @@ namespace HRMS_System.Pages.Hrms.Evaluation
 
         [BindProperty]
         public EvaluationModel Input { get; set; } = new();
+        public List<PerformanceRecord> PerformanceRecords { get; set; } = new();
+        public List<UserInformationModel> Employees { get; set; } = new();
 
         // dropdown source
         public List<SelectListItem> EmployeeOptions { get; set; } = new();
-
         // records tab
         public List<EvaluationModel> Records { get; set; } = new();
 
@@ -35,6 +37,11 @@ namespace HRMS_System.Pages.Hrms.Evaluation
 
             await LoadEmployeesAsync();
             await LoadRecordsAsync();
+            await LoadPerformanceEmployeesAsync();
+
+            /*      PerformanceRecords = _context.PerformanceRecords
+                  .Include(p => p.UserInformation)
+                  .ToList();*/
         }
 
         public async Task<IActionResult> OnPostAsync()
@@ -81,7 +88,13 @@ namespace HRMS_System.Pages.Hrms.Evaluation
             TempData["Success"] = "Employee evaluation saved successfully.";
             return RedirectToPage(); // refresh
         }
-
+        private async Task LoadPerformanceEmployeesAsync()
+        {
+            Employees = await _context.UserInformation
+                .AsNoTracking()
+                .OrderBy(e => e.EmployeeNumber)
+                .ToListAsync();
+        }
         private async Task LoadEmployeesAsync()
         {
             EmployeeOptions = await _context.UserInformation

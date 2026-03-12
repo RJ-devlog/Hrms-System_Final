@@ -13,7 +13,7 @@ namespace HRMS_System.Data
 
         }
 
-        public DbSet<LoginModel> loginModels { get; set; }
+        public DbSet<LoginModel> Login { get; set; }
         public DbSet<UserInformationModel> UserInformation { get; set; }
         public DbSet<AttendanceTrackingModel> AttendanceTrackings { get; set; }
         public DbSet<TrainingSession> TrainingSessions { get; set; }
