@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HRMS_System.Models.Training
 {
@@ -9,30 +10,27 @@ namespace HRMS_System.Models.Training
         [Key]
         public int Id { get; set; }
 
-        [StringLength(150)]
-        public string? Title { get; set; }
+        [Required, StringLength(150)]
+        public string Title { get; set; } = string.Empty;
 
-        [StringLength(2000)]
-        public string? Description { get; set; } 
+        [Required, StringLength(2000)]
+        public string Description { get; set; } = string.Empty;
 
-        [StringLength(300)]
-        public string? TargetAudience { get; set; }
+        [Required, StringLength(300)]
+        public string TargetAudience { get; set; } = string.Empty;
 
         [Required]
         public SessionType SessionType { get; set; } = SessionType.Mandatory;
 
-        //NEW: schedule
         [Required, DataType(DataType.Date)]
         public DateTime StartDate { get; set; }
 
-        //NEW: time window
         [Required]
         public TimeSpan StartTime { get; set; }
 
         [Required]
         public TimeSpan EndTime { get; set; }
 
-        //NEW: provider & training type
         [Required, StringLength(150)]
         public string Provider { get; set; } = "Internal";
 
@@ -42,8 +40,15 @@ namespace HRMS_System.Models.Training
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public ICollection<TrainingRecord> Records { get; set; } = new List<TrainingRecord>();
+
         [Required]
         public TrainingProgress Progress { get; set; } = TrainingProgress.NotStarted;
+
+        [NotMapped]
+        public DateTime EndDateTime => StartDate.Date.Add(EndTime);
+
+        [NotMapped]
+        public bool CanBeCompleted => DateTime.Now >= EndDateTime;
     }
 
     public enum SessionType

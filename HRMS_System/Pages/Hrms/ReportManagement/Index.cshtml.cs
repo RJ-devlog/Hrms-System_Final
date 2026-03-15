@@ -1,26 +1,27 @@
 using HRMS_System.Data;
 using HRMS_System.Models;
-using HRMS_System.Models.Evaluation;
 using HRMS_System.Models.Reports;
 using HRMS_System.Models.Training;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using HRMS_System.Models.Evaluation;
 
 namespace HRMS_System.Pages.Hrms.ReportManagement
 {
     public class IndexModel : PageModel
     {
-
         private readonly ApplicationDbContext _context;
 
         public IndexModel(ApplicationDbContext context)
         {
             _context = context;
         }
+
         [BindProperty(SupportsGet = true)]
         public ReportFilterModel Filter { get; set; } = new();
+
         // Dropdown sources
         public List<SelectListItem> DepartmentOptions { get; set; } = new();
 
@@ -49,11 +50,12 @@ namespace HRMS_System.Pages.Hrms.ReportManagement
 
         private async Task LoadPerformanceAsync()
         {
-            // NOTE: update DbSet name if yours is different
             IQueryable<EvaluationModel> q = _context.Set<EvaluationModel>();
-
             if (!string.IsNullOrWhiteSpace(Filter.Period))
-                q = q.Where(x => x.Period == Filter.Period);
+            {
+                string periodMonth = Filter.Period; // "March", "April", etc.
+                q = q.Where(x => x.Period.ToString() == periodMonth);
+            }
 
             if (Filter.FromDate.HasValue)
                 q = q.Where(x => x.EvaluationDate >= Filter.FromDate.Value.Date);
@@ -61,8 +63,6 @@ namespace HRMS_System.Pages.Hrms.ReportManagement
             if (Filter.ToDate.HasValue)
                 q = q.Where(x => x.EvaluationDate <= Filter.ToDate.Value.Date);
 
-            // If you have navigation to employee, join that table here.
-            // For now, use UserId and show as "User #"
             var rows = await q
                 .OrderByDescending(x => x.EvaluationDate)
                 .ToListAsync();
@@ -75,7 +75,7 @@ namespace HRMS_System.Pages.Hrms.ReportManagement
                 {
                     EvaluationDate = x.EvaluationDate,
                     EmployeeDisplay = $"User #{x.UserId}",
-                    Period = x.Period ?? "",
+                    Period = x.Period.ToString(),
                     WorkQuality = x.WorkQuality,
                     Productivity = x.Productivity,
                     Teamwork = x.Teamwork,
@@ -85,7 +85,6 @@ namespace HRMS_System.Pages.Hrms.ReportManagement
                     OverallRating = string.IsNullOrWhiteSpace(x.OverallRating) ? "-" : x.OverallRating
                 };
             }).ToList();
-
 
             PerformanceSummary.TotalEvaluations = PerformanceRows.Count;
             PerformanceSummary.AvgScore = PerformanceRows.Count == 0 ? 0 : PerformanceRows.Average(r => r.AvgScore);
@@ -186,34 +185,6 @@ namespace HRMS_System.Pages.Hrms.ReportManagement
             var list = vals.Where(v => v.HasValue).Select(v => (double)v!.Value).ToList();
             return list.Count == 0 ? 0 : list.Average();
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         // ----- ViewModels -----
         public class PerformanceRowVM

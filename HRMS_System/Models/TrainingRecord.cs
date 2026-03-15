@@ -25,7 +25,7 @@ namespace HRMS_System.Models.Training
         [Required, StringLength(150)]
         public string Provider { get; set; } = "Internal";
 
-        // Must NOT be editable (generated server-side)
+        // Generated server-side only when training is completed
         [StringLength(80)]
         public string? CertificationId { get; set; }
 

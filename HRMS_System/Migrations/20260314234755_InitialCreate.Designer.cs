@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HRMS_System.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260312180439_PromotionManagementChanges")]
-    partial class PromotionManagementChanges
+    [Migration("20260314234755_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -81,21 +81,31 @@ namespace HRMS_System.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("Attendance")
+                    b.Property<int>("Attendance")
                         .HasColumnType("int");
 
                     b.Property<string>("Comments")
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<int?>("Communication")
+                    b.Property<int>("Communication")
                         .HasColumnType("int");
 
-                    b.Property<int>("EvaluationCUrrentYear")
+                    b.Property<int>("EvaluationCurrentYear")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("EvaluationDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("EvaluatorName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("EvaluatorRole")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("EvaluatorUserId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Improvements")
                         .HasMaxLength(1000)
@@ -104,25 +114,23 @@ namespace HRMS_System.Migrations
                     b.Property<string>("OverallRating")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Period")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                    b.Property<int>("Period")
+                        .HasColumnType("int");
 
-                    b.Property<int?>("Productivity")
+                    b.Property<int>("Productivity")
                         .HasColumnType("int");
 
                     b.Property<string>("Strengths")
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<int?>("Teamwork")
+                    b.Property<int>("Teamwork")
                         .HasColumnType("int");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("WorkQuality")
+                    b.Property<int>("WorkQuality")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -305,6 +313,7 @@ namespace HRMS_System.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasMaxLength(2000)
                         .HasColumnType("nvarchar(2000)");
 
@@ -329,10 +338,12 @@ namespace HRMS_System.Migrations
                         .HasColumnType("time");
 
                     b.Property<string>("TargetAudience")
+                        .IsRequired()
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 

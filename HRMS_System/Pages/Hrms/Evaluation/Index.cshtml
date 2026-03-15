@@ -7,11 +7,12 @@
 
 <link rel="stylesheet" href="~/css/dashboard-shared.css" />
 <link rel="stylesheet" href="~/css/evaluation.css" />
+
 <style>
-    /* ACTION MENU */
     .table-actions {
         position: relative;
         text-align: center;
+        overflow: visible;
     }
 
     .action-menu {
@@ -28,40 +29,42 @@
         color: #6b7280;
     }
 
-    /* Dropdown container */
     .action-dropdown {
         display: none;
         position: absolute;
         right: 0;
-        top: 30px;
+        top: auto;
+        bottom: 30px;
         min-width: 200px;
         background: #f3f4f6;
         border-radius: 14px;
         padding: 6px;
         box-shadow: 0 10px 25px rgba(0,0,0,0.12);
-        z-index: 20;
+        z-index: 9999;
     }
 
-    /* Dropdown items */
     .dropdown-item {
         display: block;
+        width: 100%;
+        border: none;
+        background: transparent;
+        text-align: left;
         padding: 10px 14px;
         font-size: 14px;
         color: #374151;
         text-decoration: none;
         border-radius: 10px;
         transition: background 0.15s ease;
+        cursor: pointer;
     }
 
         .dropdown-item:hover {
             background: #e5e7eb;
         }
 
-    /* Show dropdown */
     .action-menu.active .action-dropdown {
         display: block;
     }
-    /* PANEL OVERLAY */
 
     .panel-overlay {
         position: fixed;
@@ -73,9 +76,6 @@
         display: none;
         z-index: 90;
     }
-
-
-    /* PROFILE PANEL */
 
     .profile-panel {
         position: fixed;
@@ -93,9 +93,6 @@
         display: none;
         z-index: 100;
     }
-
-
-    /* PANEL HEADER */
 
     .panel-header {
         display: flex;
@@ -116,56 +113,39 @@
             cursor: pointer;
         }
 
-
-    /* PANEL BODY */
-
     .panel-body {
         padding: 20px;
         min-height: 200px;
     }
-    /* =========================
-       Evaluation Management Panel
-       ========================= */
 
     .management-panel .panel-body {
         padding: 30px;
     }
 
-
-    /* Container */
     .management-container {
         width: 100%;
     }
 
-
-    /* Subtitle */
     .management-subtitle {
         font-size: 14px;
         color: #444;
         margin-bottom: 16px;
     }
 
-
-    /* Table wrapper */
     .management-table-wrap {
         width: 100%;
     }
 
-
-    /* Table */
     .management-table {
         width: 100%;
         border-collapse: collapse;
         font-size: 14px;
     }
 
-
-        /* Header */
         .management-table thead tr {
             border-top: 3px solid #111;
             border-bottom: 2px solid #111;
         }
-
 
         .management-table th {
             text-align: left;
@@ -173,41 +153,29 @@
             font-weight: 600;
         }
 
-
-        /* Body */
         .management-table td {
             padding: 10px 8px;
         }
 
-
-    /* Empty row */
     .empty-row {
         text-align: center;
         color: #888;
         padding: 40px 0;
     }
-    /* =========================
-       Performance Record Panel
-       ========================= */
 
     .performance-panel .panel-body {
         padding: 30px 40px;
     }
 
-
-    /* Table */
     .performance-table {
         width: 100%;
         border-collapse: collapse;
         font-size: 14px;
     }
 
-
-        /* Header line */
         .performance-table thead tr {
             border-bottom: 2px solid #111;
         }
-
 
         .performance-table th {
             text-align: left;
@@ -215,19 +183,15 @@
             font-weight: 600;
         }
 
-
         .performance-table td {
             padding: 10px 0;
             color: #333;
         }
 
-
-    /* History button */
     .performance-history {
         margin-top: 40px;
         text-align: right;
     }
-
 
         .performance-history a {
             color: #1d4ed8;
@@ -238,52 +202,55 @@
             .performance-history a:hover {
                 text-decoration: underline;
             }
-    /* Performance History Table */
 
-    .history-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 14px;
-    }
-
-        .history-table thead tr {
-            border-bottom: 2px solid #111;
-        }
-
-        .history-table th {
-            text-align: left;
-            padding: 10px 0;
-            font-weight: 600;
-        }
-
-        .history-table td {
-            padding: 10px 0;
-        }
-    /* Evaluation History Table */
-
+    .history-table,
     .evaluation-history-table {
         width: 100%;
         border-collapse: collapse;
         font-size: 14px;
     }
 
-    .evaluation-history-table thead tr {
-        border-bottom: 2px solid #111;
+        .history-table thead tr,
+        .evaluation-history-table thead tr {
+            border-bottom: 2px solid #111;
+        }
+
+        .history-table th,
+        .evaluation-history-table th {
+            text-align: left;
+            padding: 10px 0;
+            font-weight: 600;
+        }
+
+        .history-table td,
+        .evaluation-history-table td {
+            padding: 10px 0;
+        }
+
+    .table-wrap {
+        overflow-x: auto;
     }
 
-    .evaluation-history-table th {
-        text-align: left;
-        padding: 10px 0;
-        font-weight: 600;
+    #tab-performance .card {
+        overflow: visible;
     }
 
-    .evaluation-history-table td {
-        padding: 10px 0;
+    #tab-performance .performance-table-wrap {
+        max-height: 380px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        position: relative;
     }
+
+        #tab-performance .performance-table-wrap thead th {
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 3;
+        }
 </style>
 <div class="dashboard-page eval-page">
 
-    <!-- HEADER -->
     <div class="page-header">
         <div>
             <h1 class="page-title">Performance and Evaluation</h1>
@@ -295,222 +262,25 @@
         </div>
     </div>
 
-    <!-- TABS -->
     <div class="tab-menu">
-        <button type="button" class="tab-btn active" data-tab="tab-evaluate">Evaluate Employee</button>
-        <button type="button" class="tab-btn" data-tab="tab-records">Evaluation Records</button>
+        <button type="button" class="tab-btn active" data-tab="tab-records">Evaluation Records</button>
         <button type="button" class="tab-btn" data-tab="tab-performance">Performance Records</button>
-        <!-- ✅ NEW TAB -->
-   @*      <button type="button" class="tab-btn" data-tab="tab-activity">Activity Report</button> *@
-    </div>
-
-    <!-- TAB: EVALUATE -->
-    <div class="tab-content active" id="tab-evaluate">
-
-        <div class="card-grid">
-            <!-- LEFT: FORM -->
-            <div class="card eval-card">
-                <div class="card-title">Evaluation Form</div>
-                <div class="card-subtitle">Fill in the evaluation details and submit.</div>
-
-                <form method="post" class="eval-form">
-
-                    <!-- Employee + Period -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Employee</label>
-                            <select class="form-control" asp-for="Input.UserId">
-                                <option value="">-- Select Employee --</option>
-                                @foreach (var emp in Model.EmployeeOptions)
-                                {
-                                    <option value="@emp.Value">@emp.Text</option>
-                                }
-                            </select>
-                            <span class="text-danger" asp-validation-for="Input.UserId"></span>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="form-label">Evaluation Period</label>
-                            <select class="form-control" asp-for="Input.Period">
-                                <option value="">-- Select Period --</option>
-                                <option>Q1 Jan-March</option>
-                                <option>Q2 Apr-June</option>
-                                <option>Q3 July-Sept</option>
-                                <option>Q4 Oct-Dec</option>
-                                <option>Semi-Annual FH</option>
-                                <option>Semi-Annual SH</option>
-                                <option>Annual</option>
-                            </select>
-                            <span class="text-danger" asp-validation-for="Input.Period"></span>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Evaluation Year</label>
-                            <input type="number" class="form-control" asp-for="Input.EvaluationCUrrentYear" min="1990" max="3000" />
-                            <span class="text-danger" asp-validation-for="Input.EvaluationCUrrentYear"></span>
-                        </div>
-                    </div>
-
-                    <!-- Ratings -->
-                    <div class="section-title">Performance Ratings (1 = Low, 5 = Excellent)</div>
-
-                    <div class="rating-block">
-                        <div class="rating-title">Work Quality/Performance</div>
-                        <div class="rating-scale">
-                            @for (int i = 1; i <= 5; i++)
-                            {
-                                <label class="rate-pill">
-                                    <input type="radio" asp-for="Input.WorkQuality" value="@i" />
-                                    <span>@i</span>
-                                </label>
-                            }
-                        </div>
-                        <span class="text-danger" asp-validation-for="Input.WorkQuality"></span>
-                    </div>
-
-                    <div class="rating-block">
-                        <div class="rating-title">Productivity</div>
-                        <div class="rating-scale">
-                            @for (int i = 1; i <= 5; i++)
-                            {
-                                <label class="rate-pill">
-                                    <input type="radio" asp-for="Input.Productivity" value="@i" />
-                                    <span>@i</span>
-                                </label>
-                            }
-                        </div>
-                        <span class="text-danger" asp-validation-for="Input.Productivity"></span>
-                    </div>
-
-                    <div class="rating-block">
-                        <div class="rating-title">Teamwork</div>
-                        <div class="rating-scale">
-                            @for (int i = 1; i <= 5; i++)
-                            {
-                                <label class="rate-pill">
-                                    <input type="radio" asp-for="Input.Teamwork" value="@i" />
-                                    <span>@i</span>
-                                </label>
-                            }
-                        </div>
-                        <span class="text-danger" asp-validation-for="Input.Teamwork"></span>
-                    </div>
-
-                    <div class="rating-block">
-                        <div class="rating-title">Attendance & Punctuality</div>
-                        <div class="rating-scale">
-                            @for (int i = 1; i <= 5; i++)
-                            {
-                                <label class="rate-pill">
-                                    <input type="radio" asp-for="Input.Attendance" value="@i" />
-                                    <span>@i</span>
-                                </label>
-                            }
-                        </div>
-                        <span class="text-danger" asp-validation-for="Input.Attendance"></span>
-                    </div>
-
-                    <div class="rating-block">
-                        <div class="rating-title">Communication</div>
-                        <div class="rating-scale">
-                            @for (int i = 1; i <= 5; i++)
-                            {
-                                <label class="rate-pill">
-                                    <input type="radio" asp-for="Input.Communication" value="@i" />
-                                    <span>@i</span>
-                                </label>
-                            }
-                        </div>
-                        <span class="text-danger" asp-validation-for="Input.Communication"></span>
-                    </div>
-
-                    <!-- Comments -->
-                    <div class="form-row">
-                        <div class="form-group full">
-                            <label class="form-label">Strengths</label>
-                            <textarea class="form-control" rows="3" asp-for="Input.Strengths" placeholder="Write strengths..."></textarea>
-                            <span class="text-danger" asp-validation-for="Input.Strengths"></span>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group full">
-                            <label class="form-label">Areas for Improvement</label>
-                            <textarea class="form-control" rows="3" asp-for="Input.Improvements" placeholder="Write improvements..."></textarea>
-                            <span class="text-danger" asp-validation-for="Input.Improvements"></span>
-                        </div>
-                    </div>
-
-                    <!-- Overall -->
-                    <div class="overall-row">
-                        <div class="overall-box">
-                            <div class="overall-label">Overall Rating</div>
-                            <input class="overall-input" asp-for="Input.OverallRating" readonly placeholder="Auto-calc / optional" />
-                        </div>
-
-                        <div class="overall-actions">
-                            <button type="submit" class="btn btn-primary">Save Evaluation</button>
-                            <button type="reset" class="btn btn-ghost">Reset</button>
-                        </div>
-                    </div>
-
-                </form>
-            </div>
-
-            <!-- RIGHT: SUMMARY -->
-            <div class="card side-card">
-                <div class="card-title">Quick Summary</div>
-                <div class="card-subtitle">Use this to verify before saving.</div>
-
-                <div class="summary-item">
-                    <div class="summary-label">Selected Employee</div>
-                    <div class="summary-value" id="sumEmployee">—</div>
-                </div>
-
-                <div class="summary-item">
-                    <div class="summary-label">Period</div>
-                    <div class="summary-value" id="sumPeriod">—</div>
-                </div>
-
-                <div class="summary-item">
-                    <div class="summary-label">Date</div>
-                    <div class="summary-value" id="sumDate">—</div>
-                </div>
-
-                <div class="summary-divider"></div>
-
-                <div class="summary-item">
-                    <div class="summary-label">Overall</div>
-                    <div class="summary-score" id="sumOverall">—</div>
-                </div>
-
-                <div class="hint-box">
-                    Tip: Keep ratings consistent with Attendance Tracking and Training records when applicable.
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- TAB: RECORDS -->
-    <div class="tab-content" id="tab-records">
-
+    <div class="tab-content active" id="tab-records">
         <div class="card">
             <div class="records-top">
                 <div class="records-title">Evaluation Records</div>
 
-                <div class="records-tools active">
+                <div class="records-tools">
                     <input type="text" class="form-control small" placeholder="Search name / ID..." id="searchBox" />
-                    <select class="form-control small" id="filterPeriod">
-                        <option value="">All Periods</option>
-                        <option>Q1</option>
-                        <option>Q2</option>
-                        <option>Q3</option>
-                        <option>Q4</option>
-                        <option>Annual</option>
+                    <!-- PERIOD DROPDOWN -->
+                    <select class="form-control" asp-for="Input.Period" disabled>
                     </select>
                 </div>
             </div>
-
-            <div class="table-wrap">
+                <div class="table-wrap">
                 <table class="table-fixed">
                     <thead>
                         <tr>
@@ -527,15 +297,12 @@
                         {
                             <tr>
                                 <td>EV-@r.Id.ToString("0000")</td>
-
                                 <td>
-                                    @(r.User != null? $"{r.User.EmployeeNumber} - {r.User.FirstName} {r.User.LastName}": $"User #{r.UserId}")
+                                    @(r.User != null ? $"{r.User.EmployeeNumber} - {r.User.FirstName} {r.User.LastName}": $"User #{r.UserId}")
                                 </td>
-
-                                <td>@(r.Period ?? "-")</td>
+                                <td>@(r.Period >= 1 && r.Period <= 12 ? new DateTime(2000, r.Period, 1).ToString("MMMM") : "-")</td>
                                 <td>@r.EvaluationDate.ToString("MMMM d, yyyy")</td>
                                 <td>@(string.IsNullOrWhiteSpace(r.OverallRating) ? "-" : r.OverallRating)</td>
-
                                 <td>
                                     <button type="button" class="btn btn-ghost btn-xs" onclick="openEvalModal(@r.Id)">
                                         View
@@ -552,118 +319,105 @@
             </div>
         </div>
     </div>
-</div>
 
-<!-- TAB: PERFORMANCE RECORDS -->
-<div class="tab-content" id="tab-performance">
+    <!-- TAB: PERFORMANCE RECORDS -->
+    <div class="tab-content" id="tab-performance">
+        <div class="card">
+            <div class="records-top">
+                <div class="records-title">Employees List</div>
 
-    <div class="card">
-
-        <!-- HEADER -->
-        <div class="records-top">
-            <div class="records-title">Employees List</div>
-
-            <div class="records-tools active">
-                <input type="text"
-                       class="form-control small"
-                       placeholder="Search"
-                       id="performanceSearchBox" />
+                <div class="records-tools active">
+                    <input type="text"
+                           class="form-control small"
+                           placeholder="Search"
+                           id="performanceSearchBox" />
+                </div>
             </div>
-        </div>
 
-        <!-- TABLE -->
-        <div class="table-wrap">
-            <table class="table-fixed">
-                <thead>
-                    <tr>
-                        <th style="width:120px;">ID. No</th>
-                        <th style="width:260px;">Name</th>
-                        <th style="width:220px;">Department</th>
-                        <th style="width:220px;">Evaluator Name</th>
-                        <th style="width:80px;"> Action </th>
-                    </tr>
-                </thead>
+            <div class="table-wrap performance-table-wrap">
+                <table class="table-fixed">
+                    <thead>
+                        <tr>
+                            <th style="width:120px;">ID. No</th>
+                            <th style="width:260px;">Name</th>
+                            <th style="width:220px;">Department</th>
+                            <th style="width:220px;">Evaluator Name</th>
+                            <th style="width:80px;">Action</th>
+                        </tr>
+                    </thead>
 
-                <tbody id="performanceBody">
+                    <tbody id="performanceBody">
+                        @if (Model.Employees != null && Model.Employees.Any())
+                        {
+                            foreach (var emp in Model.Employees)
+                            {
+                                <tr>
+                                    <td>@emp.EmployeeNumber</td>
+                                    <td>@emp.FirstName @emp.LastName</td>
+                                    <td>@(emp.Department ?? "-")</td>
+                                    <td>-</td>
+                                    <td class="table-actions">
+                                        <div class="action-menu">
+                                            <button type="button" class="action-btn">
+                                                <i class="bi bi-three-dots-vertical"></i>
+                                            </button>
 
-                    @if (Model.Employees != null && Model.Employees.Any())
-                    {
-                        foreach (var emp in Model.Employees)
+                                            <div class="action-dropdown">
+                                                @{
+                                                    DateTime? nextDate = Model.NextEvaluationDates.ContainsKey(emp.Id)
+                                                    ? Model.NextEvaluationDates[emp.Id]
+                                                    : null;
+
+                                                    var canEvaluate = !nextDate.HasValue || DateTime.Today >= nextDate.Value.Date;
+                                                }
+
+                                                @if (canEvaluate)
+                                                {
+                                                    <button type="button"
+                                                            class="dropdown-item"
+                                                            onclick="openEvaluatePanel('@emp.Id', '@emp.EmployeeNumber - @emp.FirstName @emp.LastName')">
+                                                        Evaluate
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button type="button" class="dropdown-item" disabled>
+                                                        Available on @nextDate?.ToString("dd/MM/yyyy")
+                                                    </button>
+                                                }
+                                                <button type="button"
+                                                        class="dropdown-item"
+                                                        onclick="openPerformancePanel(@emp.Id)">
+                                                    Performance Record
+                                                </button>
+
+                                                <button type="button"
+                                                        class="dropdown-item"
+                                                        onclick="openPanel('managementPanel')">
+                                                    Evaluation Management
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
                         {
                             <tr>
-
-                                <!-- Employee ID -->
-                                <td>
-                                    @emp.EmployeeNumber
-                                </td>
-
-                                <!-- Name -->
-                                <td>
-                                    @emp.FirstName @emp.LastName
-                                </td>
-
-                                <!-- Department -->
-                                <td>
-                                    @(emp.Department ?? "-")
-                                </td>
-
-                                <!-- Evaluator -->
-                                <td>
-                                    -
-                                </td>
-
-                                <!-- Actions -->
-                                <td class="table-actions">
-
-                                    <div class="action-menu">
-
-                                        <button type="button" class="action-btn">
-                                            <i class="bi bi-three-dots-vertical"></i>
-                                        </button>
-
-                                        <div class="action-dropdown">
-
-                                            <button type="button"
-                                                    class="dropdown-item"
-                                                    onclick="openPanel('evaluatePanel')">
-                                                Evaluate
-                                            </button>
-
-                                            <button type="button"
-                                                    class="dropdown-item"
-                                                    onclick="openPerformancePanel('@emp.EmployeeNumber','@emp.FirstName @emp.LastName','@emp.JobRole','@emp.Department','@emp.StartDate') ">
-                                                View Performance Record
-                                            </button>
-
-                                            <button type="button"
-                                                    class="dropdown-item"
-                                                    onclick="openPanel('managementPanel')">
-                                                Evaluation Management
-                                            </button>
-
-                                        </div>
-
-                                    </div>
-
+                                <td colspan="5" class="text-center text-muted">
+                                    No employees found.
                                 </td>
                             </tr>
                         }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="5" class="text-center text-muted">
-                                No employees found.
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </div>
         </div>
-
     </div>
 
 </div>
+
 <!-- VIEW EVALUATION MODAL OVERLAY -->
 <div id="evalOverlay" class="log-overlay" onclick="closeEvalModal()"></div>
 
@@ -682,7 +436,6 @@
     </div>
 
     <div class="log-modal-body" style="padding-top: 10px;">
-
         <div class="row" style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; margin-bottom:12px;">
             <div>
                 <div class="text-muted small">Employee</div>
@@ -726,51 +479,186 @@
             <div class="p-3 rounded border" style="background:#fafafa;" id="vComments">—</div>
         </div>
 
-        <div style="margin-top:12px;">
-            <div class="text-muted small">Overall Rating</div>
-            <div class="fw-semibold" style="font-size:18px;" id="vOverall">—</div>
-        </div>
+        <div style="margin-top:12px; display:flex; justify-content:space-between; align-items:flex-start; gap:24px;">
+            <div>
+                <div class="text-muted small">Overall Rating</div>
+                <div class="fw-semibold" style="font-size:18px;" id="vOverall">—</div>
+            </div>
 
+            <div style="text-align:right;">
+                <div class="text-muted small" style="font-size:13px;">
+                    Evaluated by: <span id="vEvaluatedBy">—</span>
+                </div>
+                <div class="text-muted small" style="font-size:13px; margin-top:4px;">
+                    Date: <span id="vEvaluatedDate">—</span>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
 <!-- PANEL OVERLAY -->
 <div id="panelOverlay" class="panel-overlay" onclick="closePanel()"></div>
-
 
 <!-- Evaluate Panel -->
 <div id="evaluatePanel" class="profile-panel">
     <div class="panel-header">
         <h3>Evaluate Employee</h3>
-        <button onclick="closePanel()">×</button>
+        <button type="button" onclick="closePanel()">×</button>
     </div>
 
     <div class="panel-body">
-        <!-- empty for now -->
+        <form method="post" class="eval-form">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+
+            <input type="hidden" asp-for="Input.UserId" id="modalUserId" />
+            <span class="text-danger" asp-validation-for="Input.UserId"></span>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Employee</label>
+                    <input type="text"
+                           class="form-control"
+                           id="modalEmployeeName"
+                           value="@Model.EmployeeOptions.FirstOrDefault(e => e.Value == (Model.Input.UserId?.ToString() ?? ""))?.Text"
+                           readonly />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Period</label>
+                    <select asp-for="Input.Period" class="form-control" disabled>
+                        @foreach (var month in Model.MonthOptions)
+                        {
+                            <option value="@month.Value" selected="@(Model.Input.Period == int.Parse(month.Value) ? "selected" : null)">
+                                @month.Text
+                            </option>
+                        }
+                    </select>
+                    <span class="text-danger" asp-validation-for="Input.Period"></span>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Evaluation Year</label>
+                    <input type="number" class="form-control" asp-for="Input.EvaluationCurrentYear" min="1990" max="3000" readonly/>
+                    <span class="text-danger" asp-validation-for="Input.EvaluationCurrentYear"></span>
+                </div>
+            </div>
+
+            <div class="section-title">Performance Ratings (1 = Low, 5 = Excellent)</div>
+
+            <div class="rating-block">
+                <div class="rating-title">Work Quality/Performance</div>
+                <div class="rating-scale">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <label class="rate-pill">
+                            <input type="radio" asp-for="Input.WorkQuality" value="@i" />
+                            <span>@i</span>
+                        </label>
+                    }
+                </div>
+                <span class="text-danger" asp-validation-for="Input.WorkQuality"></span>
+            </div>
+
+            <div class="rating-block">
+                <div class="rating-title">Productivity</div>
+                <div class="rating-scale">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <label class="rate-pill">
+                            <input type="radio" asp-for="Input.Productivity" value="@i" />
+                            <span>@i</span>
+                        </label>
+                    }
+                </div>
+                <span class="text-danger" asp-validation-for="Input.Productivity"></span>
+            </div>
+
+            <div class="rating-block">
+                <div class="rating-title">Teamwork</div>
+                <div class="rating-scale">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <label class="rate-pill">
+                            <input type="radio" asp-for="Input.Teamwork" value="@i" />
+                            <span>@i</span>
+                        </label>
+                    }
+                </div>
+                <span class="text-danger" asp-validation-for="Input.Teamwork"></span>
+            </div>
+
+            <div class="rating-block">
+                <div class="rating-title">Attendance & Punctuality</div>
+                <div class="rating-scale">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <label class="rate-pill">
+                            <input type="radio" asp-for="Input.Attendance" value="@i" />
+                            <span>@i</span>
+                        </label>
+                    }
+                </div>
+                <span class="text-danger" asp-validation-for="Input.Attendance"></span>
+            </div>
+
+            <div class="rating-block">
+                <div class="rating-title">Communication</div>
+                <div class="rating-scale">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <label class="rate-pill">
+                            <input type="radio" asp-for="Input.Communication" value="@i" />
+                            <span>@i</span>
+                        </label>
+                    }
+                </div>
+                <span class="text-danger" asp-validation-for="Input.Communication"></span>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group full">
+                    <label class="form-label">Strengths</label>
+                    <textarea class="form-control" rows="3" asp-for="Input.Strengths"></textarea>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group full">
+                    <label class="form-label">Areas for Improvement</label>
+                    <textarea class="form-control" rows="3" asp-for="Input.Improvements"></textarea>
+                </div>
+            </div>
+
+            <div class="overall-row">
+                <div class="overall-box">
+                    <div class="overall-label">Overall Rating</div>
+                    <input class="overall-input" placeholder="0.00" asp-for="Input.OverallRating" readonly />
+                </div>
+
+                <div class="overall-actions">
+                    <button type="submit" class="btn btn-primary">Save Evaluation</button>
+                    <button type="button" class="btn btn-ghost" onclick="closePanel()">Cancel</button>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 
 <!-- Performance History Panel -->
 <div id="performanceHistoryPanel" class="profile-panel performance-history-panel">
-
     <div class="panel-header">
-
         <div style="display:flex;align-items:center;gap:12px;">
             <button onclick="backToPerformancePanel()"
                     style="border:none;background:none;font-size:20px;cursor:pointer;">
                 ←
             </button>
-
             <h3 style="margin:0;">Performance History</h3>
         </div>
-
         <button onclick="closePanel()">×</button>
-
     </div>
 
     <div class="panel-body">
-
         <table class="history-table">
-
             <thead>
                 <tr>
                     <th style="width:150px;">Year</th>
@@ -780,72 +668,32 @@
             </thead>
 
             <tbody>
-
-                <tr>
-                    <td>2020</td>
-                    <td>-</td>
-                    <td>-</td>
-                </tr>
-
-                <tr>
-                    <td>2021</td>
-                    <td>-</td>
-                    <td>-</td>
-                </tr>
-
-                <tr>
-                    <td>2022</td>
-                    <td>-</td>
-                    <td>-</td>
-                </tr>
-
-                <tr>
-                    <td>2023</td>
-                    <td>-</td>
-                    <td>-</td>
-                </tr>
-
-                <tr>
-                    <td>2024</td>
-                    <td>-</td>
-                    <td>-</td>
-                </tr>
-
-                <tr>
-                    <td>2025</td>
-                    <td>-</td>
-                    <td>-</td>
-                </tr>
-
+                <tr><td>2020</td><td>-</td><td>-</td></tr>
+                <tr><td>2021</td><td>-</td><td>-</td></tr>
+                <tr><td>2022</td><td>-</td><td>-</td></tr>
+                <tr><td>2023</td><td>-</td><td>-</td></tr>
+                <tr><td>2024</td><td>-</td><td>-</td></tr>
+                <tr><td>2025</td><td>-</td><td>-</td></tr>
             </tbody>
-
         </table>
-
     </div>
-
 </div>
-
 
 <!-- Management Panel -->
 <div id="managementPanel" class="profile-panel management-panel">
-
     <div class="panel-header">
         <h3>Evaluation Management</h3>
         <button onclick="closePanel()">×</button>
     </div>
 
     <div class="panel-body">
-
         <div class="management-container">
-
             <div class="management-subtitle">
                 Manager and Peer Evaluation Summary
             </div>
 
             <div class="management-table-wrap">
-
                 <table class="management-table">
-
                     <thead>
                         <tr>
                             <th style="width:80px;">ID</th>
@@ -860,64 +708,28 @@
 
                     <tbody>
                         <tr>
-
-                            <!-- ID (Employee Number) -->
-                            <td>
-                               @*  @(p.UserInformation?.EmployeeNumber ?? "-") *@ 
-                               ADM-000001
-                            </td>
-
-                            <!-- Employee Name -->
-                            <td>
-                               @*  @(p.UserInformation != null
-                                                                ? $"{p.UserInformation.FirstName} {p.UserInformation.LastName}"
-                                                                : "-") *@
-                                CHOU CHOURUSEL
-                            </td>
-
-                            <!-- Evaluator -->
-                            <td>
-                                JOhn Cruz
-                            </td>
-
-                            <!-- Evaluator Name -->
-                            <td>
-                                Chai Deguzman
-                            </td>
-
-                            <!-- Department -->
-                            <td>
-                               @*  @(p.UserInformation?.Department ?? "-") *@
-                               Administration
-                            </td>
-
-                            <!-- Overall Average -->
-                            <td>
-                                9.56
-                            </td>
-
-                            <!-- Evaluation History -->
+                            <td>ADM-000001</td>
+                            <td>CHOU CHOURUSEL</td>
+                            <td>JOhn Cruz</td>
+                            <td>Chai Deguzman</td>
+                            <td>Administration</td>
+                            <td>9.56</td>
                             <td>
                                 <button class="btn btn-ghost btn-xs"
                                         onclick="openEvaluationHistoryPanel()">
                                     View
                                 </button>
                             </td>
-
                         </tr>
-
                     </tbody>
-
                 </table>
-
             </div>
-
         </div>
-
     </div>
-
 </div>
+
 <div id="performancePanel" class="profile-panel performance-panel">
+    <input type="hidden" id="currentPerformanceUserId" />
 
     <div class="panel-header">
         <h3>📊 Performance Record</h3>
@@ -925,9 +737,7 @@
     </div>
 
     <div class="panel-body">
-
         <table class="performance-table">
-
             <thead>
                 <tr>
                     <th style="width:40%;">Field</th>
@@ -936,71 +746,35 @@
             </thead>
 
             <tbody>
-
-                <tr>
-                    <td>Employee ID</td>
-                    <td id="perfEmployeeId">—</td>
-                </tr>
-
-                <tr>
-                    <td>Employee Name</td>
-                    <td id="perfEmployeeName">—</td>
-                </tr>
-
-                <tr>
-                    <td>Job Title/Position</td>
-                    <td id="perfJobRole">—</td>
-                </tr>
-
-                <tr>
-                    <td>Department</td>
-                    <td id="perfDepartment">—</td>
-                </tr>
-
-                <tr>
-                    <td>Date Hired</td>
-                    <td id="perfDateHired">—</td>
-                </tr>
-
-                <tr>
-                    <td>Performance Overall Score</td>
-                    <td id="perfOverallScore">—</td>
-                </tr>
-
+                <tr><td>Employee ID</td><td id="perfEmployeeId">—</td></tr>
+                <tr><td>Employee Name</td><td id="perfEmployeeName">—</td></tr>
+                <tr><td>Job Title/Position</td><td id="perfJobRole">—</td></tr>
+                <tr><td>Department</td><td id="perfDepartment">—</td></tr>
+                <tr><td>Date Hired</td><td id="perfDateHired">—</td></tr>
+                <tr><td>Performance Overall Score</td><td id="perfOverallScore">—</td></tr>
             </tbody>
-
         </table>
 
         <div class="performance-history">
-            <a href="#" onclick="openPerformanceHistory()">View Performance History</a>
+            <a href="#" onclick="openPerformanceHistory(); return false;">View Performance History</a>
         </div>
-
     </div>
-
 </div>
-
 <!-- Evaluation History Panel -->
 <div id="evaluationHistoryPanel" class="profile-panel evaluation-history-panel">
-
     <div class="panel-header">
-
         <div style="display:flex;align-items:center;gap:12px;">
             <button onclick="backToManagementPanel()"
                     style="border:none;background:none;font-size:20px;cursor:pointer;">
                 ←
             </button>
-
             <h3 style="margin:0;">Evaluation History</h3>
         </div>
-
         <button onclick="closePanel()">×</button>
-
     </div>
 
     <div class="panel-body">
-
         <table class="evaluation-history-table">
-
             <thead>
                 <tr>
                     <th style="width:250px;">Evaluation Period</th>
@@ -1009,34 +783,15 @@
             </thead>
 
             <tbody>
-
-                <tr>
-                    <td>Q1 2024</td>
-                    <td>-</td>
-                </tr>
-
-                <tr>
-                    <td>Q2 2024</td>
-                    <td>-</td>
-                </tr>
-
-                <tr>
-                    <td>Q3 2024</td>
-                    <td>-</td>
-                </tr>
-
-                <tr>
-                    <td>Annual 2024</td>
-                    <td>-</td>
-                </tr>
-
+                <tr><td>Q1 2024</td><td>-</td></tr>
+                <tr><td>Q2 2024</td><td>-</td></tr>
+                <tr><td>Q3 2024</td><td>-</td></tr>
+                <tr><td>Annual 2024</td><td>-</td></tr>
             </tbody>
-
         </table>
-
     </div>
-
 </div>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 
@@ -1055,70 +810,20 @@
         // Print
         document.getElementById("btnPrint")?.addEventListener("click", () => window.print());
 
-        // Quick summary + optional overall calc
-        const selEmp = document.querySelector('[name="Input.UserId"]');
-        const selPeriod = document.querySelector('[name="Input.Period"]');
-        const inpDate = document.querySelector('[name="Input.EvaluationDate"]');
-        const overall = document.querySelector('[name="Input.OverallRating"]');
-
-        function getCheckedValue(name) {
-            const el = document.querySelector(`input[name="${name}"]:checked`);
-            return el ? parseInt(el.value) : null;
-        }
-
-        function calcOverall() {
-            const vals = [
-                getCheckedValue("Input.WorkQuality"),
-                getCheckedValue("Input.Productivity"),
-                getCheckedValue("Input.Teamwork"),
-                getCheckedValue("Input.Attendance"),
-                getCheckedValue("Input.Communication"),
-            ].filter(v => v !== null);
-
-            if (!vals.length) return "";
-            const avg = (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2);
-            return avg;
-        }
-
-        function updateSummary() {
-            const empText = selEmp?.selectedOptions?.[0]?.text ?? "—";
-            const periodText = selPeriod?.value ?? "—";
-            const dateText = inpDate?.value ?? "—";
-
-            const avg = calcOverall();
-            if (overall) overall.value = avg;
-
-            document.getElementById("sumEmployee").textContent = (selEmp?.value ? empText : "—");
-            document.getElementById("sumPeriod").textContent = (periodText && periodText !== "" ? periodText : "—");
-            document.getElementById("sumDate").textContent = (dateText && dateText !== "" ? dateText : "—");
-            document.getElementById("sumOverall").textContent = (avg && avg !== "" ? avg : "—");
-        }
-
-        ["change", "input"].forEach(evt => {
-            selEmp?.addEventListener(evt, updateSummary);
-            selPeriod?.addEventListener(evt, updateSummary);
-            inpDate?.addEventListener(evt, updateSummary);
+        // Search
+        document.getElementById("performanceSearchBox")?.addEventListener("input", function () {
+            const value = this.value.toLowerCase();
+            document.querySelectorAll("#performanceBody tr").forEach(row => {
+                const text = row.innerText.toLowerCase();
+                row.style.display = text.includes(value) ? "" : "none";
+            });
         });
 
-        document.querySelectorAll('input[type="radio"]').forEach(r => r.addEventListener("change", updateSummary));
-        updateSummary();
-
-        // (Optional) Activity search filter (frontend only)
-        function filterActivity() {
-            const q = (document.getElementById("actSearch")?.value || "").toLowerCase();
-            document.querySelectorAll("#activityBody tr").forEach(tr => {
-                const text = tr.innerText.toLowerCase();
-                tr.style.display = text.includes(q) ? "" : "none";
-            });
-        }
-        document.getElementById("actSearch")?.addEventListener("input", filterActivity);
-
-        //MODAL VIEW DISPLAY
-             function openEvalModal(id) {
+        // View Evaluation Modal
+        function openEvalModal(id) {
             document.getElementById("evalOverlay").style.display = "block";
             document.getElementById("evalModal").style.display = "block";
 
-            // reset
             document.getElementById("vEmployee").innerText = "Loading...";
             document.getElementById("vPeriod").innerText = "—";
             document.getElementById("vDate").innerText = "—";
@@ -1126,6 +831,9 @@
             document.getElementById("vImprovements").innerText = "—";
             document.getElementById("vComments").innerText = "—";
             document.getElementById("vOverall").innerText = "—";
+            document.getElementById("vEvaluatedBy").innerText = "—";
+            document.getElementById("vEvaluatedDate").innerText = "—";
+
             document.getElementById("vRatings").innerHTML = `<tr><td colspan="2">Loading...</td></tr>`;
 
             fetch(`?handler=EvalDetails&id=${id}`)
@@ -1158,7 +866,8 @@
                     document.getElementById("vImprovements").innerText = data.improvements?.trim() ? data.improvements : "—";
                     document.getElementById("vComments").innerText = data.comments?.trim() ? data.comments : "—";
                     document.getElementById("vOverall").innerText = data.overall?.trim() ? data.overall : "—";
-                })
+                    document.getElementById("vEvaluatedBy").innerText = data.evaluatedBy || "—";
+                    document.getElementById("vEvaluatedDate").innerText = data.evaluatedDate || "—";                })
                 .catch(err => {
                     console.error(err);
                     document.getElementById("vRatings").innerHTML = `<tr><td colspan="2">Error loading evaluation.</td></tr>`;
@@ -1169,104 +878,228 @@
             document.getElementById("evalOverlay").style.display = "none";
             document.getElementById("evalModal").style.display = "none";
         }
-        document.getElementById("performanceSearchBox")?.addEventListener("input", function () {
-            const value = this.value.toLowerCase();
-            document.querySelectorAll("#performanceBody tr").forEach(row => {
-                const text = row.innerText.toLowerCase();
-                row.style.display = text.includes(value) ? "" : "none";
-            });
-        });
-                // ACTION MENU DROPDOWN
-        document.querySelectorAll(".action-btn").forEach(btn => {
 
-            btn.addEventListener("click", function (e) {
+        // Dropdown
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".action-btn").forEach(btn => {
+                btn.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
 
-                e.stopPropagation();
+                    document.querySelectorAll(".action-menu").forEach(menu => {
+                        if (menu !== this.closest(".action-menu")) {
+                            menu.classList.remove("active");
+                        }
+                    });
 
-                document.querySelectorAll(".action-menu").forEach(m => {
-                    if (m !== this.parentElement)
-                        m.classList.remove("active");
+                    this.closest(".action-menu").classList.toggle("active");
                 });
-
-                this.parentElement.classList.toggle("active");
-
             });
 
+            document.addEventListener("click", function () {
+                document.querySelectorAll(".action-menu").forEach(menu => {
+                    menu.classList.remove("active");
+                });
+            });
         });
 
-        // close when clicking outside
-        document.addEventListener("click", () => {
-            document.querySelectorAll(".action-menu")
-                .forEach(m => m.classList.remove("active"));
-        });
-        function openPanel(panelId){
-
+        // Panels
+        function openPanel(panelId) {
             document.getElementById("panelOverlay").style.display = "block";
-
-            document.querySelectorAll(".profile-panel")
-                .forEach(p => p.style.display = "none");
-
+            document.querySelectorAll(".profile-panel").forEach(p => p.style.display = "none");
             document.getElementById(panelId).style.display = "block";
         }
 
-        function closePanel(){
-
+        function closePanel() {
             document.getElementById("panelOverlay").style.display = "none";
-
-            document.querySelectorAll(".profile-panel")
-                .forEach(p => p.style.display = "none");
+            document.querySelectorAll(".profile-panel").forEach(p => p.style.display = "none");
         }
 
-        function openPerformancePanel(id,name,role,dept,date){
+        function openPerformancePanel(id) {
+            document.getElementById("panelOverlay").style.display = "block";
 
-            document.getElementById("panelOverlay").style.display="block";
+            document.querySelectorAll(".profile-panel").forEach(p => p.style.display = "none");
+            document.getElementById("performancePanel").style.display = "block";
 
-            document.querySelectorAll(".profile-panel")
-                .forEach(p=>p.style.display="none");
+            document.getElementById("perfEmployeeId").innerText = "Loading...";
+            document.getElementById("perfEmployeeName").innerText = "Loading...";
+            document.getElementById("perfJobRole").innerText = "Loading...";
+            document.getElementById("perfDepartment").innerText = "Loading...";
+            document.getElementById("perfDateHired").innerText = "Loading...";
+            document.getElementById("perfOverallScore").innerText = "Loading...";
 
-            document.getElementById("performancePanel").style.display="block";
+            fetch(`?handler=PerformanceDetails&id=${id}`)
+                .then(res => {
+                    if (!res.ok) throw new Error("Failed to load performance details");
+                    return res.json();
+                })
+                .then(data => {
+                    document.getElementById("currentPerformanceUserId").value = id;
+                    document.getElementById("perfEmployeeId").innerText = data.id || "—";
+                    document.getElementById("perfEmployeeName").innerText = data.name || "—";
+                    document.getElementById("perfJobRole").innerText = data.jobRole || "—";
+                    document.getElementById("perfDepartment").innerText = data.department || "—";
+                    document.getElementById("perfDateHired").innerText = data.dateHired || "—";
+                    document.getElementById("perfOverallScore").innerText = data.overallScore || "—";
 
-            document.getElementById("perfEmployeeId").innerText=id;
-            document.getElementById("perfEmployeeName").innerText=name;
-            document.getElementById("perfJobRole").innerText=role ?? "-";
-            document.getElementById("perfDepartment").innerText=dept ?? "-";
-            document.getElementById("perfDateHired").innerText=date ?? "-";
-
-            document.getElementById("perfOverallScore").innerText="—";
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById("perfEmployeeId").innerText = "Error";
+                    document.getElementById("perfEmployeeName").innerText = "Error";
+                    document.getElementById("perfJobRole").innerText = "Error";
+                    document.getElementById("perfDepartment").innerText = "Error";
+                    document.getElementById("perfDateHired").innerText = "Error";
+                    document.getElementById("perfOverallScore").innerText = "Error";
+                });
         }
 
-        function closePerformancePanel(){
+        function closePerformancePanel() {
             document.getElementById("performancePanel").style.display = "none";
         }
-        function openPerformanceHistory(){
 
-            document.querySelectorAll(".profile-panel")
-                .forEach(p => p.style.display="none");
+        function openPerformanceHistory() {
+            const userId = document.getElementById("currentPerformanceUserId").value;
+            if (!userId) return;
 
-            document.getElementById("performanceHistoryPanel").style.display="block";
+            document.querySelectorAll(".profile-panel").forEach(p => p.style.display = "none");
+            document.getElementById("performanceHistoryPanel").style.display = "block";
 
+            const tbody = document.querySelector("#performanceHistoryPanel tbody");
+            tbody.innerHTML = `<tr><td colspan="3">Loading...</td></tr>`;
+
+            fetch(`?handler=PerformanceHistory&id=${userId}`)
+                .then(res => {
+                    if (!res.ok) throw new Error("Failed to load performance history");
+                    return res.json();
+                })
+                .then(data => {
+                    if (!data.length) {
+                        tbody.innerHTML = `<tr><td colspan="3">No performance history found.</td></tr>`;
+                        return;
+                    }
+
+                    tbody.innerHTML = data.map(row => `
+                        <tr>
+                            <td>${row.year}</td>
+                            <td>${row.score}%</td>
+                            <td>${row.trend}</td>
+                        </tr>
+                    `).join("");
+                })
+                .catch(err => {
+                    console.error(err);
+                    tbody.innerHTML = `<tr><td colspan="3">Error loading performance history.</td></tr>`;
+                });
         }
 
-        function backToPerformancePanel(){
-
-            document.querySelectorAll(".profile-panel")
-                .forEach(p => p.style.display="none");
-            document.getElementById("performancePanel").style.display="block";
-        }
-        function openEvaluationHistoryPanel(){
-
-            document.querySelectorAll(".profile-panel")
-                .forEach(p => p.style.display="none");
-
-            document.getElementById("evaluationHistoryPanel").style.display="block";
+        function backToPerformancePanel() {
+            document.querySelectorAll(".profile-panel").forEach(p => p.style.display = "none");
+            document.getElementById("performancePanel").style.display = "block";
         }
 
-        function backToManagementPanel(){
-
-            document.querySelectorAll(".profile-panel")
-                .forEach(p => p.style.display="none");
-
-            document.getElementById("managementPanel").style.display="block";
+        function openEvaluationHistoryPanel() {
+            document.querySelectorAll(".profile-panel").forEach(p => p.style.display = "none");
+            document.getElementById("evaluationHistoryPanel").style.display = "block";
         }
+
+        function backToManagementPanel() {
+            document.querySelectorAll(".profile-panel").forEach(p => p.style.display = "none");
+            document.getElementById("managementPanel").style.display = "block";
+        }
+
+        // Evaluate modal
+        function openEvaluatePanel(userId, employeeName) {
+            document.getElementById("panelOverlay").style.display = "block";
+
+            document.querySelectorAll(".profile-panel").forEach(p => p.style.display = "none");
+            document.getElementById("evaluatePanel").style.display = "block";
+
+            document.getElementById("modalUserId").value = userId;
+            document.getElementById("modalEmployeeName").value = employeeName;
+
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, "0");
+            const dd = String(today.getDate()).padStart(2, "0");
+
+            const dateInput = document.querySelector('#evaluatePanel [name="Input.EvaluationDate"]');
+            const yearInput = document.querySelector('#evaluatePanel [name="Input.EvaluationCUrrentYear"]');
+
+            if (periodSelect) {
+                periodSelect.value = "@Model.Input.Period"; // string literal
+                periodSelect.disabled = true;
+            }
+            
+            if (dateInput && !dateInput.value) {
+                dateInput.value = `${yyyy}-${mm}-${dd}`;
+            }
+
+            if (yearInput && !yearInput.value) {
+                yearInput.value = yyyy;
+            }
+
+            updateModalOverall();
+        }
+
+        function getCheckedValueInModal(name) {
+            const panel = document.getElementById("evaluatePanel");
+            const el = panel.querySelector(`input[name="${name}"]:checked`);
+            return el ? parseInt(el.value) : null;
+        }
+
+        function calcOverallInModal() {
+            const vals = [
+                getCheckedValueInModal("Input.WorkQuality"),
+                getCheckedValueInModal("Input.Productivity"),
+                getCheckedValueInModal("Input.Teamwork"),
+                getCheckedValueInModal("Input.Attendance"),
+                getCheckedValueInModal("Input.Communication")
+            ].filter(v => v !== null);
+
+            if (!vals.length) return "";
+            return (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2);
+        }
+
+        function updateModalOverall() {
+            const panel = document.getElementById("evaluatePanel");
+            const overallInput = panel.querySelector('[name="Input.OverallRating"]');
+            if (!overallInput) return;
+            overallInput.value = calcOverallInModal();
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const panel = document.getElementById("evaluatePanel");
+            if (!panel) return;
+
+            panel.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.addEventListener("change", updateModalOverall);
+            });
+
+            updateModalOverall();
+        });
     </script>
 }
+
+@if (TempData["OpenEvaluateModal"]?.ToString() == "true")
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("panelOverlay").style.display = "block";
+            document.getElementById("evaluatePanel").style.display = "block";
+
+            const hiddenUserId = document.getElementById("modalUserId");
+            const employeeName = document.getElementById("modalEmployeeName");
+
+            if (hiddenUserId && employeeName && !employeeName.value) {
+                const selected = document.querySelector(`#performanceBody button[onclick*="openEvaluatePanel('${hiddenUserId.value}'"]`);
+                if (selected) {
+                    // fallback only if needed
+                }
+            }
+
+            updateModalOverall();
+        });
+    </script>
+}
+
