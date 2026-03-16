@@ -1,12 +1,11 @@
 using HRMS_System.Data;
 using HRMS_System.Models;
 using HRMS_System.Models.Reports;
-using HRMS_System.Models.Training;
+using HRMS_System.Models.Evaluation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using HRMS_System.Models.Evaluation;
 
 namespace HRMS_System.Pages.Hrms.ReportManagement
 {
@@ -24,7 +23,7 @@ namespace HRMS_System.Pages.Hrms.ReportManagement
 
         // Dropdown sources
         public List<SelectListItem> DepartmentOptions { get; set; } = new();
-
+   //     public List<TrainingandSeminar> TrainingFilter { get; set; } = new();
         // UI Rows
         public List<PerformanceRowVM> PerformanceRows { get; set; } = new();
         public List<AttendanceRowVM> AttendanceRows { get; set; } = new();
@@ -138,46 +137,48 @@ namespace HRMS_System.Pages.Hrms.ReportManagement
 
         private async Task LoadTrainingAsync()
         {
-            IQueryable<TrainingRecord> q = _context.Set<TrainingRecord>()
-                .Include(r => r.User)
-                .Include(r => r.Session);
+            /*
+                IQueryable<TrainingandSeminar> q = _context.Set<TrainingandSeminar>()
+                    .Include(r => r.User)
+                    .Include(r => r.Session);
 
-            if (Filter.FromDate.HasValue)
-                q = q.Where(r => r.Session!.StartDate >= Filter.FromDate.Value.Date);
+                if (Filter.FromDate.HasValue)
+                    q = q.Where(r => r.Session!.StartDate >= Filter.FromDate.Value.Date);
 
-            if (Filter.ToDate.HasValue)
-                q = q.Where(r => r.Session!.StartDate <= Filter.ToDate.Value.Date);
+                if (Filter.ToDate.HasValue)
+                    q = q.Where(r => r.Session!.StartDate <= Filter.ToDate.Value.Date);
 
-            if (!string.IsNullOrWhiteSpace(Filter.Provider))
-                q = q.Where(r => r.Provider.Contains(Filter.Provider));
+                if (!string.IsNullOrWhiteSpace(Filter.Provider))
+                    q = q.Where(r => r.Provider.Contains(Filter.Provider));
 
-            if (!string.IsNullOrWhiteSpace(Filter.Search))
-            {
-                q = q.Where(r =>
-                    r.Session!.Title!.Contains(Filter.Search) ||
-                    r.User.FirstName!.Contains(Filter.Search) ||
-                    r.User.LastName!.Contains(Filter.Search));
-            }
+                if (!string.IsNullOrWhiteSpace(Filter.Search))
+                {
+                    q = q.Where(r =>
+                        r.Session!.Title!.Contains(Filter.Search) ||
+                        r.User.FirstName!.Contains(Filter.Search) ||
+                        r.User.LastName!.Contains(Filter.Search));
+                }
 
-            var rows = await q
-                .OrderByDescending(r => r.Session!.StartDate)
-                .ToListAsync();
+                var rows = await q
+                    .OrderByDescending(r => r.Session!.StartDate)
+                    .ToListAsync();
 
-            TrainingRows = rows.Select(r => new TrainingRowVM
-            {
-                SessionDate = r.Session!.StartDate,
-                Title = r.Session.Title ?? "-",
-                Provider = r.Provider,
-                TrainingType = r.Session.TrainingType.ToString(),
-                EmployeeDisplay = $"{r.User.FirstName} {r.User.LastName} ({r.User.EmployeeNumberDigits})",
-                Progress = r.Progress.ToString(),
-                DateCompletedDisplay = r.DateCompleted?.ToString("yyyy-MM-dd") ?? "-",
-                CertificationId = r.CertificationId
-            }).ToList();
+                TrainingRows = rows.Select(r => new TrainingRowVM
+                {
+                    SessionDate = r.Session!.StartDate,
+                    Title = r.Session.Title ?? "-",
+                    Provider = r.Provider,
+                    TrainingType = r.Session.TrainingType.ToString(),
+                    EmployeeDisplay = $"{r.User.FirstName} {r.User.LastName} ({r.User.EmployeeNumberDigits})",
+                    Progress = r.Progress.ToString(),
+                    DateCompletedDisplay = r.DateCompleted?.ToString("yyyy-MM-dd") ?? "-",
+                    CertificationId = r.CertificationId
+                }).ToList();
 
-            TrainingSummary.TotalRecords = TrainingRows.Count;
-            TrainingSummary.TotalSessions = rows.Select(x => x.TrainingSessionId).Distinct().Count();
-            TrainingSummary.CompletedCount = rows.Count(x => x.Progress == TrainingProgress.Completed);
+                TrainingSummary.TotalRecords = TrainingRows.Count;
+                TrainingSummary.TotalSessions = rows.Select(x => x.TrainingSessionId).Distinct().Count();
+                TrainingSummary.CompletedCount = rows.Count(x => x.Progress == "Completed");
+                    */
         }
 
         private static double Avg5(params int?[] vals)

@@ -50,7 +50,7 @@ namespace HRMS_System.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AttendanceTrackings");
+                    b.ToTable("AttendanceTracking");
                 });
 
             modelBuilder.Entity("HRMS_System.Models.Department", b =>
@@ -134,7 +134,7 @@ namespace HRMS_System.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Evaluations");
+                    b.ToTable("Evaluation");
                 });
 
             modelBuilder.Entity("HRMS_System.Models.LoginModel", b =>
@@ -187,6 +187,9 @@ namespace HRMS_System.Migrations
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("EmployeeInfoId")
+                        .HasColumnType("int");
+
                     b.Property<string>("EmployeeName")
                         .IsRequired()
                         .HasMaxLength(120)
@@ -215,10 +218,12 @@ namespace HRMS_System.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("EmployeeInfoId");
+
                     b.ToTable("PromotionNotifications");
                 });
 
-            modelBuilder.Entity("HRMS_System.Models.Reports.ReportFilterModel", b =>
+            modelBuilder.Entity("HRMS_System.Models.PromotionRecord", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -226,34 +231,34 @@ namespace HRMS_System.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ActiveTab")
+                    b.Property<string>("ApprovedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("NewRole")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Department")
+                    b.Property<string>("Notes")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("FromDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Period")
+                    b.Property<string>("OldRole")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Provider")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Search")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ToDate")
+                    b.Property<DateTime>("PromotionDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.ToTable("ReportFilters");
+                    b.HasIndex("EmployeeId");
+
+                    b.ToTable("PromotionRecords");
                 });
 
-            modelBuilder.Entity("HRMS_System.Models.Training.TrainingRecord", b =>
+            modelBuilder.Entity("HRMS_System.Models.TrainingandSeminar", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -261,95 +266,28 @@ namespace HRMS_System.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CertificationId")
-                        .HasMaxLength(80)
-                        .HasColumnType("nvarchar(80)");
+                    b.Property<int>("CertificateCount")
+                        .HasColumnType("int");
 
-                    b.Property<DateTime?>("DateCompleted")
+                    b.Property<DateTime>("DateAccomplished")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Duration")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("Progress")
+                    b.Property<int>("Points")
                         .HasColumnType("int");
-
-                    b.Property<string>("Provider")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<int>("TrainingSessionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("ValidUntil")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TrainingSessionId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("TrainingRecords");
-                });
-
-            modelBuilder.Entity("HRMS_System.Models.Training.TrainingSession", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
-                    b.Property<TimeSpan>("EndTime")
-                        .HasColumnType("time");
-
-                    b.Property<int>("Progress")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Provider")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<int>("SessionType")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<TimeSpan>("StartTime")
-                        .HasColumnType("time");
-
-                    b.Property<string>("TargetAudience")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.Property<int>("TrainingType")
+                    b.Property<int>("UserInformationId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("TrainingSessions");
+                    b.HasIndex("UserInformationId");
+
+                    b.ToTable("TrainingandSeminar", (string)null);
                 });
 
             modelBuilder.Entity("HRMS_System.Models.UserInformationModel", b =>
@@ -484,33 +422,42 @@ namespace HRMS_System.Migrations
                     b.Navigation("UserInformation");
                 });
 
-            modelBuilder.Entity("HRMS_System.Models.Training.TrainingRecord", b =>
+            modelBuilder.Entity("HRMS_System.Models.PromotionNotificationModel", b =>
                 {
-                    b.HasOne("HRMS_System.Models.Training.TrainingSession", "Session")
-                        .WithMany("Records")
-                        .HasForeignKey("TrainingSessionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HRMS_System.Models.UserInformationModel", "User")
+                    b.HasOne("HRMS_System.Models.UserInformationModel", "EmployeeInfo")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("EmployeeInfoId");
 
-                    b.Navigation("Session");
-
-                    b.Navigation("User");
+                    b.Navigation("EmployeeInfo");
                 });
 
-            modelBuilder.Entity("HRMS_System.Models.Training.TrainingSession", b =>
+            modelBuilder.Entity("HRMS_System.Models.PromotionRecord", b =>
                 {
-                    b.Navigation("Records");
+                    b.HasOne("HRMS_System.Models.UserInformationModel", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("HRMS_System.Models.TrainingandSeminar", b =>
+                {
+                    b.HasOne("HRMS_System.Models.UserInformationModel", "UserInfo")
+                        .WithMany("TrainingandSeminar")
+                        .HasForeignKey("UserInformationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("UserInfo");
                 });
 
             modelBuilder.Entity("HRMS_System.Models.UserInformationModel", b =>
                 {
                     b.Navigation("Login");
+
+                    b.Navigation("TrainingandSeminar");
                 });
 #pragma warning restore 612, 618
         }

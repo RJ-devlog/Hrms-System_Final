@@ -70,7 +70,7 @@
                     .ToListAsync();
 
             //Time In/Out tab data (REAL current month)
-            TimeInOutMonthAttendance = await _context.AttendanceTrackings
+            TimeInOutMonthAttendance = await _context.AttendanceTracking
                 .AsNoTracking()
                 .Include(a => a.User)
                 .Where(a => a.AttendanceDate >= realMonthStart && a.AttendanceDate < realMonthEndExclusive)
@@ -118,7 +118,7 @@
                 rangeEndExclusive = DateTime.Today.AddDays(1);
             }
 
-            DateRangeAttendance = await _context.AttendanceTrackings
+            DateRangeAttendance = await _context.AttendanceTracking
                     .AsNoTracking()
                     .Include(a => a.User)
                     .Where(a => a.AttendanceDate >= rangeStart && a.AttendanceDate < rangeEndExclusive)
@@ -127,7 +127,7 @@
                     .ToListAsync();
 
                 //Today attendance
-                TodayAttendance = await _context.AttendanceTrackings
+                TodayAttendance = await _context.AttendanceTracking
                     .AsNoTracking()
                     .Where(a => a.AttendanceDate == today)
                     .ToListAsync();
@@ -138,7 +138,7 @@
                     .Count(d => d.DayOfWeek != DayOfWeek.Saturday && d.DayOfWeek != DayOfWeek.Sunday);
 
                 //Attendance Summary based on SUMMARY MONTH
-                AttendanceSummary = await _context.AttendanceTrackings
+                AttendanceSummary = await _context.AttendanceTracking
                     .AsNoTracking()
                     .Include(a => a.User)
                     .Where(a => a.AttendanceDate >= summaryMonthStart && a.AttendanceDate < summaryMonthEndExclusive)
@@ -170,7 +170,7 @@
 
                 if (emp == null) return NotFound();
 
-                var query = _context.AttendanceTrackings
+                var query = _context.AttendanceTracking
                     .AsNoTracking()
                     .Where(a => a.UserId == id);
 

@@ -1,8 +1,10 @@
 ﻿using HRMS_System.Data;
-using HRMS_System.Models.Training;
+using HRMS_System.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using TrainingRecord = HRMS_System.Models.TrainingandSeminar;
 
 namespace HRMS_System.Pages.Hrms.TrainingandSeminar
 {
@@ -15,202 +17,139 @@ namespace HRMS_System.Pages.Hrms.TrainingandSeminar
             _context = context;
         }
 
-        public List<TrainingRecord> Records { get; set; } = new();
-        public List<TrainingSession> Sessions { get; set; } = new();
+        public List<TrainingRecord> Trainings { get; set; } = new();
+        public List<SelectListItem> EmployeeOptions { get; set; } = new();
+        public List<EmployeeCertificateCountModel> CertificateCounts { get; set; } = new();
 
         [BindProperty]
-        public TrainingSession CreateSession { get; set; } = new();
-
-        [BindProperty]
-        public TrainingSession EditSession { get; set; } = new();
+        public TrainingRecord Input { get; set; } = new();
 
         [BindProperty(SupportsGet = true)]
-        public string? Tab { get; set; } = "tab-records";
-
-        public bool ReopenCreateModal { get; set; }
-        public bool ReopenEditModal { get; set; }
+        public string? SearchTerm { get; set; }
 
         public async Task OnGetAsync()
         {
-            if (string.IsNullOrWhiteSpace(Tab))
-                Tab = "tab-records";
-
-            await LoadDataAsync();
+            await LoadPageDataAsync();
         }
 
-        public async Task<IActionResult> OnPostCreateSessionAsync()
+        public async Task<IActionResult> OnPostSaveAsync()
         {
-            Tab = "tab-sessions";
-
-            // Normalize values first
-            CreateSession.Title = (CreateSession.Title ?? string.Empty).Trim();
-            CreateSession.Description = (CreateSession.Description ?? string.Empty).Trim();
-            CreateSession.TargetAudience = (CreateSession.TargetAudience ?? string.Empty).Trim();
-            CreateSession.Provider = string.IsNullOrWhiteSpace(CreateSession.Provider)
-                ? "Internal"
-                : CreateSession.Provider.Trim();
-
-            // IMPORTANT: clear all automatic validation state,
-            // then validate ONLY the posted form model
-            ModelState.Clear();
-            TryValidateModel(CreateSession, nameof(CreateSession));
-            ValidateSession(CreateSession, nameof(CreateSession));
-
             if (!ModelState.IsValid)
             {
-                ReopenCreateModal = true;
-                await LoadDataAsync();
+                await LoadPageDataAsync();
                 return Page();
             }
 
-            _context.TrainingSessions.Add(CreateSession);
+            if (Input.Id == 0)
+            {
+                _context.TrainingandSeminar.Add(Input);
+            }
+            else
+            {
+                var existing = await _context.TrainingandSeminar
+                    .FirstOrDefaultAsync(x => x.Id == Input.Id);
+
+                if (existing == null)
+                    return NotFound();
+
+                existing.UserInformationId = Input.UserInformationId;
+                existing.Title = Input.Title;
+                existing.DateAccomplished = Input.DateAccomplished;
+                existing.Points = Input.Points;
+            }
+
             await _context.SaveChangesAsync();
-
-            await SyncTrainingRecordsForSessionAsync(CreateSession);
-            await _context.SaveChangesAsync();
-
-            return RedirectToPage(new { tab = "tab-sessions" });
+            return RedirectToPage();
         }
 
-        public async Task<IActionResult> OnPostEditSessionAsync()
+        public async Task<IActionResult> OnPostDeleteAsync(int id)
         {
-            Tab = "tab-sessions";
+            var record = await _context.TrainingandSeminar
+                .FirstOrDefaultAsync(x => x.Id == id);
 
-            // Normalize values first
-            EditSession.Title = (EditSession.Title ?? string.Empty).Trim();
-            EditSession.Description = (EditSession.Description ?? string.Empty).Trim();
-            EditSession.TargetAudience = (EditSession.TargetAudience ?? string.Empty).Trim();
-            EditSession.Provider = string.IsNullOrWhiteSpace(EditSession.Provider)
-                ? "Internal"
-                : EditSession.Provider.Trim();
-
-            // IMPORTANT: clear all automatic validation state,
-            // then validate ONLY the posted form model
-            ModelState.Clear();
-            TryValidateModel(EditSession, nameof(EditSession));
-            ValidateSession(EditSession, nameof(EditSession));
-
-            if (!ModelState.IsValid)
+            if (record != null)
             {
-                ReopenEditModal = true;
-                await LoadDataAsync();
-                return Page();
+                _context.TrainingandSeminar.Remove(record);
+                await _context.SaveChangesAsync();
             }
 
-            var session = await _context.TrainingSessions
-                .FirstOrDefaultAsync(s => s.Id == EditSession.Id);
-
-            if (session == null)
-            {
-                ModelState.AddModelError(string.Empty, "Session not found.");
-                ReopenEditModal = true;
-                await LoadDataAsync();
-                return Page();
-            }
-
-            session.Title = EditSession.Title;
-            session.Description = EditSession.Description;
-            session.TargetAudience = EditSession.TargetAudience;
-            session.SessionType = EditSession.SessionType;
-            session.StartDate = EditSession.StartDate;
-            session.StartTime = EditSession.StartTime;
-            session.EndTime = EditSession.EndTime;
-            session.Provider = EditSession.Provider;
-            session.TrainingType = EditSession.TrainingType;
-            session.Progress = EditSession.Progress;
-
-            await SyncTrainingRecordsForSessionAsync(session);
-            await _context.SaveChangesAsync();
-
-            return RedirectToPage(new { tab = "tab-sessions" });
+            return RedirectToPage();
         }
 
-        private void ValidateSession(TrainingSession session, string prefix)
+        private async Task LoadPageDataAsync()
         {
-            if (session.StartDate == default)
+            var query = _context.TrainingandSeminar
+                .Include(x => x.UserInfo)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(SearchTerm))
             {
-                ModelState.AddModelError($"{prefix}.StartDate", "Start date is required.");
+                var keyword = SearchTerm.Trim();
+
+                query = query.Where(x =>
+                    x.Title.Contains(keyword) ||
+                    (
+                        x.UserInfo != null &&
+                        (
+                            (x.UserInfo.FirstName ?? "").Contains(keyword) ||
+                            (x.UserInfo.LastName ?? "").Contains(keyword) ||
+                            (x.UserInfo.EmployeeNumber ?? "").Contains(keyword)
+                        )
+                    ));
             }
 
-            if (session.EndTime <= session.StartTime)
-            {
-                ModelState.AddModelError($"{prefix}.EndTime", "End time must be later than start time.");
-            }
-
-            if (session.Progress == TrainingProgress.Completed && !HasSessionEnded(session))
-            {
-                ModelState.AddModelError(
-                    $"{prefix}.Progress",
-                    "Completed can only be selected after the training end date and time has passed."
-                );
-            }
-        }
-
-        private static bool HasSessionEnded(TrainingSession session)
-        {
-            var endDateTime = session.StartDate.Date.Add(session.EndTime);
-            return DateTime.Now >= endDateTime;
-        }
-
-        private async Task SyncTrainingRecordsForSessionAsync(TrainingSession session)
-        {
-            var records = await _context.TrainingRecords
-                .Where(r => r.TrainingSessionId == session.Id)
+            Trainings = await query
+                .OrderByDescending(x => x.DateAccomplished)
                 .ToListAsync();
 
-            foreach (var record in records)
-            {
-                record.Progress = session.Progress;
-
-                if (session.Progress == TrainingProgress.Completed)
+            var countsByEmployee = await _context.TrainingandSeminar
+                .GroupBy(x => x.UserInformationId)
+                .Select(g => new
                 {
-                    record.DateCompleted = session.EndDateTime;
-                    record.CertificationId = GenerateCertificationId(record, session);
+                    UserInformationId = g.Key,
+                    Count = g.Count()
+                })
+                .ToDictionaryAsync(x => x.UserInformationId, x => x.Count);
 
-                    if (string.IsNullOrWhiteSpace(record.Duration) && session.EndTime > session.StartTime)
-                    {
-                        record.Duration = FormatDuration(session.EndTime - session.StartTime);
-                    }
-                }
-                else
-                {
-                    record.DateCompleted = null;
-                    record.CertificationId = null;
-                }
+            foreach (var item in Trainings)
+            {
+                item.CertificateCount = countsByEmployee.TryGetValue(item.UserInformationId, out var count)
+                    ? count
+                    : 0;
             }
-        }
 
-        private static string GenerateCertificationId(TrainingRecord record, TrainingSession session)
-        {
-            return $"CERT-S{session.Id:D4}-U{record.UserId:D4}-R{record.Id:D6}";
-        }
-
-        private static string FormatDuration(TimeSpan duration)
-        {
-            if (duration.TotalMinutes <= 0)
-                return "0m";
-
-            if (duration.Hours > 0 && duration.Minutes > 0)
-                return $"{duration.Hours}h {duration.Minutes}m";
-
-            if (duration.Hours > 0)
-                return $"{duration.Hours}h";
-
-            return $"{duration.Minutes}m";
-        }
-
-        private async Task LoadDataAsync()
-        {
-            Records = await _context.TrainingRecords
-                .Include(r => r.User)
-                .Include(r => r.Session)
-                .OrderByDescending(r => r.DateCompleted ?? DateTime.MinValue)
-                .ToListAsync();
-
-            Sessions = await _context.TrainingSessions
-                .OrderByDescending(s => s.StartDate)
-                .ThenByDescending(s => s.StartTime)
+            EmployeeOptions = await _context.UserInformation
+                .OrderBy(x => x.LastName)
+                .ThenBy(x => x.FirstName)
+                .Select(x => new SelectListItem
+                {
+                    Value = x.Id.ToString(),
+                    Text = (x.EmployeeNumber ?? "") + " - " + (x.FirstName ?? "") + " " + (x.LastName ?? "")
+                })
                 .ToListAsync();
         }
+        private static string BuildEmployeeDisplay(string? employeeNumber, string? firstName, string? lastName)
+        {
+            var empNo = employeeNumber?.Trim() ?? "";
+            var fullName = $"{firstName ?? ""} {lastName ?? ""}".Trim();
+
+            if (!string.IsNullOrWhiteSpace(empNo) && !string.IsNullOrWhiteSpace(fullName))
+                return $"{empNo} - {fullName}";
+
+            if (!string.IsNullOrWhiteSpace(fullName))
+                return fullName;
+
+            if (!string.IsNullOrWhiteSpace(empNo))
+                return empNo;
+
+            return "Unknown Employee";
+        }
+    }
+
+    public class EmployeeCertificateCountModel
+    {
+        public int UserInformationId { get; set; }
+        public string EmployeeDisplay { get; set; } = string.Empty;
+        public int CertificateCount { get; set; }
     }
 }

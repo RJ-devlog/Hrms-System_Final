@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HRMS_System.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialCReate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -22,68 +22,6 @@ namespace HRMS_System.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Departments", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PromotionNotifications",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    EmployeeId = table.Column<int>(type: "int", nullable: false),
-                    EmployeeName = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Message = table.Column<string>(type: "nvarchar(600)", maxLength: 600, nullable: false),
-                    StatusKey = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
-                    IsRead = table.Column<bool>(type: "bit", nullable: false),
-                    IsArchived = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PromotionNotifications", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ReportFilters",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ActiveTab = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FromDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ToDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Search = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Period = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Department = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Provider = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ReportFilters", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "TrainingSessions",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(2000)", maxLength: 2000, nullable: false),
-                    TargetAudience = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
-                    SessionType = table.Column<int>(type: "int", nullable: false),
-                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    StartTime = table.Column<TimeSpan>(type: "time", nullable: false),
-                    EndTime = table.Column<TimeSpan>(type: "time", nullable: false),
-                    Provider = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
-                    TrainingType = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Progress = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_TrainingSessions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -119,7 +57,7 @@ namespace HRMS_System.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AttendanceTrackings",
+                name: "AttendanceTracking",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -132,9 +70,9 @@ namespace HRMS_System.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AttendanceTrackings", x => x.Id);
+                    table.PrimaryKey("PK_AttendanceTracking", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AttendanceTrackings_UserInformation_UserId",
+                        name: "FK_AttendanceTracking_UserInformation_UserId",
                         column: x => x.UserId,
                         principalTable: "UserInformation",
                         principalColumn: "Id",
@@ -142,7 +80,7 @@ namespace HRMS_System.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Evaluations",
+                name: "Evaluation",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -166,9 +104,9 @@ namespace HRMS_System.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Evaluations", x => x.Id);
+                    table.PrimaryKey("PK_Evaluation", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Evaluations_UserInformation_UserId",
+                        name: "FK_Evaluation_UserInformation_UserId",
                         column: x => x.UserId,
                         principalTable: "UserInformation",
                         principalColumn: "Id",
@@ -198,45 +136,86 @@ namespace HRMS_System.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "TrainingRecords",
+                name: "PromotionNotifications",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    TrainingSessionId = table.Column<int>(type: "int", nullable: false),
-                    Provider = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
-                    CertificationId = table.Column<string>(type: "nvarchar(80)", maxLength: 80, nullable: true),
-                    DateCompleted = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Duration = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Progress = table.Column<int>(type: "int", nullable: false),
-                    ValidUntil = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    EmployeeId = table.Column<int>(type: "int", nullable: false),
+                    EmployeeInfoId = table.Column<int>(type: "int", nullable: true),
+                    EmployeeName = table.Column<string>(type: "nvarchar(120)", maxLength: 120, nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(600)", maxLength: 600, nullable: false),
+                    StatusKey = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    IsRead = table.Column<bool>(type: "bit", nullable: false),
+                    IsArchived = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TrainingRecords", x => x.Id);
+                    table.PrimaryKey("PK_PromotionNotifications", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TrainingRecords_TrainingSessions_TrainingSessionId",
-                        column: x => x.TrainingSessionId,
-                        principalTable: "TrainingSessions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_PromotionNotifications_UserInformation_EmployeeInfoId",
+                        column: x => x.EmployeeInfoId,
+                        principalTable: "UserInformation",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PromotionRecords",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    EmployeeId = table.Column<int>(type: "int", nullable: false),
+                    OldRole = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    NewRole = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PromotionDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ApprovedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PromotionRecords", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_TrainingRecords_UserInformation_UserId",
-                        column: x => x.UserId,
+                        name: "FK_PromotionRecords_UserInformation_EmployeeId",
+                        column: x => x.EmployeeId,
                         principalTable: "UserInformation",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "TrainingandSeminar",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserInformationId = table.Column<int>(type: "int", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: false),
+                    DateAccomplished = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Points = table.Column<int>(type: "int", nullable: false),
+                    CertificateCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TrainingandSeminar", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TrainingandSeminar_UserInformation_UserInformationId",
+                        column: x => x.UserInformationId,
+                        principalTable: "UserInformation",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.CreateIndex(
-                name: "IX_AttendanceTrackings_UserId",
-                table: "AttendanceTrackings",
+                name: "IX_AttendanceTracking_UserId",
+                table: "AttendanceTracking",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Evaluations_UserId",
-                table: "Evaluations",
+                name: "IX_Evaluation_UserId",
+                table: "Evaluation",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -252,14 +231,19 @@ namespace HRMS_System.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_TrainingRecords_TrainingSessionId",
-                table: "TrainingRecords",
-                column: "TrainingSessionId");
+                name: "IX_PromotionNotifications_EmployeeInfoId",
+                table: "PromotionNotifications",
+                column: "EmployeeInfoId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_TrainingRecords_UserId",
-                table: "TrainingRecords",
-                column: "UserId");
+                name: "IX_PromotionRecords_EmployeeId",
+                table: "PromotionRecords",
+                column: "EmployeeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TrainingandSeminar_UserInformationId",
+                table: "TrainingandSeminar",
+                column: "UserInformationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserInformation_EmployeeNumber",
@@ -272,13 +256,13 @@ namespace HRMS_System.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AttendanceTrackings");
+                name: "AttendanceTracking");
 
             migrationBuilder.DropTable(
                 name: "Departments");
 
             migrationBuilder.DropTable(
-                name: "Evaluations");
+                name: "Evaluation");
 
             migrationBuilder.DropTable(
                 name: "Login");
@@ -287,13 +271,10 @@ namespace HRMS_System.Migrations
                 name: "PromotionNotifications");
 
             migrationBuilder.DropTable(
-                name: "ReportFilters");
+                name: "PromotionRecords");
 
             migrationBuilder.DropTable(
-                name: "TrainingRecords");
-
-            migrationBuilder.DropTable(
-                name: "TrainingSessions");
+                name: "TrainingandSeminar");
 
             migrationBuilder.DropTable(
                 name: "UserInformation");

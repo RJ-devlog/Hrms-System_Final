@@ -85,7 +85,7 @@ namespace HRMS_System.Pages.Hrms.DailyLogsAttendance
             // 2) Find or create today's attendance row for that user
             var today = DateTime.Today;
 
-            var attendance = await _context.AttendanceTrackings
+            var attendance = await _context.AttendanceTracking
                 .FirstOrDefaultAsync(a => a.UserId == user.Id && a.AttendanceDate == today);
 
             if (attendance == null)
@@ -95,7 +95,7 @@ namespace HRMS_System.Pages.Hrms.DailyLogsAttendance
                     UserId = user.Id,
                     AttendanceDate = today
                 };
-                _context.AttendanceTrackings.Add(attendance);
+                _context.AttendanceTracking.Add(attendance);
             }
 
             var now = DateTime.Now;

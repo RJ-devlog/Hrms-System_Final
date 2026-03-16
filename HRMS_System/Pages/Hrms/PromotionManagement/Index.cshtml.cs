@@ -63,20 +63,40 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
         {
             await LoadEmployeesAsync();
             LoadRoleOptions();
-            var trainingRows = _featureBuilder.BuildTrainingRows();
 
-            if (!trainingRows.Any())
+            try
             {
-                TempData["Error"] = "No training data found. Add promotion history first.";
+                var trainingRows = _featureBuilder.BuildTrainingRows();
+
+                if (!trainingRows.Any())
+                {
+                    TempData["Error"] = "No training data found. Add employee evaluation, attendance, training, and promotion history first.";
+                    return Page();
+                }
+
+                if (!trainingRows.Any(x => x.WasPromoted) || !trainingRows.Any(x => !x.WasPromoted))
+                {
+                    TempData["Error"] = "Training data must contain both promoted and non-promoted employees.";
+                    return Page();
+                }
+
+                if (trainingRows.Count < 10)
+                {
+                    TempData["Error"] = "Not enough training data yet. Add more employee history first.";
+                    return Page();
+                }
+
+                _mlService.TrainAndSaveModel(trainingRows);
+
+                TempData["Success"] = "Promotion model trained successfully.";
+                return RedirectToPage();
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
                 return Page();
             }
-
-            _mlService.TrainAndSaveModel(trainingRows);
-
-            TempData["Success"] = "Model trained successfully!";
-            return RedirectToPage();
         }
-
         /* ===================== POST: PREDICT PROMOTION ===================== */
         public async Task<IActionResult> OnPostPredictAsync()
         {
@@ -97,15 +117,55 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
             try
             {
                 var result = _mlService.Predict(featureRow);
+                var reasons = new List<string>();
+
+                if (featureRow.AvgEvaluationScore < 3.5f)
+                    reasons.Add("performance evaluation results may still need improvement");
+
+                if (featureRow.AbsenceRate > 0.10f)
+                    reasons.Add("attendance records show a higher number of absences");
+
+                if (featureRow.LateRate > 0.10f)
+                    reasons.Add("attendance records show several late arrivals");
+
+                if (featureRow.TrainingCount < 2)
+                    reasons.Add("additional training participation may be beneficial");
+
+                if (featureRow.CertificationCount < 1)
+                    reasons.Add("gaining more certifications may help strengthen readiness");
+
+                if (featureRow.TenureMonths < 12)
+                    reasons.Add("more time and experience in the current role may still be needed");
 
                 PredictionAvailable = true;
                 PredictedPromoted = result.PredictedLabel;
                 PredictionProbability = result.Probability;
 
-                RecommendationText = PredictedPromoted
-                    ? "Recommended for promotion review (strong indicators: performance, attendance, growth)."
-                    : "Not yet recommended. Improve evaluation, reduce absences/lates, and attend more trainings/certifications.";
+                if (PredictedPromoted)
+                {
+                    RecommendationText =
+                        $"Based on the current records, this employee shows positive indicators for promotion consideration. " +
+                        $"The model suggests readiness for promotion review with {PredictionProbability:P2} confidence.";
 
+                    TempData["Success"] =
+                        $"Based on the current records, this employee is recommended for promotion review. " +
+                        $"Model confidence: {PredictionProbability:P2}.";
+                }
+                else
+                {
+                    var reasonText = reasons.Any()
+                        ? string.Join(", ", reasons)
+                        : "the current overall records may not yet fully support promotion consideration";
+
+                    RecommendationText =
+                        $"Based on the current records, this employee may not yet be ready for promotion review at this time. " +
+                        $"Some areas that may still need attention include {reasonText}. " +
+                        $"With continued improvement and development, the employee may become a stronger candidate in the future.";
+
+                    TempData["Error"] =
+                        $"Based on the current records, this employee is not yet recommended for promotion review. " +
+                        $"Areas for improvement may include {reasonText}. ";
+                }
                 /* ===================== CREATE NOTIFICATION ===================== */
                 _context.PromotionNotifications.Add(new PromotionNotificationModel
                 {
@@ -162,31 +222,71 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
                 return Page();
             }
 
-            // ✅ APPLY NEW ROLE (change 'JobRole' to your real column name if different)
+            if (string.Equals(emp.JobRole, ProposedRole, StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["Error"] = "The proposed role is the same as the employee's current role.";
+                return Page();
+            }
+
+            var oldRole = emp.JobRole ?? "—";
+            var employeeDisplay = $"{emp.EmployeeNumber} - {emp.FirstName} {emp.LastName}".Trim();
+
             emp.JobRole = ProposedRole;
+
+            _context.PromotionRecords.Add(new PromotionRecord
+            {
+                EmployeeId = emp.Id,
+                OldRole = oldRole,
+                NewRole = ProposedRole,
+                PromotionDate = DateTime.Now,
+                ApprovedBy = User.Identity?.Name ?? "HR",
+                Notes = "Created from Promotion Management page"
+            });
+
+            _context.PromotionNotifications.Add(new PromotionNotificationModel
+            {
+                EmployeeId = emp.Id,
+                EmployeeName = employeeDisplay,
+                Title = "Promotion Record Created",
+                Message = $"Promotion record created: {oldRole} -> {ProposedRole}.",
+                StatusKey = "created",
+                IsRead = false,
+                IsArchived = false,
+                CreatedAt = DateTime.Now
+            });
 
             await _context.SaveChangesAsync();
 
-            TempData["Success"] = $"Employee role updated to: {ProposedRole}.";
+            TempData["Success"] = $"Employee role updated to: {ProposedRole}. Promotion record saved.";
             return RedirectToPage();
         }
-
 
         /* ===================== DB LOADING (DROPDOWN + TABLE) ===================== */
         private async Task LoadEmployeesAsync()
         {
+            var today = DateTime.Today;
+
             var employees = await _context.UserInformation
                 .AsNoTracking()
                 .OrderBy(e => e.EmployeeNumber)
-                .Select(e => new
-                {
-                    e.Id,
-                    e.EmployeeNumber,
-                    e.FirstName,
-                    e.LastName,
-                    DepartmentName = string.IsNullOrWhiteSpace(e.Department) ? "—" : e.Department
-                })
                 .ToListAsync();
+
+            var latestEvalMap = await _context.Evaluation
+                .AsNoTracking()
+                .Where(e => e.UserId.HasValue)
+                .GroupBy(e => e.UserId!.Value)
+                .Select(g => new
+                {
+                    UserId = g.Key,
+                    LatestEvalAvg = g.OrderByDescending(x => x.EvaluationDate)
+                        .Select(x => ((x.WorkQuality ?? 0) +
+                                      (x.Productivity ?? 0) +
+                                      (x.Teamwork ?? 0) +
+                                      (x.Attendance ?? 0) +
+                                      (x.Communication ?? 0)) / 5f)
+                        .FirstOrDefault()
+                })
+                .ToDictionaryAsync(x => x.UserId, x => x.LatestEvalAvg);
 
             EmployeeOptions = employees.Select(e => new SelectListItem
             {
@@ -197,12 +297,22 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
             EmployeeRows = employees.Select(e => new EmployeeRowVM
             {
                 EmployeeNumber = e.EmployeeNumber ?? "",
-                FullName = $"{e.FirstName} {e.LastName}",
-                Department = e.DepartmentName,
-                TenureMonths = 0,   // (optional, compute later if you have StartDate)
-                LatestEvalAvg = 0f  // (optional, compute later)
+                FullName = $"{e.FirstName} {e.LastName}".Trim(),
+                Department = string.IsNullOrWhiteSpace(e.Department) ? "—" : e.Department,
+                TenureMonths = e.TenureMonths ?? CalculateMonths(e.StartDate, today),
+                LatestEvalAvg = latestEvalMap.TryGetValue(e.Id, out var avg) ? avg : 0f,
+                SearchText = $"{e.EmployeeNumber} {e.FirstName} {e.LastName}".Trim()
             }).ToList();
         }
 
+        private static int CalculateMonths(DateTime startDate, DateTime endDate)
+        {
+            int months = (endDate.Year - startDate.Year) * 12 + endDate.Month - startDate.Month;
+
+            if (endDate.Day < startDate.Day)
+                months--;
+
+            return Math.Max(months, 0);
+        }
     }
 }

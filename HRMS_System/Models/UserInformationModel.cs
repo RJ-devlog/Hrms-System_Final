@@ -86,5 +86,7 @@ namespace HRMS_System.Models
         public string? Pin { get; set; }
 
         public LoginModel? Login { get; set; }
+
+        public ICollection<TrainingandSeminar> TrainingandSeminar { get; set; } = new List<TrainingandSeminar>();
     }
 }

@@ -72,7 +72,7 @@ namespace HRMS_System.Pages.Hrms.Evaluation
                 return Page();
             }
 
-            var lastEvaluation = await _context.Evaluations
+            var lastEvaluation = await _context.Evaluation
                 .Where(e => e.UserId == Input.UserId.Value)
                 .OrderByDescending(e => e.EvaluationDate)
                 .FirstOrDefaultAsync();
@@ -148,7 +148,7 @@ namespace HRMS_System.Pages.Hrms.Evaluation
             if (Input.EvaluationCurrentYear == default)
                 Input.EvaluationCurrentYear = DateTime.Today.Year;
 
-            _context.Evaluations.Add(Input);
+            _context.Evaluation.Add(Input);
             await _context.SaveChangesAsync();
 
             TempData["Success"] = "Employee evaluation saved successfully.";
@@ -163,7 +163,7 @@ namespace HRMS_System.Pages.Hrms.Evaluation
             if (employee == null)
                 return NotFound();
 
-            var evaluations = await _context.Evaluations
+            var evaluations = await _context.Evaluation
                 .AsNoTracking()
                 .Where(e => e.UserId == id)
                 .OrderByDescending(e => e.EvaluationDate)
@@ -197,7 +197,7 @@ namespace HRMS_System.Pages.Hrms.Evaluation
         }
         public async Task<IActionResult> OnGetPerformanceHistoryAsync(int id)
         {
-            var evaluations = await _context.Evaluations
+            var evaluations = await _context.Evaluation
                 .AsNoTracking()
                 .Where(e => e.UserId == id)
                 .ToListAsync();
@@ -234,7 +234,7 @@ namespace HRMS_System.Pages.Hrms.Evaluation
         }
         private async Task LoadNextEvaluationDatesAsync()
         {
-            var latestEvaluations = await _context.Evaluations
+            var latestEvaluations = await _context.Evaluation
                 .AsNoTracking()
                 .Where(e => e.UserId.HasValue)
                 .GroupBy(e => e.UserId!.Value)
@@ -275,7 +275,7 @@ namespace HRMS_System.Pages.Hrms.Evaluation
 
         private async Task LoadRecordsAsync()
         {
-            Records = await _context.Evaluations
+            Records = await _context.Evaluation
                 .AsNoTracking()
                 .Include(e => e.User)
                 .OrderByDescending(e => e.EvaluationCurrentYear)
@@ -302,7 +302,7 @@ namespace HRMS_System.Pages.Hrms.Evaluation
         }
         public async Task<IActionResult> OnGetEvalDetailsAsync(int id)
         {
-            var eval = await _context.Evaluations
+            var eval = await _context.Evaluation
                 .AsNoTracking()
                 .Include(e => e.User)
                 .FirstOrDefaultAsync(e => e.Id == id);

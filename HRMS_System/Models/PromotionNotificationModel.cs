@@ -11,7 +11,9 @@ namespace HRMS_System.Models
         // Who this notification is about (employee)
         public int EmployeeId { get; set; }
 
-        // For display (store to avoid joins if you want)
+        public UserInformationModel? EmployeeInfo { get; set; }
+
+
         [StringLength(120)]
         public string EmployeeName { get; set; } = "";
 
