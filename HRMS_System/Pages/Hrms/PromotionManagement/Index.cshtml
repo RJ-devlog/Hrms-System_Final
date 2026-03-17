@@ -14,6 +14,7 @@
         color: #8a6d1d;
     }
 </style>
+
 <div class="dashboard-page promo-page">
 
     <div class="page-header">
@@ -22,7 +23,7 @@
             <div class="page-subtitle">Predictive employee promotion eligibility using performance & HR metrics.</div>
         </div>
 
-        <div class="page-actions">
+        <div class="page-actions" hidden>
             <form method="post" asp-page-handler="TrainModel">
                 <button class="btn btn-ghost" type="submit">Train / Re-train Model</button>
             </form>
@@ -58,16 +59,16 @@
                 </form>
             </div>
 
-
             <div class="table-wrap">
                 <table class="table-fixed">
                     <thead>
                         <tr>
                             <th style="width:130px;">Emp ID</th>
                             <th>Name</th>
-                            <th style="width:140px;">Dept</th>
-                            <th style="width:140px;">Tenure</th>
-                            <th style="width:150px;">Latest Eval</th>
+                            <th style="width:120px;">Tenure</th>
+                            <th style="width:130px;">Evaluation</th>
+                            <th style="width:220px;">Performance</th>
+                            <th style="width:140px;">Rating</th>
                         </tr>
                     </thead>
                     <tbody id="empBody">
@@ -76,9 +77,41 @@
                             <tr class="emp-row" data-name="@row.SearchText">
                                 <td>@row.EmployeeNumber</td>
                                 <td>@row.FullName</td>
-                                <td>@row.Department</td>
                                 <td>@row.TenureMonths mo</td>
-                                <td><span class="pill pill-info">@row.LatestEvalAvg</span></td>
+
+                                <td>
+                                    <span class="pill pill-info">
+                                        @(row.LatestEvalAvg.HasValue? row.LatestEvalAvg.Value.ToString("F1") : "—")
+                                    </span>
+                                </td>
+
+                                <td>
+                                    @if (row.LatestPerformanceEvaluationScore.HasValue)
+                                    {
+                                        <span class="pill pill-info">
+                                            @row.LatestPerformanceEvaluationScore.Value.ToString("F1")%
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="pill pill-info">—</span>
+                                    }
+                                </td>
+
+                                <td>
+                                    <span class="pill pill-info">
+                                        @{
+                                            if (decimal.TryParse(row.Rating, out var ratingValue))
+                                            {
+                                                @ratingValue.ToString("F1")
+                                            }
+                                            else
+                                            {
+                                                @row.Rating
+                                            }
+                                        }
+                                    </span>
+                                </td>
                             </tr>
                         }
                     </tbody>
@@ -93,8 +126,7 @@
         <!-- RIGHT: Prediction Panel -->
         <div class="card side-card">
             <div class="card-title">Prediction Result</div>
-            <div class="card-subtitle">Model output using Random Forest (FastForest).</div>
-
+            <div class="card-subtitle">Promotion recommendation.</div>
             <div class="predict-box">
                 <div class="predict-label">Employee</div>
                 <div class="predict-value">@Model.PredictionEmployeeName</div>
@@ -108,9 +140,8 @@
                         @(Model.PredictedPromoted ? "YES" : "NO")
                     </div>
 
-                    <div class="predict-label">Confidence</div>
+                    <div class="predict-label">Overall Score</div>
                     <div class="predict-value">@Model.PredictionProbability.ToString("P2")</div>
-
                     <div class="predict-label">Recommendation</div>
                     <div class="hint-box">
                         @Model.RecommendationText
@@ -160,7 +191,6 @@
 
     <script>
         $(function () {
-            // Make ProposedRole dropdown searchable + match your UI
             $('.role-select').select2({
                 width: '100%',
                 placeholder: '-- Select Job Role --',
@@ -170,7 +200,6 @@
     </script>
 
     <script>
-        // your existing search/filter script (if you have one)
         const search = document.getElementById("searchBox");
         const rows = document.querySelectorAll(".emp-row");
 

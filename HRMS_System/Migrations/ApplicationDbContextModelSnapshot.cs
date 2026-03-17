@@ -145,8 +145,9 @@ namespace HRMS_System.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AccessRole")
-                        .HasColumnType("int");
+                    b.Property<string>("AccessRole")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EmployeeNumber")
                         .IsRequired()

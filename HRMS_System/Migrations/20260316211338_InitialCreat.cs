@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HRMS_System.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCReate : Migration
+    public partial class InitialCreat : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -122,7 +122,7 @@ namespace HRMS_System.Migrations
                     UserInformationId = table.Column<int>(type: "int", nullable: false),
                     EmployeeNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     Passwordd = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    AccessRole = table.Column<int>(type: "int", nullable: false)
+                    AccessRole = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {

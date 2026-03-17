@@ -1,4 +1,5 @@
 using HRMS_System.Data;
+using HRMS_System.Enums;
 using HRMS_System.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -33,7 +34,6 @@ namespace HRMS_System.Pages.Account
         [BindProperty]
         public string? LoginErrorMessage { get; set; }
 
-        // STEP 1: Validate credentials only (AJAX call)
         public async Task<JsonResult> OnPostValidateCredentialsAsync([FromBody] LoginRequest request)
         {
             if (request == null ||
@@ -68,17 +68,15 @@ namespace HRMS_System.Pages.Account
             });
         }
 
-        // STEP 2: Actual login after modal selection
         public async Task<IActionResult> OnPostAsync()
         {
-
             if (string.IsNullOrWhiteSpace(Users.EmployeeNumber) || string.IsNullOrWhiteSpace(Users.Password))
             {
                 ModelState.AddModelError("", "Username and Password are required.");
                 return Page();
             }
 
-            var user = await _context.Login 
+            var user = await _context.Login
                 .FirstOrDefaultAsync(u => u.EmployeeNumber == Users.EmployeeNumber && u.Password == Users.Password);
 
             if (user == null)
@@ -86,11 +84,11 @@ namespace HRMS_System.Pages.Account
                 ModelState.AddModelError("", "Invalid username or password.");
                 return Page();
             }
-            var roleValue = user.AccessRole.ToString();
 
-            var allowedRoles = new[] { "HR", "Supervisor", "Manager", "CEO"};
+            var role = user.AccessRole;
+            var roleValue = role.ToString();
 
-            if (!allowedRoles.Contains(roleValue))
+            if (role == AccessRole.Employee)
             {
                 ModelState.AddModelError(string.Empty, "Your account is not authorized to access this system.");
                 return Page();
@@ -109,28 +107,36 @@ namespace HRMS_System.Pages.Account
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-            if (roleValue == "HR")
+            switch (role)
             {
-                if (SelectedModule == "AttendanceDailyLogs")
-                    return RedirectToPage("/Hrms/DailyLogsAttendance/Index");
+                case AccessRole.HR:
+                    if (SelectedModule == "AttendanceDailyLogs")
+                        return RedirectToPage("/Hrms/DailyLogsAttendance/Index");
 
-                if (SelectedModule == "EmployeeManagement")
+                    if (SelectedModule == "EmployeeManagement")
+                        return RedirectToPage("/Hrms/EmployeeManagement/Index");
+
                     return RedirectToPage("/Hrms/EmployeeManagement/Index");
 
-                return RedirectToPage("/Hrms/EmployeeManagement/Index");
+                case AccessRole.Admin:
+                    return RedirectToPage("/Hrms/EmployeeManagement/Index");
+
+                case AccessRole.Supervisor:
+                    return RedirectToPage("/Hrms/Evaluation/Index");
+
+                case AccessRole.Manager:
+                    return RedirectToPage("/Hrms/Evaluation/Index");
+
+                case AccessRole.CEO:
+                    return RedirectToPage("/Hrms/ReportManagement/Index");
+
+                default:
+                    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                    ModelState.AddModelError(string.Empty, "Your account is not authorized to access this system.");
+                    return Page();
             }
-
-            if (roleValue == "Supervisor")
-                return RedirectToPage("/Hrms/Evaluation/Index");
-
-            if (roleValue == "Manager")
-                return RedirectToPage("/Hrms/AttendanceTracking/Index");
-
-            if (roleValue == "CEO")
-                return RedirectToPage("/Hrms/AttendanceTracking/Index");
-
-            return RedirectToPage("/Account/LoginPage");
         }
+
         public class LoginRequest
         {
             public string? Username { get; set; }

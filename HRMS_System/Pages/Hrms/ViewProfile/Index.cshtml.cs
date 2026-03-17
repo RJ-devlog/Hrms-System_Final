@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HRMS_System.Pages.Hrms.ViewProfile
 {
-    [RoleAuthorize(AccessRole.Supervisor, AccessRole.Manager, AccessRole.CEO)]
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;

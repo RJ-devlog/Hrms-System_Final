@@ -16,6 +16,7 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
         private readonly ApplicationDbContext _context;
         private readonly PromotionPredictionService _mlService;
         private readonly PromotionFeatureBuilder _featureBuilder;
+        private readonly PromotionWeightedScoringService _weightedService;
 
         public IndexModel(ApplicationDbContext context, IWebHostEnvironment env)
         {
@@ -25,6 +26,7 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
             _mlService = new PromotionPredictionService(modelPath);
 
             _featureBuilder = new PromotionFeatureBuilder(context);
+            _weightedService = new PromotionWeightedScoringService();
         }
 
         /* ===================== UI BINDINGS (INPUTS FROM FORM) ===================== */
@@ -45,9 +47,16 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
         public float PredictionProbability { get; set; }
         public string PredictionEmployeeName { get; set; } = "—";
         public string RecommendationText { get; set; } = "—";
+
+        private sealed class LatestEvalInfo
+        {
+            public int UserId { get; set; }
+            public float LatestEvalAvg { get; set; }
+            public string? OverallRating { get; set; }
+        }
+
         private void LoadRoleOptions()
         {
-            // Uses your static catalog
             RoleOptions = HRMS_System.Data.EmployeeCatalog.JobRoles;
         }
 
@@ -97,86 +106,85 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
                 return Page();
             }
         }
+
         /* ===================== POST: PREDICT PROMOTION ===================== */
         public async Task<IActionResult> OnPostPredictAsync()
         {
             await LoadEmployeesAsync();
             LoadRoleOptions();
+
             if (!SelectedUserId.HasValue)
             {
                 TempData["Error"] = "Please select an employee first.";
                 return Page();
             }
 
-            // Show selected employee text on the right panel
             PredictionEmployeeName =
                 EmployeeOptions.FirstOrDefault(x => x.Value == SelectedUserId.Value.ToString())?.Text
                 ?? "Selected Employee";
 
-            var featureRow = _featureBuilder.BuildFeatureRow(SelectedUserId.Value);
             try
             {
-                var result = _mlService.Predict(featureRow);
-                var reasons = new List<string>();
-
-                if (featureRow.AvgEvaluationScore < 3.5f)
-                    reasons.Add("performance evaluation results may still need improvement");
-
-                if (featureRow.AbsenceRate > 0.10f)
-                    reasons.Add("attendance records show a higher number of absences");
-
-                if (featureRow.LateRate > 0.10f)
-                    reasons.Add("attendance records show several late arrivals");
-
-                if (featureRow.TrainingCount < 2)
-                    reasons.Add("additional training participation may be beneficial");
-
-                if (featureRow.CertificationCount < 1)
-                    reasons.Add("gaining more certifications may help strengthen readiness");
-
-                if (featureRow.TenureMonths < 12)
-                    reasons.Add("more time and experience in the current role may still be needed");
+                var featureRow = _featureBuilder.BuildFeatureRow(SelectedUserId.Value);
+                var weightedResult = _weightedService.Calculate(featureRow);
 
                 PredictionAvailable = true;
-                PredictedPromoted = result.PredictedLabel;
-                PredictionProbability = result.Probability;
+                PredictedPromoted = weightedResult.IsRecommended;
+                PredictionProbability = weightedResult.OverallScore / 100f;
+
+                var reasons = new List<string>();
+
+                if (weightedResult.AttendanceScore < 92f)
+                    reasons.Add("attendance-related records may still need improvement");
+
+                if (weightedResult.TrainingScore < 92f)
+                    reasons.Add("training and certification records may still be strengthened");
+
+                if (weightedResult.PerformanceScore < 92f)
+                    reasons.Add("performance and evaluation results may still need improvement");
 
                 if (PredictedPromoted)
                 {
                     RecommendationText =
-                        $"Based on the current records, this employee shows positive indicators for promotion consideration. " +
-                        $"The model suggests readiness for promotion review with {PredictionProbability:P2} confidence.";
+                        $"Based on the current records, this employee meets the promotion recommendation threshold. " +
+                        $"Overall weighted score: {weightedResult.OverallScore:F2}%. " +
+                        $"Attendance: {weightedResult.AttendanceScore:F2}%, " +
+                        $"Training and Certification: {weightedResult.TrainingScore:F2}%, " +
+                        $"Performance and Evaluation: {weightedResult.PerformanceScore:F2}%.";
 
                     TempData["Success"] =
-                        $"Based on the current records, this employee is recommended for promotion review. " +
-                        $"Model confidence: {PredictionProbability:P2}.";
+                        $"This employee is recommended for promotion review. " +
+                        $"Overall weighted score: {weightedResult.OverallScore:F2}%.";
                 }
                 else
                 {
                     var reasonText = reasons.Any()
                         ? string.Join(", ", reasons)
-                        : "the current overall records may not yet fully support promotion consideration";
+                        : "some records may still need further improvement";
 
                     RecommendationText =
-                        $"Based on the current records, this employee may not yet be ready for promotion review at this time. " +
-                        $"Some areas that may still need attention include {reasonText}. " +
-                        $"With continued improvement and development, the employee may become a stronger candidate in the future.";
+                        $"Based on the current records, this employee does not yet meet the promotion recommendation threshold of 92.00%. " +
+                        $"Overall weighted score: {weightedResult.OverallScore:F2}%. " +
+                        $"Attendance: {weightedResult.AttendanceScore:F2}%, " +
+                        $"Training and Certification: {weightedResult.TrainingScore:F2}%, " +
+                        $"Performance and Evaluation: {weightedResult.PerformanceScore:F2}%. " +
+                        $"Areas that may still need attention include {reasonText}.";
 
                     TempData["Error"] =
-                        $"Based on the current records, this employee is not yet recommended for promotion review. " +
-                        $"Areas for improvement may include {reasonText}. ";
+                        $"This employee is not yet recommended for promotion review. " +
+                        $"Overall weighted score: {weightedResult.OverallScore:F2}%.";
                 }
-                /* ===================== CREATE NOTIFICATION ===================== */
+
                 _context.PromotionNotifications.Add(new PromotionNotificationModel
                 {
                     EmployeeId = SelectedUserId.Value,
                     EmployeeName = PredictionEmployeeName,
                     Title = PredictedPromoted
-                        ? "Promotion Prediction: HIGH"
-                        : "Promotion Prediction: LOW",
+                        ? "Promotion Recommendation: QUALIFIED"
+                        : "Promotion Recommendation: NOT YET QUALIFIED",
                     Message = PredictedPromoted
-                        ? $"Predicted promotable with {PredictionProbability:P0} confidence."
-                        : $"Predicted not promotable ({PredictionProbability:P0}). Improve evaluations and attendance.",
+                        ? $"Recommended for promotion with an overall weighted score of {weightedResult.OverallScore:F2}%."
+                        : $"Not yet recommended for promotion. Overall weighted score: {weightedResult.OverallScore:F2}%.",
                     StatusKey = PredictedPromoted ? "predicted_yes" : "predicted_no",
                     IsRead = false,
                     IsArchived = false,
@@ -185,7 +193,6 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
 
                 await _context.SaveChangesAsync();
                 TempData["NewNotif"] = true;
-                /* =============================================================== */
             }
             catch (Exception ex)
             {
@@ -271,22 +278,29 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
                 .OrderBy(e => e.EmployeeNumber)
                 .ToListAsync();
 
-            var latestEvalMap = await _context.Evaluation
+            var latestEvalList = await _context.Evaluation
                 .AsNoTracking()
                 .Where(e => e.UserId.HasValue)
                 .GroupBy(e => e.UserId!.Value)
-                .Select(g => new
-                {
-                    UserId = g.Key,
-                    LatestEvalAvg = g.OrderByDescending(x => x.EvaluationDate)
-                        .Select(x => ((x.WorkQuality ?? 0) +
-                                      (x.Productivity ?? 0) +
-                                      (x.Teamwork ?? 0) +
-                                      (x.Attendance ?? 0) +
-                                      (x.Communication ?? 0)) / 5f)
-                        .FirstOrDefault()
-                })
-                .ToDictionaryAsync(x => x.UserId, x => x.LatestEvalAvg);
+                .Select(g => g
+                    .OrderByDescending(x => x.EvaluationDate)
+                    .ThenByDescending(x => x.Id)
+                    .Select(x => new LatestEvalInfo
+                    {
+                        UserId = x.UserId!.Value,
+                        LatestEvalAvg = ((x.WorkQuality ?? 0) +
+                                         (x.Productivity ?? 0) +
+                                         (x.Teamwork ?? 0) +
+                                         (x.Attendance ?? 0) +
+                                         (x.Communication ?? 0)) / 5f,
+                        OverallRating = x.OverallRating
+                    })
+                    .FirstOrDefault()!)
+                .ToListAsync();
+
+            var latestEvalMap = latestEvalList
+                .Where(x => x != null)
+                .ToDictionary(x => x.UserId, x => x);
 
             EmployeeOptions = employees.Select(e => new SelectListItem
             {
@@ -294,15 +308,36 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
                 Text = $"{e.EmployeeNumber} - {e.FirstName} {e.LastName}"
             }).ToList();
 
-            EmployeeRows = employees.Select(e => new EmployeeRowVM
+            EmployeeRows = new List<EmployeeRowVM>();
+
+            foreach (var e in employees)
             {
-                EmployeeNumber = e.EmployeeNumber ?? "",
-                FullName = $"{e.FirstName} {e.LastName}".Trim(),
-                Department = string.IsNullOrWhiteSpace(e.Department) ? "—" : e.Department,
-                TenureMonths = e.TenureMonths ?? CalculateMonths(e.StartDate, today),
-                LatestEvalAvg = latestEvalMap.TryGetValue(e.Id, out var avg) ? avg : 0f,
-                SearchText = $"{e.EmployeeNumber} {e.FirstName} {e.LastName}".Trim()
-            }).ToList();
+                latestEvalMap.TryGetValue(e.Id, out var latestEval);
+
+                float? latestPerformanceEvaluationScore = null;
+
+                try
+                {
+                    var featureRow = _featureBuilder.BuildFeatureRow(e.Id);
+                    var weightedResult = _weightedService.Calculate(featureRow);
+                    latestPerformanceEvaluationScore = weightedResult.PerformanceScore;
+                }
+                catch
+                {
+                    latestPerformanceEvaluationScore = null;
+                }
+
+                EmployeeRows.Add(new EmployeeRowVM
+                {
+                    EmployeeNumber = e.EmployeeNumber ?? "",
+                    FullName = $"{e.FirstName} {e.LastName}".Trim(),
+                    TenureMonths = e.TenureMonths ?? CalculateMonths(e.StartDate, today),
+                    LatestEvalAvg = latestEval?.LatestEvalAvg,
+                    LatestPerformanceEvaluationScore = latestPerformanceEvaluationScore,
+                    Rating = string.IsNullOrWhiteSpace(latestEval?.OverallRating) ? "—" : latestEval!.OverallRating!,
+                    SearchText = $"{e.EmployeeNumber} {e.FirstName} {e.LastName}".Trim()
+                });
+            }
         }
 
         private static int CalculateMonths(DateTime startDate, DateTime endDate)

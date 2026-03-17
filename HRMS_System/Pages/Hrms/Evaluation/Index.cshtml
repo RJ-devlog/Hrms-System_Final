@@ -257,7 +257,7 @@
             <div class="page-subtitle">Create performance evaluations and manage records.</div>
         </div>
 
-        <div class="page-actions">
+        <div class="page-actions" hidden>
             <button type="button" class="btn btn-ghost" id="btnPrint">Print</button>
         </div>
     </div>
@@ -274,7 +274,7 @@
                 <div class="records-title">Evaluation Records</div>
 
                 <div class="records-tools">
-                    <input type="text" class="form-control small" placeholder="Search name / ID..." id="searchBox" />
+                    <input type="text" class="form-control small" placeholder="Search name / ID..." id="searchBox"/>
                     <!-- PERIOD DROPDOWN -->
                     <select class="form-control" asp-for="Input.Period" disabled>
                     </select>

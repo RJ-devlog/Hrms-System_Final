@@ -1,5 +1,7 @@
 ﻿@using HRMS_System.Enums
 @using HRMS_System.Models
+@using System.Security.Claims
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -16,15 +18,15 @@
     @{
         bool bellAnimate = TempData["NewNotif"] != null;
 
-        var roleClaim = User.FindFirst("UserRole")?.Value;
-        Enum.TryParse<AccessRole>(roleClaim, out var role);
+        var roleClaim = User.FindFirstValue(ClaimTypes.Role);
+        Enum.TryParse<AccessRole>(roleClaim, true, out var role);
 
+        bool isEmployee = role == AccessRole.Employee;
         bool isHR = role == AccessRole.HR;
         bool isSupervisor = role == AccessRole.Supervisor;
         bool isManager = role == AccessRole.Manager;
         bool isCEO = role == AccessRole.CEO;
-
-        bool Can(params AccessRole[] allowed) => isHR || allowed.Contains(role);
+        bool isAdmin = role == AccessRole.Admin;
 
         var currentPage = ViewContext.RouteData.Values["page"]?.ToString() ?? "";
 
@@ -46,8 +48,8 @@
 
             <ul class="sidebar-menu">
 
-                @* Employee Management: HR only *@
-                @if (Can())
+                @* Employee Management: HR + AdminMIS *@
+                @if (isHR || isAdmin)
                 {
                     <li class="menu-item @IsActive("/Hrms/EmployeeManagement")">
                         <a asp-page="/Hrms/EmployeeManagement/Index">
@@ -55,7 +57,11 @@
                             <span>Employee Management</span>
                         </a>
                     </li>
+                }
 
+                @* Training & Seminars: HR + AdminMIS *@
+                @if (isHR || isAdmin)
+                {
                     <li class="menu-item @IsActive("/Hrms/TrainingandSeminar")">
                         <a asp-page="/Hrms/TrainingandSeminar/Index">
                             <i class="bi bi-mortarboard"></i>
@@ -64,7 +70,8 @@
                     </li>
                 }
 
-                @if (Can(AccessRole.Manager))
+                @* Attendance Tracking: HR + AdminMIS *@
+                @if (isHR || isAdmin)
                 {
                     <li class="menu-item @IsActive("/Hrms/AttendanceTracking")">
                         <a asp-page="/Hrms/AttendanceTracking/Index">
@@ -74,7 +81,8 @@
                     </li>
                 }
 
-                @if (Can(AccessRole.Supervisor,AccessRole.Manager))
+                @* Performance and Evaluation: HR + AdminMIS + Manager + Supervisor *@
+                @if (isHR || isAdmin || isManager || isSupervisor)
                 {
                     <li class="menu-item @IsActive("/Hrms/Evaluation")">
                         <a asp-page="/Hrms/Evaluation/Index">
@@ -84,7 +92,8 @@
                     </li>
                 }
 
-                @if (Can(AccessRole.Manager, AccessRole.CEO))
+                @* Report Management: AdminMIS + CEO only *@
+                @if (isAdmin || isCEO || isHR)
                 {
                     <li class="menu-item @IsActive("/Hrms/ReportManagement")">
                         <a asp-page="/Hrms/ReportManagement/Index">
@@ -94,7 +103,8 @@
                     </li>
                 }
 
-                @if (Can(AccessRole.CEO))
+                @* Promotion Management: HR + AdminMIS + CEO *@
+                @if (isHR || isAdmin || isCEO)
                 {
                     <li class="menu-item @IsActive("/Hrms/PromotionManagement")">
                         <a asp-page="/Hrms/PromotionManagement/Index">
@@ -104,7 +114,8 @@
                     </li>
                 }
 
-                @if (Can(AccessRole.Manager))
+                @* Notification: HR + AdminMIS *@
+                @if (isHR || isAdmin)
                 {
                     <li class="menu-item @IsActive("/Hrms/Notification")">
                         <a asp-page="/Hrms/Notification/Index">
@@ -119,7 +130,7 @@
                         </a>
                     </li>
                 }
-                
+
             </ul>
 
             <div class="sidebar-footer dropdown">
@@ -128,7 +139,7 @@
                    data-bs-toggle="dropdown"
                    aria-expanded="false">
                     <i class="bi bi-person-circle"></i>
-                    <span>@(User.FindFirst("UserRole")?.Value ?? "Account")</span>
+                    <span>@(roleClaim ?? "Account")</span>
                 </a>
 
                 <ul class="dropdown-menu dropdown-menu-end sidebar-dd">
@@ -145,11 +156,13 @@
                     </li>
                 </ul>
             </div>
-        </div> <!--  sidebar -->
+        </div>
+
         <!-- MAIN CONTENT -->
         <div class="main-content">
             @RenderBody()
         </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)

@@ -23,11 +23,12 @@ namespace HRMS_System.Pages.Hrms.ReportManagement
 
         // Dropdown sources
         public List<SelectListItem> DepartmentOptions { get; set; } = new();
-   //     public List<TrainingandSeminar> TrainingFilter { get; set; } = new();
         // UI Rows
         public List<PerformanceRowVM> PerformanceRows { get; set; } = new();
         public List<AttendanceRowVM> AttendanceRows { get; set; } = new();
         public List<TrainingRowVM> TrainingRows { get; set; } = new();
+
+        public List<HRMS_System.Models.TrainingandSeminar> TrainingAndSeminar { get; set; } = new();
 
         // Summaries
         public PerformanceSummaryVM PerformanceSummary { get; set; } = new();
@@ -130,6 +131,8 @@ namespace HRMS_System.Pages.Hrms.ReportManagement
                 TimeOutDisplay = x.TimeOut?.ToString("HH:mm") ?? "-"
             }).ToList();
 
+
+
             AttendanceSummary.TotalRecords = AttendanceRows.Count;
             AttendanceSummary.PresentCount = AttendanceRows.Count(r => (r.AttendanceStatus ?? "").Equals("Present", StringComparison.OrdinalIgnoreCase));
             AttendanceSummary.AbsentCount = AttendanceRows.Count(r => (r.AttendanceStatus ?? "").Equals("Absent", StringComparison.OrdinalIgnoreCase));
@@ -137,50 +140,43 @@ namespace HRMS_System.Pages.Hrms.ReportManagement
 
         private async Task LoadTrainingAsync()
         {
-            /*
-                IQueryable<TrainingandSeminar> q = _context.Set<TrainingandSeminar>()
-                    .Include(r => r.User)
-                    .Include(r => r.Session);
+            IQueryable<HRMS_System.Models.TrainingandSeminar> q = _context.Set<HRMS_System.Models.TrainingandSeminar>()
+                .Include(x => x.UserInfo);
 
-                if (Filter.FromDate.HasValue)
-                    q = q.Where(r => r.Session!.StartDate >= Filter.FromDate.Value.Date);
+            if (Filter.FromDate.HasValue)
+                q = q.Where(x => x.DateAccomplished >= Filter.FromDate.Value.Date);
 
-                if (Filter.ToDate.HasValue)
-                    q = q.Where(r => r.Session!.StartDate <= Filter.ToDate.Value.Date);
+            if (Filter.ToDate.HasValue)
+                q = q.Where(x => x.DateAccomplished <= Filter.ToDate.Value.Date);
 
-                if (!string.IsNullOrWhiteSpace(Filter.Provider))
-                    q = q.Where(r => r.Provider.Contains(Filter.Provider));
+            if (!string.IsNullOrWhiteSpace(Filter.Search))
+            {
+                var search = Filter.Search.Trim();
 
-                if (!string.IsNullOrWhiteSpace(Filter.Search))
-                {
-                    q = q.Where(r =>
-                        r.Session!.Title!.Contains(Filter.Search) ||
-                        r.User.FirstName!.Contains(Filter.Search) ||
-                        r.User.LastName!.Contains(Filter.Search));
-                }
+                q = q.Where(x =>
+                    (x.Title != null && x.Title.Contains(search)) ||
+                    (x.UserInfo != null && x.UserInfo.FirstName != null && x.UserInfo.FirstName.Contains(search)) ||
+                    (x.UserInfo != null && x.UserInfo.LastName != null && x.UserInfo.LastName.Contains(search)) ||
+                    (x.UserInfo != null && x.UserInfo.EmployeeNumber != null && x.UserInfo.EmployeeNumber.Contains(search)));
+            }
 
-                var rows = await q
-                    .OrderByDescending(r => r.Session!.StartDate)
-                    .ToListAsync();
+            var rows = await q
+                .OrderByDescending(x => x.DateAccomplished)
+                .ToListAsync();
 
-                TrainingRows = rows.Select(r => new TrainingRowVM
-                {
-                    SessionDate = r.Session!.StartDate,
-                    Title = r.Session.Title ?? "-",
-                    Provider = r.Provider,
-                    TrainingType = r.Session.TrainingType.ToString(),
-                    EmployeeDisplay = $"{r.User.FirstName} {r.User.LastName} ({r.User.EmployeeNumberDigits})",
-                    Progress = r.Progress.ToString(),
-                    DateCompletedDisplay = r.DateCompleted?.ToString("yyyy-MM-dd") ?? "-",
-                    CertificationId = r.CertificationId
-                }).ToList();
+            TrainingRows = rows.Select(x => new TrainingRowVM
+            {
+                TitleOrCertificate = string.IsNullOrWhiteSpace(x.Title) ? "-" : x.Title,
+                EmployeeDisplay = x.UserInfo == null
+                    ? "-"
+                    : $"{x.UserInfo.FirstName} {x.UserInfo.LastName} ({x.UserInfo.EmployeeNumberDigits})",
+                DateAccomplishedDisplay = x.DateAccomplished.ToString("yyyy-MM-dd"),
+                Points = Convert.ToInt32(x.Points)
+            }).ToList();
 
-                TrainingSummary.TotalRecords = TrainingRows.Count;
-                TrainingSummary.TotalSessions = rows.Select(x => x.TrainingSessionId).Distinct().Count();
-                TrainingSummary.CompletedCount = rows.Count(x => x.Progress == "Completed");
-                    */
+            TrainingSummary.TotalRecords = TrainingRows.Count;
+            TrainingSummary.TotalPoints = TrainingRows.Sum(x => x.Points);
         }
-
         private static double Avg5(params int?[] vals)
         {
             var list = vals.Where(v => v.HasValue).Select(v => (double)v!.Value).ToList();
@@ -213,14 +209,10 @@ namespace HRMS_System.Pages.Hrms.ReportManagement
 
         public class TrainingRowVM
         {
-            public DateTime SessionDate { get; set; }
-            public string Title { get; set; } = "-";
-            public string Provider { get; set; } = "-";
-            public string TrainingType { get; set; } = "-";
+            public string TitleOrCertificate { get; set; } = "-";
             public string EmployeeDisplay { get; set; } = "";
-            public string Progress { get; set; } = "-";
-            public string DateCompletedDisplay { get; set; } = "-";
-            public string? CertificationId { get; set; }
+            public string DateAccomplishedDisplay { get; set; } = "-";
+            public int Points { get; set; }
         }
 
         public class PerformanceSummaryVM
@@ -239,9 +231,8 @@ namespace HRMS_System.Pages.Hrms.ReportManagement
 
         public class TrainingSummaryVM
         {
-            public int TotalSessions { get; set; }
             public int TotalRecords { get; set; }
-            public int CompletedCount { get; set; }
+            public int TotalPoints { get; set; }
         }
     }
 }

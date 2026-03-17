@@ -1,8 +1,12 @@
 ﻿@page
+@model HRMS_System.Pages.IndexModel
+@{
+    ViewData["Title"] = "Access Denied";
+}
 <div class="container mt-5">
     <div class="alert alert-danger">
-        <h4 class="mb-2">Access Denied</h4>
-        <p>You don’t have permission to access this page.</p>
-        <a class="btn btn-primary" asp-page="/Hrms/AttendanceTracking/Index">Go back</a>
+        <h2>Access Denied</h2>
+        <p>You are not authorized to access this page.</p>
+        <a asp-page="/Account/LoginPage" class="btn btn-primary">Back to Login</a>
     </div>
 </div>

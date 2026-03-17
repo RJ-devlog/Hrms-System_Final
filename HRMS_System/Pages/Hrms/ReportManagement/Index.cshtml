@@ -35,7 +35,7 @@
                 <form method="get" class="row g-2 align-items-end">
                     <input type="hidden" name="ActiveTab" value="performance" />
 
-                    <div class="col-md-3">
+                    <div class="col-md-3" hidden>
                         <label class="form-label">Period</label>
                         <select class="form-control" name="Period">
                             <option value="">All</option>
@@ -70,10 +70,6 @@
                     <div class="col-12 d-flex gap-2 mt-2">
                         <button class="btn btn-primary" type="submit">Apply Filter</button>
                         <a class="btn btn-outline-secondary" href="?ActiveTab=performance">Reset</a>
-                        
-                        <!-- optional export buttons (wire later) -->
-                        <button class="btn btn-outline-success ms-auto" type="submit" name="export" value="csv">Export CSV</button>
-                        <button class="btn btn-outline-danger" type="submit" name="export" value="pdf">Export PDF</button>
                     </div>
                 </form>
             </div>
@@ -210,9 +206,6 @@
                     <div class="col-12 d-flex gap-2 mt-2">
                         <button class="btn btn-primary" type="submit">Apply Filter</button>
                         <a class="btn btn-outline-secondary" href="?ActiveTab=attendance">Reset</a>
-
-                        <button class="btn btn-outline-success ms-auto" type="submit" name="export" value="csv">Export CSV</button>
-                        <button class="btn btn-outline-danger" type="submit" name="export" value="pdf">Export PDF</button>
                     </div>
                 </form>
             </div>
@@ -297,60 +290,48 @@
                 <form method="get" class="row g-2 align-items-end">
                     <input type="hidden" name="ActiveTab" value="training" />
 
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <label class="form-label">From</label>
                         <input type="date" class="form-control" name="FromDate"
                                value="@(Model.Filter.FromDate?.ToString("yyyy-MM-dd"))" />
                     </div>
-                    <div class="col-md-3">
+
+                    <div class="col-md-4">
                         <label class="form-label">To</label>
                         <input type="date" class="form-control" name="ToDate"
                                value="@(Model.Filter.ToDate?.ToString("yyyy-MM-dd"))" />
                     </div>
 
-                    <div class="col-md-3">
-                        <label class="form-label">Provider</label>
-                        <input class="form-control" name="Provider" value="@Model.Filter.Provider" placeholder="Internal / External..." />
-                    </div>
-
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <label class="form-label">Search</label>
-                        <input class="form-control" name="Search" value="@Model.Filter.Search" placeholder="Title / Employee..." />
+                        <input class="form-control" name="Search"
+                               value="@Model.Filter.Search"
+                               placeholder="Title / Employee..." />
                     </div>
 
                     <div class="col-12 d-flex gap-2 mt-2">
                         <button class="btn btn-primary" type="submit">Apply Filter</button>
                         <a class="btn btn-outline-secondary" href="?ActiveTab=training">Reset</a>
-
-                        <button class="btn btn-outline-success ms-auto" type="submit" name="export" value="csv">Export CSV</button>
-                        <button class="btn btn-outline-danger" type="submit" name="export" value="pdf">Export PDF</button>
                     </div>
                 </form>
             </div>
         </div>
 
         <div class="row g-3 mb-3">
-            <div class="col-md-4">
+            <div class="col-md-6">
                 <div class="card h-100">
                     <div class="card-body">
-                        <div class="text-muted">Total Sessions</div>
-                        <div class="fs-3 fw-semibold">@Model.TrainingSummary.TotalSessions</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <div class="text-muted">Total Participants (Records)</div>
+                        <div class="text-muted">Total Records</div>
                         <div class="fs-3 fw-semibold">@Model.TrainingSummary.TotalRecords</div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
+
+            <div class="col-md-6">
                 <div class="card h-100">
                     <div class="card-body">
-                        <div class="text-muted">Completed</div>
-                        <div class="fs-3 fw-semibold">@Model.TrainingSummary.CompletedCount</div>
+                        <div class="text-muted">Total Points</div>
+                        <div class="fs-3 fw-semibold">@Model.TrainingSummary.TotalPoints</div>
                     </div>
                 </div>
             </div>
@@ -358,27 +339,23 @@
 
         <div class="card">
             <div class="card-body">
-                <h5 class="mb-2">Training / Seminar Report</h5>
+                <h5 class="mb-2">Training / Seminar Report</h5> <br/>
 
                 <div class="table-responsive">
                     <table class="table table-striped align-middle">
                         <thead>
                             <tr>
-                                <th>Session Date</th>
-                                <th>Title</th>
-                                <th>Provider</th>
-                                <th>Type</th>
+                                <th>Title / Certificate</th>
                                 <th>Employee</th>
-                                <th>Progress</th>
-                                <th>Completed</th>
-                                <th>Certification</th>
+                                <th>Date Accomplished</th>
+                                <th class="text-center">Points</th>
                             </tr>
                         </thead>
                         <tbody>
                             @if (!Model.TrainingRows.Any())
                             {
                                 <tr>
-                                    <td colspan="8" class="text-center text-muted py-4">
+                                    <td colspan="4" class="text-center text-muted py-4">
                                         No training records found.
                                     </td>
                                 </tr>
@@ -388,14 +365,10 @@
                                 foreach (var r in Model.TrainingRows)
                                 {
                                     <tr>
-                                        <td>@r.SessionDate.ToString("yyyy-MM-dd")</td>
-                                        <td>@r.Title</td>
-                                        <td>@r.Provider</td>
-                                        <td>@r.TrainingType</td>
+                                        <td>@r.TitleOrCertificate</td>
                                         <td>@r.EmployeeDisplay</td>
-                                        <td>@r.Progress</td>
-                                        <td>@r.DateCompletedDisplay</td>
-                                        <td>@(string.IsNullOrWhiteSpace(r.CertificationId) ? "-" : r.CertificationId)</td>
+                                        <td>@r.DateAccomplishedDisplay</td>
+                                        <td class="text-center">@r.Points</td>
                                     </tr>
                                 }
                             }

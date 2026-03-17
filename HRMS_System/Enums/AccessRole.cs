@@ -7,6 +7,7 @@
         HR = 1,
         Supervisor = 2,
         Manager = 3,
-        CEO = 4
+        Admin = 4,
+        CEO = 5
     }
 }

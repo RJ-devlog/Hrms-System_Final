@@ -163,7 +163,7 @@ namespace HRMS_System.Data
                 new SelectListItem { Value = "Operations & Monitoring Staff", Text = "Operations & Monitoring Staff", Group = misc },
                 new SelectListItem { Value = "OPN / Monitoring Staff", Text = "OPN / Monitoring Staff", Group = misc },
                 new SelectListItem { Value = "VOS", Text = "VOS", Group = misc },
-
+                new SelectListItem {Value = "SUPERVISOR", Text = "SUPERVISOR", Group = misc},
                 // Management / Exucutive
                 new SelectListItem { Value = "General Manager", Text = "General Manager", Group = mngmt },
                 new SelectListItem { Value = "CEO", Text = "CEO", Group = mngmt }

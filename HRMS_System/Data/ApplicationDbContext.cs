@@ -23,6 +23,9 @@ namespace HRMS_System.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<LoginModel>()
+                .Property(x => x.AccessRole)
+                .HasConversion<string>();
 
             modelBuilder.Entity<UserInformationModel>()
                 .HasIndex(e => e.EmployeeNumber)

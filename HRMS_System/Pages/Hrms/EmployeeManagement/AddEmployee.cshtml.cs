@@ -131,10 +131,10 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
                     {
                         UserInformationId = Employee.Id,
                         EmployeeNumber = Employee.EmployeeNumber,
-                        Password = Employee.EmployeeNumber,
+                        Password = Employee.EmployeeNumber,      
                         AccessRole = accessRole
                     });
-                }
+                }   
                 else
                 {
                     existingUser.UserInformationId = Employee.Id;
@@ -197,8 +197,9 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
 
             return role switch
             {
-                "IT Development Personnel" => AccessRole.Supervisor,
+                "IT Development Personnel" => AccessRole.Admin,
                 "General Manager" => AccessRole.Manager,
+                "SUPERVISOR" => AccessRole.Supervisor,
                 "HR Clerk" => AccessRole.HR,
                 "HR Staff" => AccessRole.HR,
                 "CEO" => AccessRole.CEO,
@@ -332,7 +333,7 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
                 "Operations & Monitoring Staff" => EmployeeCategory.MiscSupportRoles,
                 "OPN / Monitoring Staff" => EmployeeCategory.MiscSupportRoles,
                 "VOS" => EmployeeCategory.MiscSupportRoles,
-
+                "SUPERVISOR" => EmployeeCategory.MiscSupportRoles,
                 // Management / Executive
                 "General Manager" => EmployeeCategory.ManagementExecutive,
                 "CEO" => EmployeeCategory.ManagementExecutive,

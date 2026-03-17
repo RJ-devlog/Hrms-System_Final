@@ -8,6 +8,8 @@ C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\HRMS_System
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\HRMS_System.RazorAssemblyInfo.cache
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\HRMS_System.RazorAssemblyInfo.cs
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\HRMS_System.sourcelink.json
+C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\HRMS_System.dll
+C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\HRMS_System.pdb
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\bin\Debug\net9.0\appsettings.Development.json
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\bin\Debug\net9.0\appsettings.json
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\bin\Debug\net9.0\HRMS_System.staticwebassets.runtime.json
@@ -353,8 +355,6 @@ C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\staticwebas
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\swae.build.ex.cache
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\staticwebassets.upToDateCheck.txt
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\HRMS_Sys.B7424ECA.Up2Date
-C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\HRMS_System.dll
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\refint\HRMS_System.dll
-C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\HRMS_System.pdb
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\HRMS_System.genruntimeconfig.cache
 C:\Users\rieln\source\repos\HRMS_System\HRMS_System\obj\Debug\net9.0\ref\HRMS_System.dll

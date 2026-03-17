@@ -11,7 +11,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HRMS_System.Pages.Hrms.Evaluation
 {
-    [RoleAuthorize(AccessRole.Supervisor,AccessRole.Manager)]
     public class IndexModel : PageModel
     {
         private readonly ApplicationDbContext _context;
