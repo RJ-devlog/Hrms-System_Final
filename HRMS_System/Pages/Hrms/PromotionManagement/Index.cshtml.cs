@@ -1,6 +1,6 @@
 ﻿using HRMS_System.Data;
 using HRMS_System.Models;
-using HRMS_System.Models.PromotionML;
+using HRMS_System.Models.Evaluation;
 using HRMS_System.Models.ViewModels;
 using HRMS_System.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -12,42 +12,41 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
 {
     public class IndexModel : PageModel
     {
-        /* ===================== DB + SERVICES ===================== */
         private readonly ApplicationDbContext _context;
-        private readonly PromotionPredictionService _mlService;
         private readonly PromotionFeatureBuilder _featureBuilder;
         private readonly PromotionWeightedScoringService _weightedService;
 
-        public IndexModel(ApplicationDbContext context, IWebHostEnvironment env)
+        public IndexModel(ApplicationDbContext context)
         {
             _context = context;
-
-            var modelPath = Path.Combine(env.ContentRootPath, "App_Data", "ml", "promotion-model.zip");
-            _mlService = new PromotionPredictionService(modelPath);
-
             _featureBuilder = new PromotionFeatureBuilder(context);
             _weightedService = new PromotionWeightedScoringService();
         }
 
-        /* ===================== UI BINDINGS (INPUTS FROM FORM) ===================== */
-        [BindProperty]
+        [BindProperty(SupportsGet = true)]
         public int? SelectedUserId { get; set; }
 
         [BindProperty]
         public string? ProposedRole { get; set; }
 
-        /* ===================== DATA FOR UI DISPLAY ===================== */
         public List<SelectListItem> EmployeeOptions { get; set; } = new();
         public List<EmployeeRowVM> EmployeeRows { get; set; } = new();
         public List<SelectListItem> RoleOptions { get; set; } = new();
 
-        /* ===================== PREDICTION OUTPUT (RIGHT SIDE PANEL) ===================== */
-        public bool PredictionAvailable { get; set; }
-        public bool PredictedPromoted { get; set; }
-        public float PredictionProbability { get; set; }
-        public string PredictionEmployeeName { get; set; } = "—";
-        public string RecommendationText { get; set; } = "—";
+        public string SelectedEmployeeName { get; set; } = "—";
+        public string SelectedCategoryName { get; set; } = "—";
 
+        private sealed class PromotionSnapshot
+        {
+            public int EmployeeId { get; set; }
+            public string EmployeeDisplay { get; set; } = "";
+            public string CategoryName { get; set; } = "—";
+            public float AttendancePercent { get; set; }
+            public float? LatestEvalAvg { get; set; }
+            public float? PerformancePercent { get; set; }
+            public int CertificationBonus { get; set; }
+            public float PromotionChance { get; set; }
+        }
         private sealed class LatestEvalInfo
         {
             public int UserId { get; set; }
@@ -55,158 +54,30 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
             public string? OverallRating { get; set; }
         }
 
-        private void LoadRoleOptions()
+        private sealed class AttendanceInfo
         {
-            RoleOptions = HRMS_System.Data.EmployeeCatalog.JobRoles;
+            public int UserId { get; set; }
+            public int TotalCount { get; set; }
+            public int PresentCount { get; set; }
+            public float AttendancePercent { get; set; }
         }
 
-        /* ===================== GET (PAGE LOAD) ===================== */
+        private sealed class TrainingInfo
+        {
+            public int UserId { get; set; }
+            public int TotalPoints { get; set; }
+        }
+
         public async Task OnGetAsync()
         {
-            await LoadEmployeesAsync();
             LoadRoleOptions();
+            await LoadEmployeesAsync();
         }
 
-        /* ===================== POST: TRAIN MODEL ===================== */
-        public async Task<IActionResult> OnPostTrainModelAsync()
-        {
-            await LoadEmployeesAsync();
-            LoadRoleOptions();
-
-            try
-            {
-                var trainingRows = _featureBuilder.BuildTrainingRows();
-
-                if (!trainingRows.Any())
-                {
-                    TempData["Error"] = "No training data found. Add employee evaluation, attendance, training, and promotion history first.";
-                    return Page();
-                }
-
-                if (!trainingRows.Any(x => x.WasPromoted) || !trainingRows.Any(x => !x.WasPromoted))
-                {
-                    TempData["Error"] = "Training data must contain both promoted and non-promoted employees.";
-                    return Page();
-                }
-
-                if (trainingRows.Count < 10)
-                {
-                    TempData["Error"] = "Not enough training data yet. Add more employee history first.";
-                    return Page();
-                }
-
-                _mlService.TrainAndSaveModel(trainingRows);
-
-                TempData["Success"] = "Promotion model trained successfully.";
-                return RedirectToPage();
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = ex.Message;
-                return Page();
-            }
-        }
-
-        /* ===================== POST: PREDICT PROMOTION ===================== */
-        public async Task<IActionResult> OnPostPredictAsync()
-        {
-            await LoadEmployeesAsync();
-            LoadRoleOptions();
-
-            if (!SelectedUserId.HasValue)
-            {
-                TempData["Error"] = "Please select an employee first.";
-                return Page();
-            }
-
-            PredictionEmployeeName =
-                EmployeeOptions.FirstOrDefault(x => x.Value == SelectedUserId.Value.ToString())?.Text
-                ?? "Selected Employee";
-
-            try
-            {
-                var featureRow = _featureBuilder.BuildFeatureRow(SelectedUserId.Value);
-                var weightedResult = _weightedService.Calculate(featureRow);
-
-                PredictionAvailable = true;
-                PredictedPromoted = weightedResult.IsRecommended;
-                PredictionProbability = weightedResult.OverallScore / 100f;
-
-                var reasons = new List<string>();
-
-                if (weightedResult.AttendanceScore < 92f)
-                    reasons.Add("attendance-related records may still need improvement");
-
-                if (weightedResult.TrainingScore < 92f)
-                    reasons.Add("training and certification records may still be strengthened");
-
-                if (weightedResult.PerformanceScore < 92f)
-                    reasons.Add("performance and evaluation results may still need improvement");
-
-                if (PredictedPromoted)
-                {
-                    RecommendationText =
-                        $"Based on the current records, this employee meets the promotion recommendation threshold. " +
-                        $"Overall weighted score: {weightedResult.OverallScore:F2}%. " +
-                        $"Attendance: {weightedResult.AttendanceScore:F2}%, " +
-                        $"Training and Certification: {weightedResult.TrainingScore:F2}%, " +
-                        $"Performance and Evaluation: {weightedResult.PerformanceScore:F2}%.";
-
-                    TempData["Success"] =
-                        $"This employee is recommended for promotion review. " +
-                        $"Overall weighted score: {weightedResult.OverallScore:F2}%.";
-                }
-                else
-                {
-                    var reasonText = reasons.Any()
-                        ? string.Join(", ", reasons)
-                        : "some records may still need further improvement";
-
-                    RecommendationText =
-                        $"Based on the current records, this employee does not yet meet the promotion recommendation threshold of 92.00%. " +
-                        $"Overall weighted score: {weightedResult.OverallScore:F2}%. " +
-                        $"Attendance: {weightedResult.AttendanceScore:F2}%, " +
-                        $"Training and Certification: {weightedResult.TrainingScore:F2}%, " +
-                        $"Performance and Evaluation: {weightedResult.PerformanceScore:F2}%. " +
-                        $"Areas that may still need attention include {reasonText}.";
-
-                    TempData["Error"] =
-                        $"This employee is not yet recommended for promotion review. " +
-                        $"Overall weighted score: {weightedResult.OverallScore:F2}%.";
-                }
-
-                _context.PromotionNotifications.Add(new PromotionNotificationModel
-                {
-                    EmployeeId = SelectedUserId.Value,
-                    EmployeeName = PredictionEmployeeName,
-                    Title = PredictedPromoted
-                        ? "Promotion Recommendation: QUALIFIED"
-                        : "Promotion Recommendation: NOT YET QUALIFIED",
-                    Message = PredictedPromoted
-                        ? $"Recommended for promotion with an overall weighted score of {weightedResult.OverallScore:F2}%."
-                        : $"Not yet recommended for promotion. Overall weighted score: {weightedResult.OverallScore:F2}%.",
-                    StatusKey = PredictedPromoted ? "predicted_yes" : "predicted_no",
-                    IsRead = false,
-                    IsArchived = false,
-                    CreatedAt = DateTime.Now
-                });
-
-                await _context.SaveChangesAsync();
-                TempData["NewNotif"] = true;
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = ex.Message;
-            }
-
-            return Page();
-        }
-
-        /* ===================== POST: CREATE PROMOTION RECORD (MANUAL) ===================== */
         public async Task<IActionResult> OnPostCreatePromotionAsync()
         {
-            await LoadEmployeesAsync();
             LoadRoleOptions();
+            await LoadEmployeesAsync();
 
             if (!SelectedUserId.HasValue)
             {
@@ -220,7 +91,7 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
                 return Page();
             }
 
-            var emp = await _context.UserInformation
+            var emp = await _context.Set<UserInformationModel>()
                 .FirstOrDefaultAsync(x => x.Id == SelectedUserId.Value);
 
             if (emp == null)
@@ -240,7 +111,7 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
 
             emp.JobRole = ProposedRole;
 
-            _context.PromotionRecords.Add(new PromotionRecord
+            _context.Set<PromotionRecord>().Add(new PromotionRecord
             {
                 EmployeeId = emp.Id,
                 OldRole = oldRole,
@@ -250,7 +121,7 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
                 Notes = "Created from Promotion Management page"
             });
 
-            _context.PromotionNotifications.Add(new PromotionNotificationModel
+            _context.Set<PromotionNotificationModel>().Add(new PromotionNotificationModel
             {
                 EmployeeId = emp.Id,
                 EmployeeName = employeeDisplay,
@@ -265,20 +136,268 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
             await _context.SaveChangesAsync();
 
             TempData["Success"] = $"Employee role updated to: {ProposedRole}. Promotion record saved.";
-            return RedirectToPage();
+            return RedirectToPage(new { SelectedUserId = SelectedUserId });
         }
 
-        /* ===================== DB LOADING (DROPDOWN + TABLE) ===================== */
+        private void LoadRoleOptions()
+        {
+            RoleOptions = EmployeeCatalog.JobRoles;
+        }
+        private async Task<PromotionSnapshot?> BuildPromotionSnapshotAsync(int userId)
+        {
+            var employee = await _context.Set<UserInformationModel>()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == userId);
+
+            if (employee == null)
+                return null;
+
+            var attendanceRows = await _context.Set<AttendanceTrackingModel>()
+                .AsNoTracking()
+                .Where(x => x.UserId == userId)
+                .ToListAsync();
+
+            var totalAttendance = attendanceRows.Count;
+
+            var attendedCount = attendanceRows.Count(x =>
+                !string.IsNullOrWhiteSpace(x.AttendanceStatus) &&
+                !x.AttendanceStatus.Equals("Absent", StringComparison.OrdinalIgnoreCase));
+
+            var attendancePercent = totalAttendance == 0
+                ? 0f
+                : (float)attendedCount / totalAttendance * 100f;
+
+            var latestEval = await _context.Set<EvaluationModel>()
+                .AsNoTracking()
+                .Where(x => x.UserId == userId)
+                .OrderByDescending(x => x.EvaluationDate)
+                .ThenByDescending(x => x.Id)
+                .FirstOrDefaultAsync();
+
+            float? latestEvalAvg = null;
+
+            if (latestEval != null)
+            {
+                latestEvalAvg = (
+                    (latestEval.WorkQuality ?? 0) +
+                    (latestEval.Productivity ?? 0) +
+                    (latestEval.Teamwork ?? 0) +
+                    (latestEval.Attendance ?? 0) +
+                    (latestEval.Communication ?? 0)
+                ) / 5f;
+            }
+
+            var totalTrainingPoints = await _context.Set<HRMS_System.Models.TrainingandSeminar>()
+                .AsNoTracking()
+                .Where(x => x.UserInformationId == userId)
+                .SumAsync(x => (int?)x.Points) ?? 0;
+
+            var certificationBonus = Math.Min(totalTrainingPoints, 6);
+
+            float? performancePercent = null;
+
+            try
+            {
+                var featureRow = _featureBuilder.BuildFeatureRow(userId);
+                var weightedResult = _weightedService.Calculate(featureRow);
+                performancePercent = weightedResult.PerformanceScore;
+            }
+            catch
+            {
+                performancePercent = null;
+            }
+
+            var promotionChance =
+                (attendancePercent * 0.40f) +
+                ((performancePercent ?? 0f) * 0.60f) +
+                certificationBonus;
+
+            if (promotionChance > 106f)
+                promotionChance = 106f;
+
+            return new PromotionSnapshot
+            {
+                EmployeeId = employee.Id,
+                EmployeeDisplay = $"{employee.EmployeeNumber} - {employee.FirstName} {employee.LastName}".Trim(),
+                CategoryName = employee.Category?.ToString() ?? "No Category",
+                AttendancePercent = attendancePercent,
+                LatestEvalAvg = latestEvalAvg,
+                PerformancePercent = performancePercent,
+                CertificationBonus = certificationBonus,
+                PromotionChance = promotionChance
+            };
+        }
+        public async Task<IActionResult> OnPostSelectEmployeeAsync()
+        {
+            if (!SelectedUserId.HasValue)
+            {
+                TempData["Error"] = "Please select an employee first.";
+                return RedirectToPage();
+            }
+
+            var employee = await _context.Set<UserInformationModel>()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == SelectedUserId.Value);
+
+            if (employee == null)
+            {
+                TempData["Error"] = "Employee not found.";
+                return RedirectToPage();
+            }
+
+            var attendanceRows = await _context.Set<AttendanceTrackingModel>()
+                .AsNoTracking()
+                .Where(x => x.UserId == employee.Id)
+                .ToListAsync();
+
+            var totalAttendance = attendanceRows.Count;
+
+            var attendedCount = attendanceRows.Count(x =>
+                !string.IsNullOrWhiteSpace(x.AttendanceStatus) &&
+                !x.AttendanceStatus.Equals("Absent", StringComparison.OrdinalIgnoreCase));
+
+            var attendancePercent = totalAttendance == 0
+                ? 0f
+                : (float)attendedCount / totalAttendance * 100f;
+
+            var latestEval = await _context.Set<EvaluationModel>()
+                .AsNoTracking()
+                .Where(x => x.UserId == employee.Id)
+                .OrderByDescending(x => x.EvaluationDate)
+                .ThenByDescending(x => x.Id)
+                .FirstOrDefaultAsync();
+
+            float? latestEvalAvg = null;
+
+            if (latestEval != null)
+            {
+                latestEvalAvg =
+                    (
+                        (latestEval.WorkQuality ?? 0) +
+                        (latestEval.Productivity ?? 0) +
+                        (latestEval.Teamwork ?? 0) +
+                        (latestEval.Attendance ?? 0) +
+                        (latestEval.Communication ?? 0)
+                    ) / 5f;
+            }
+
+            var totalTrainingPoints = await _context.Set<HRMS_System.Models.TrainingandSeminar>()
+                .AsNoTracking()
+                .Where(x => x.UserInformationId == employee.Id)
+                .SumAsync(x => (int?)x.Points) ?? 0;
+
+            var certificationBonus = Math.Min(totalTrainingPoints, 6);
+
+            float? performancePercent = null;
+
+            try
+            {
+                var featureRow = _featureBuilder.BuildFeatureRow(employee.Id);
+                var weightedResult = _weightedService.Calculate(featureRow);
+                performancePercent = weightedResult.PerformanceScore;
+            }
+            catch
+            {
+                performancePercent = null;
+            }
+
+            var promotionChance =
+                (attendancePercent * 0.40f) +
+                ((performancePercent ?? 0f) * 0.60f) +
+                certificationBonus;
+
+            if (promotionChance > 106f)
+                promotionChance = 106f;
+
+            var employeeDisplay = $"{employee.EmployeeNumber} - {employee.FirstName} {employee.LastName}".Trim();
+            var categoryName = employee.Category?.ToString() ?? "No Category";
+
+            _context.Set<PromotionNotificationModel>().Add(new PromotionNotificationModel
+            {
+                EmployeeId = employee.Id,
+                EmployeeName = employeeDisplay,
+                Title = "Promotion Chance Updated",
+                Message =
+                    $"Promotion chance for {employeeDisplay} is {promotionChance:F2}%. " +
+                    $"Attendance: {attendancePercent:F2}%, " +
+                    $"Evaluation: {(latestEvalAvg.HasValue ? latestEvalAvg.Value.ToString("F2") : "—")}, " +
+                    $"Performance: {(performancePercent.HasValue ? performancePercent.Value.ToString("F2") + "%" : "—")}, " +
+                    $"Certification Bonus: +{certificationBonus}, " +
+                    $"Category: {categoryName}.",
+                StatusKey = "promotion_chance",
+                IsRead = false,
+                IsArchived = false,
+                CreatedAt = DateTime.Now
+            });
+
+            await _context.SaveChangesAsync();
+            TempData["NewNotif"] = true;
+            TempData["Success"] = $"Promotion chance notification created for {employeeDisplay}: {promotionChance:F2}%";
+            TempData["Success"] = $"Promotion chance notification created for {employeeDisplay}: {promotionChance:F2}%";
+            return RedirectToPage(new { SelectedUserId = employee.Id });
+        }
         private async Task LoadEmployeesAsync()
         {
-            var today = DateTime.Today;
-
-            var employees = await _context.UserInformation
+            var allEmployees = await _context.Set<UserInformationModel>()
                 .AsNoTracking()
                 .OrderBy(e => e.EmployeeNumber)
                 .ToListAsync();
 
-            var latestEvalList = await _context.Evaluation
+            EmployeeOptions = allEmployees.Select(e => new SelectListItem
+            {
+                Value = e.Id.ToString(),
+                Text = $"{e.EmployeeNumber} - {e.FirstName} {e.LastName}"
+            }).ToList();
+
+            UserInformationModel? selectedEmployee = null;
+
+            if (SelectedUserId.HasValue)
+            {
+                selectedEmployee = allEmployees.FirstOrDefault(x => x.Id == SelectedUserId.Value);
+
+                if (selectedEmployee != null)
+                {
+                    SelectedEmployeeName = $"{selectedEmployee.EmployeeNumber} - {selectedEmployee.FirstName} {selectedEmployee.LastName}".Trim();
+                    SelectedCategoryName = selectedEmployee.Category?.ToString() ?? "No Category";
+                }
+            }
+
+            var employeesToShow = allEmployees.AsEnumerable();
+
+            if (selectedEmployee?.Category != null)
+            {
+                employeesToShow = employeesToShow.Where(x => x.Category == selectedEmployee.Category);
+            }
+
+            var employeeList = employeesToShow.ToList();
+
+            var attendanceList = await _context.Set<AttendanceTrackingModel>()
+                .AsNoTracking()
+                .GroupBy(a => a.UserId)
+                .Select(g => new AttendanceInfo
+                {
+                    UserId = g.Key,
+                    TotalCount = g.Count(),
+                    PresentCount = g.Count(x =>
+                        x.AttendanceStatus != null &&
+                        (
+                            x.AttendanceStatus == "Present" ||
+                            x.AttendanceStatus == "On-Time"
+                        )),
+                    AttendancePercent = g.Count() == 0
+                        ? 0
+                        : (float)g.Count(x =>
+                            x.AttendanceStatus != null &&
+                            (
+                                x.AttendanceStatus == "Present" ||
+                                x.AttendanceStatus == "On-Time"
+                            )) / g.Count() * 100f
+                })
+                .ToListAsync();
+
+            var attendanceMap = attendanceList.ToDictionary(x => x.UserId, x => x);
+
+            var latestEvalList = await _context.Set<EvaluationModel>()
                 .AsNoTracking()
                 .Where(e => e.UserId.HasValue)
                 .GroupBy(e => e.UserId!.Value)
@@ -288,11 +407,13 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
                     .Select(x => new LatestEvalInfo
                     {
                         UserId = x.UserId!.Value,
-                        LatestEvalAvg = ((x.WorkQuality ?? 0) +
-                                         (x.Productivity ?? 0) +
-                                         (x.Teamwork ?? 0) +
-                                         (x.Attendance ?? 0) +
-                                         (x.Communication ?? 0)) / 5f,
+                        LatestEvalAvg = (
+                            (x.WorkQuality ?? 0) +
+                            (x.Productivity ?? 0) +
+                            (x.Teamwork ?? 0) +
+                            (x.Attendance ?? 0) +
+                            (x.Communication ?? 0)
+                        ) / 5f,
                         OverallRating = x.OverallRating
                     })
                     .FirstOrDefault()!)
@@ -302,52 +423,76 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
                 .Where(x => x != null)
                 .ToDictionary(x => x.UserId, x => x);
 
-            EmployeeOptions = employees.Select(e => new SelectListItem
-            {
-                Value = e.Id.ToString(),
-                Text = $"{e.EmployeeNumber} - {e.FirstName} {e.LastName}"
-            }).ToList();
+            var trainingList = await _context.Set<HRMS_System.Models.TrainingandSeminar>()
+                .AsNoTracking()
+                .GroupBy(t => t.UserInformationId)
+                .Select(g => new TrainingInfo
+                {
+                    UserId = g.Key,
+                    TotalPoints = g.Sum(x => x.Points)
+                })
+                .ToListAsync();
+
+            var trainingMap = trainingList.ToDictionary(x => x.UserId, x => x);
 
             EmployeeRows = new List<EmployeeRowVM>();
 
-            foreach (var e in employees)
+            foreach (var e in employeeList)
             {
+                attendanceMap.TryGetValue(e.Id, out var attendanceInfo);
                 latestEvalMap.TryGetValue(e.Id, out var latestEval);
+                trainingMap.TryGetValue(e.Id, out var trainingInfo);
 
-                float? latestPerformanceEvaluationScore = null;
+                var attendancePercent = attendanceInfo?.AttendancePercent ?? 0f;
+                var certificationBonus = Math.Min(trainingInfo?.TotalPoints ?? 0, 6);
+
+                float? performancePercent = null;
 
                 try
                 {
                     var featureRow = _featureBuilder.BuildFeatureRow(e.Id);
                     var weightedResult = _weightedService.Calculate(featureRow);
-                    latestPerformanceEvaluationScore = weightedResult.PerformanceScore;
+                    performancePercent = weightedResult.PerformanceScore;
                 }
                 catch
                 {
-                    latestPerformanceEvaluationScore = null;
+                    performancePercent = null;
                 }
+
+                var promotionChance =
+                    (attendancePercent * 0.40f) +
+                    ((performancePercent ?? 0f) * 0.60f) +
+                    certificationBonus;
+
+                if (promotionChance > 106f)
+                    promotionChance = 106f;
 
                 EmployeeRows.Add(new EmployeeRowVM
                 {
                     EmployeeNumber = e.EmployeeNumber ?? "",
                     FullName = $"{e.FirstName} {e.LastName}".Trim(),
-                    TenureMonths = e.TenureMonths ?? CalculateMonths(e.StartDate, today),
+                    AttendancePercent = attendancePercent,
                     LatestEvalAvg = latestEval?.LatestEvalAvg,
-                    LatestPerformanceEvaluationScore = latestPerformanceEvaluationScore,
+                    PerformancePercent = performancePercent,
+                    PromotionChance = promotionChance,
+                    CertificationBonus = certificationBonus,
                     Rating = string.IsNullOrWhiteSpace(latestEval?.OverallRating) ? "—" : latestEval!.OverallRating!,
                     SearchText = $"{e.EmployeeNumber} {e.FirstName} {e.LastName}".Trim()
                 });
             }
         }
 
-        private static int CalculateMonths(DateTime startDate, DateTime endDate)
+        public class EmployeeRowVM
         {
-            int months = (endDate.Year - startDate.Year) * 12 + endDate.Month - startDate.Month;
-
-            if (endDate.Day < startDate.Day)
-                months--;
-
-            return Math.Max(months, 0);
+            public string EmployeeNumber { get; set; } = "";
+            public string FullName { get; set; } = "";
+            public float AttendancePercent { get; set; }
+            public float? LatestEvalAvg { get; set; }
+            public float? PerformancePercent { get; set; }
+            public float PromotionChance { get; set; }
+            public int CertificationBonus { get; set; }
+            public string Rating { get; set; } = "—";
+            public string SearchText { get; set; } = "";
         }
     }
 }

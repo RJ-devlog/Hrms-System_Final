@@ -7,11 +7,322 @@
 
 <link rel="stylesheet" href="~/css/dashboard-shared.css" />
 <link rel="stylesheet" href="~/css/promotion.css" />
+
 <style>
-    .alert.error {
-        background: #fff8db;
-        border: 1px solid #f4d97a;
-        color: #8a6d1d;
+    .promo-page {
+        padding: 10px 0 24px;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .page-title {
+        margin: 0;
+        font-size: 34px;
+        line-height: 1.15;
+        font-weight: 800;
+        color: #172554;
+        letter-spacing: -0.02em;
+    }
+
+    .page-subtitle {
+        margin-top: 8px;
+        font-size: 15px;
+        color: #64748b;
+        max-width: 860px;
+    }
+
+    .alert {
+        border-radius: 16px;
+        padding: 14px 16px;
+        margin-bottom: 16px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+        .alert.success {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+        }
+
+        .alert.error {
+            background: #fff8db;
+            border: 1px solid #f4d97a;
+            color: #8a6d1d;
+        }
+
+    .card-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.8fr) minmax(320px, .95fr);
+        gap: 22px;
+        align-items: start;
+    }
+
+    .card {
+        background: #ffffff;
+        border: 1px solid #dbe5f1;
+        border-radius: 24px;
+        box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+        padding: 20px;
+    }
+
+    .side-card {
+        position: sticky;
+        top: 18px;
+    }
+
+    .card-title {
+        font-size: 22px;
+        font-weight: 800;
+        color: #172554;
+        margin-bottom: 6px;
+    }
+
+    .card-subtitle {
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.5;
+        margin-bottom: 16px;
+    }
+
+    .tool-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+    }
+
+    .form-control {
+        width: 100%;
+        height: 48px;
+        border: 1px solid #cbd5e1;
+        border-radius: 16px;
+        padding: 0 14px;
+        font-size: 14px;
+        color: #0f172a;
+        background: #fff;
+        outline: none;
+        transition: .2s ease;
+        box-shadow: none;
+    }
+
+        .form-control.small {
+            max-width: 360px;
+        }
+
+        .form-control:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+        }
+
+    .table-wrap {
+        overflow: hidden;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        background: #fff;
+    }
+
+    .table-fixed {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        table-layout: fixed;
+    }
+
+        .table-fixed thead th {
+            background: #f8fafc;
+            color: #1e293b;
+            font-size: 14px;
+            font-weight: 800;
+            text-align: left;
+            padding: 16px 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+            .table-fixed thead th:first-child {
+                border-top-left-radius: 20px;
+            }
+
+            .table-fixed thead th:last-child {
+                border-top-right-radius: 20px;
+            }
+
+        .table-fixed tbody td {
+            padding: 16px 16px;
+            border-bottom: 1px solid #eef2f7;
+            vertical-align: middle;
+            font-size: 14px;
+            color: #0f172a;
+            background: #fff;
+            word-wrap: break-word;
+        }
+
+        .table-fixed tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table-fixed tbody tr:hover td {
+            background: #fbfdff;
+        }
+
+    .pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 52px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 800;
+        line-height: 1;
+    }
+
+    .pill-info {
+        background: #ecfeff;
+        color: #155e75;
+        border: 1px solid #d5f5f6;
+    }
+
+    .table-footer {
+        margin-top: 14px;
+    }
+
+    .muted {
+        font-size: 13px;
+        color: #64748b;
+        line-height: 1.5;
+    }
+
+    .info-box {
+        padding: 16px 16px;
+        border-radius: 18px;
+        background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+        border: 1px solid #dbe5f1;
+        color: #334155;
+        font-size: 14px;
+        line-height: 1.6;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+
+        .info-box b {
+            color: #172554;
+        }
+
+    .metric-note {
+        margin-top: 10px;
+        font-size: 13px;
+        color: #64748b;
+    }
+
+    .side-grid {
+        display: grid;
+        gap: 14px;
+    }
+
+    .form-group {
+        margin-bottom: 14px;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #1e293b;
+        font-size: 14px;
+    }
+
+    .badge-soft {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-weight: 700;
+        font-size: 12px;
+    }
+
+    .muted-2 {
+        color: #64748b;
+        font-size: 13px;
+    }
+
+    .card-subsection {
+        margin-top: 4px;
+        padding-top: 2px;
+    }
+
+    .select2-container--default .select2-selection--single {
+        height: 48px !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 16px !important;
+        display: flex !important;
+        align-items: center !important;
+        padding: 0 8px !important;
+    }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            line-height: 46px !important;
+            color: #0f172a !important;
+            font-size: 14px;
+            padding-left: 4px !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 46px !important;
+            right: 10px !important;
+        }
+
+    .select2-dropdown {
+        border-radius: 14px !important;
+        border: 1px solid #dbe5f1 !important;
+        overflow: hidden;
+    }
+
+    .select2-search__field {
+        border-radius: 10px !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+
+    @@media (max-width: 1200px) {
+        .card-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .side-card {
+            position: static;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .card {
+            padding: 16px;
+            border-radius: 20px;
+        }
+
+        .page-title {
+            font-size: 28px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        .table-fixed {
+            min-width: 920px;
+        }
+
+        .form-control.small {
+            max-width: 100%;
+        }
     }
 </style>
 
@@ -20,13 +331,9 @@
     <div class="page-header">
         <div>
             <h1 class="page-title">Promotion Management</h1>
-            <div class="page-subtitle">Predictive employee promotion eligibility using performance & HR metrics.</div>
-        </div>
-
-        <div class="page-actions" hidden>
-            <form method="post" asp-page-handler="TrainModel">
-                <button class="btn btn-ghost" type="submit">Train / Re-train Model</button>
-            </form>
+            <div class="page-subtitle">
+                Review employees by category and create promotion records using attendance, evaluation, performance, and certification points.
+            </div>
         </div>
     </div>
 
@@ -41,22 +348,22 @@
 
     <div class="card-grid">
 
-        <!-- LEFT: Employee list + predict -->
+        <!-- LEFT: employee table -->
         <div class="card">
             <div class="card-title">Employees</div>
-            <div class="card-subtitle">Select an employee then click Predict.</div>
+            <div class="card-subtitle">
+                @if (Model.SelectedUserId.HasValue)
+                {
+                    <text>Showing employees from the same category as <b>@Model.SelectedEmployeeName</b>.</text>
+                }
+                else
+                {
+                    <text>Select an employee on the right panel to filter this table by category.</text>
+                }
+            </div>
 
             <div class="tool-row">
                 <input class="form-control small" placeholder="Search name / ID..." id="searchBox" />
-                <form method="post" asp-page-handler="Predict" class="inline-form">
-                    <select class="form-control small"
-                            asp-for="SelectedUserId"
-                            asp-items="Model.EmployeeOptions">
-                        <option value="">-- Select Employee --</option>
-                    </select>
-
-                    <button class="btn btn-primary" type="submit">Predict Promotion</button>
-                </form>
             </div>
 
             <div class="table-wrap">
@@ -65,10 +372,10 @@
                         <tr>
                             <th style="width:130px;">Emp ID</th>
                             <th>Name</th>
-                            <th style="width:120px;">Tenure</th>
-                            <th style="width:130px;">Evaluation</th>
-                            <th style="width:220px;">Performance</th>
-                            <th style="width:140px;">Rating</th>
+                            <th style="width:140px;">Attendance</th>
+                            <th style="width:140px;">Evaluation</th>
+                            <th style="width:140px;">Performance</th>
+                            <th style="width:170px;">Promotion Chance</th>
                         </tr>
                     </thead>
                     <tbody id="empBody">
@@ -77,7 +384,12 @@
                             <tr class="emp-row" data-name="@row.SearchText">
                                 <td>@row.EmployeeNumber</td>
                                 <td>@row.FullName</td>
-                                <td>@row.TenureMonths mo</td>
+
+                                <td>
+                                    <span class="pill pill-info">
+                                        @row.AttendancePercent.ToString("F1")%
+                                    </span>
+                                </td>
 
                                 <td>
                                     <span class="pill pill-info">
@@ -86,30 +398,14 @@
                                 </td>
 
                                 <td>
-                                    @if (row.LatestPerformanceEvaluationScore.HasValue)
-                                    {
-                                        <span class="pill pill-info">
-                                            @row.LatestPerformanceEvaluationScore.Value.ToString("F1")%
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="pill pill-info">—</span>
-                                    }
+                                    <span class="pill pill-info">
+                                        @(row.PerformancePercent.HasValue? row.PerformancePercent.Value.ToString("F1") + "%" : "—")
+                                    </span>
                                 </td>
 
                                 <td>
                                     <span class="pill pill-info">
-                                        @{
-                                            if (decimal.TryParse(row.Rating, out var ratingValue))
-                                            {
-                                                @ratingValue.ToString("F1")
-                                            }
-                                            else
-                                            {
-                                                @row.Rating
-                                            }
-                                        }
+                                        @row.PromotionChance.ToString("F1")%
                                     </span>
                                 </td>
                             </tr>
@@ -119,64 +415,73 @@
             </div>
 
             <div class="table-footer">
-                <div class="muted">Tip: Ensure Evaluation + Attendance records exist for better prediction.</div>
+                <div class="muted">
+                    Formula: Attendance (40%) + Performance &amp; Evaluation (60%) + Certification bonus points (max +6). Maximum total: 106%.
+                </div>
             </div>
         </div>
 
-        <!-- RIGHT: Prediction Panel -->
+        <!-- RIGHT: selection + promotion action -->
         <div class="card side-card">
-            <div class="card-title">Prediction Result</div>
-            <div class="card-subtitle">Promotion recommendation.</div>
-            <div class="predict-box">
-                <div class="predict-label">Employee</div>
-                <div class="predict-value">@Model.PredictionEmployeeName</div>
+            <div class="card-title">Promotion Action</div>
+            <div class="card-subtitle">Choose an employee and filter the table by that employee's category.</div>
 
-                <div class="predict-divider"></div>
-
-                <div class="predict-label">Predicted Promotion</div>
-                @if (Model.PredictionAvailable)
-                {
-                    <div class="predict-big @(Model.PredictedPromoted ? "good" : "bad")">
-                        @(Model.PredictedPromoted ? "YES" : "NO")
-                    </div>
-
-                    <div class="predict-label">Overall Score</div>
-                    <div class="predict-value">@Model.PredictionProbability.ToString("P2")</div>
-                    <div class="predict-label">Recommendation</div>
-                    <div class="hint-box">
-                        @Model.RecommendationText
-                    </div>
-
-                    <div class="predict-divider"></div>
-
-                    <div class="actions">
-                        <a class="btn btn-ghost" asp-page="/Hrms/Evaluation/Index">View Evaluations</a>
-                        <a class="btn btn-ghost" asp-page="/Hrms/TrainingandSeminar/Index">View Training</a>
-                    </div>
-                }
-                else
-                {
-                    <div class="hint-box">
-                        No prediction yet. Select an employee then click <b>Predict Promotion</b>.
-                    </div>
-                }
-            </div>
-
-            <!-- OPTIONAL: Manual approval -->
-            <div class="card-subsection">
-                <div class="card-subtitle">Manual Promotion Action</div>
-                <form method="post" asp-page-handler="CreatePromotion">
-                    <input type="hidden" name="SelectedUserId" value="@Model.SelectedUserId" />
-                    <div class="form-group mb-3">
-                        <label class="form-label">Proposed New Role</label>
-                        <select class="form-control role-select"
-                                asp-for="ProposedRole"
-                                asp-items="Model.RoleOptions">
+            <div class="side-grid">
+                <form method="post" asp-page-handler="SelectEmployee">
+                    <div class="form-group">
+                        <label class="form-label">Select Employee</label>
+                        <select class="form-control"
+                                asp-for="SelectedUserId"
+                                asp-items="Model.EmployeeOptions"
+                                onchange="this.form.submit()">
+                            <option value="">-- Select Employee --</option>
                         </select>
                     </div>
-
-                    <button class="btn btn-primary" type="submit">Create Promotion Record</button>
                 </form>
+
+                <div class="info-box">
+                    <div><b>Job Role Category:</b> @Model.SelectedCategoryName</div>
+                    <div><b>Selected Employee:</b> @Model.SelectedEmployeeName</div>
+                    <div class="metric-note">
+                        When an employee is selected, the table shows all employees under the same category.
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <div><b>Computation</b></div>
+                    <div>Attendance = 40%</div>
+                    <div>Performance &amp; Evaluation = 60%</div>
+                    <div>Certification = additional bonus points</div>
+                    <div>Maximum total = 106%</div>
+                </div>
+
+                <div class="card-subsection" hidden>
+                      <div class="card-subtitle">Manual Promotion Action</div>
+
+                    <form method="post" asp-page-handler="CreatePromotion">
+                        <input type="hidden" asp-for="SelectedUserId" />
+
+                        <div class="form-group">
+                            <label class="form-label">Proposed New Role</label>
+                            <select class="form-control role-select"
+                                    asp-for="ProposedRole"
+                                    asp-items="Model.RoleOptions">
+                                <option value="">-- Select Job Role --</option>
+                            </select>
+                        </div>
+
+                        <button class="btn btn-primary"
+                                type="submit"
+                                disabled="@(Model.SelectedUserId.HasValue ? null : "disabled")">
+                            Create Promotion Record
+                        </button>
+
+                        @if (!Model.SelectedUserId.HasValue)
+                        {
+                            <div class="metric-note">Select an employee first before creating a promotion record.</div>
+                        }
+                    </form> 
+                </div>
             </div>
         </div>
 
@@ -184,7 +489,6 @@
 </div>
 
 @section Scripts {
-    <!-- Select2 (searchable dropdown) -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>

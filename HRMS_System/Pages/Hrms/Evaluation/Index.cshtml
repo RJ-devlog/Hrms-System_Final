@@ -249,6 +249,7 @@
             z-index: 3;
         }
 </style>
+
 <div class="dashboard-page eval-page">
 
     <div class="page-header">
@@ -274,13 +275,13 @@
                 <div class="records-title">Evaluation Records</div>
 
                 <div class="records-tools">
-                    <input type="text" class="form-control small" placeholder="Search name / ID..." id="searchBox"/>
-                    <!-- PERIOD DROPDOWN -->
+                    <input type="text" class="form-control small" placeholder="Search name / ID..." id="searchBox" />
                     <select class="form-control" asp-for="Input.Period" disabled>
                     </select>
                 </div>
             </div>
-                <div class="table-wrap">
+
+            <div class="table-wrap">
                 <table class="table-fixed">
                     <thead>
                         <tr>
@@ -298,7 +299,7 @@
                             <tr>
                                 <td>EV-@r.Id.ToString("0000")</td>
                                 <td>
-                                    @(r.User != null ? $"{r.User.EmployeeNumber} - {r.User.FirstName} {r.User.LastName}": $"User #{r.UserId}")
+                                    @(r.User != null ? $"{r.User.EmployeeNumber} - {r.User.FirstName} {r.User.LastName}" : $"User #{r.UserId}")
                                 </td>
                                 <td>@(r.Period >= 1 && r.Period <= 12 ? new DateTime(2000, r.Period, 1).ToString("MMMM") : "-")</td>
                                 <td>@r.EvaluationDate.ToString("MMMM d, yyyy")</td>
@@ -385,6 +386,7 @@
                                                         Available on @nextDate?.ToString("dd/MM/yyyy")
                                                     </button>
                                                 }
+
                                                 <button type="button"
                                                         class="dropdown-item"
                                                         onclick="openPerformancePanel(@emp.Id)">
@@ -536,9 +538,10 @@
                     </select>
                     <span class="text-danger" asp-validation-for="Input.Period"></span>
                 </div>
+
                 <div class="form-group">
                     <label class="form-label">Evaluation Year</label>
-                    <input type="number" class="form-control" asp-for="Input.EvaluationCurrentYear" min="1990" max="3000" readonly/>
+                    <input type="number" class="form-control" asp-for="Input.EvaluationCurrentYear" min="1990" max="3000" readonly />
                     <span class="text-danger" asp-validation-for="Input.EvaluationCurrentYear"></span>
                 </div>
             </div>
@@ -702,7 +705,7 @@
                             <th style="width:180px;">Evaluator Name</th>
                             <th style="width:180px;">Department</th>
                             <th style="width:160px;">Overall Average</th>
-                            <th style="width:160px;">Evaluation History</th>
+              @*               <th style="width:160px;">Evaluation History</th> *@
                         </tr>
                     </thead>
 
@@ -714,12 +717,12 @@
                             <td>Chai Deguzman</td>
                             <td>Administration</td>
                             <td>9.56</td>
-                            <td>
+                  @*           <td>
                                 <button class="btn btn-ghost btn-xs"
-                                        onclick="openEvaluationHistoryPanel()">
+                                        onclick="openEvaluationHistoryPanel(1, 'CHOU CHOURUSEL')">
                                     View
                                 </button>
-                            </td>
+                            </td> *@
                         </tr>
                     </tbody>
                 </table>
@@ -760,17 +763,26 @@
         </div>
     </div>
 </div>
+
 <!-- Evaluation History Panel -->
 <div id="evaluationHistoryPanel" class="profile-panel evaluation-history-panel">
+    <input type="hidden" id="currentEvaluationHistoryUserId" />
+
     <div class="panel-header">
         <div style="display:flex;align-items:center;gap:12px;">
-            <button onclick="backToManagementPanel()"
+            <button type="button"
+                    onclick="backToManagementPanel()"
                     style="border:none;background:none;font-size:20px;cursor:pointer;">
                 ←
             </button>
-            <h3 style="margin:0;">Evaluation History</h3>
+
+            <div>
+                <h3 style="margin:0;">Evaluation History</h3>
+                <div id="evaluationHistorySubtitle" style="font-size:13px; color:#6b7280;"></div>
+            </div>
         </div>
-        <button onclick="closePanel()">×</button>
+
+        <button type="button" onclick="closePanel()">×</button>
     </div>
 
     <div class="panel-body">
@@ -782,11 +794,10 @@
                 </tr>
             </thead>
 
-            <tbody>
-                <tr><td>Q1 2024</td><td>-</td></tr>
-                <tr><td>Q2 2024</td><td>-</td></tr>
-                <tr><td>Q3 2024</td><td>-</td></tr>
-                <tr><td>Annual 2024</td><td>-</td></tr>
+            <tbody id="evaluationHistoryBody">
+                <tr>
+                    <td colspan="2">No evaluation history found.</td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -867,7 +878,8 @@
                     document.getElementById("vComments").innerText = data.comments?.trim() ? data.comments : "—";
                     document.getElementById("vOverall").innerText = data.overall?.trim() ? data.overall : "—";
                     document.getElementById("vEvaluatedBy").innerText = data.evaluatedBy || "—";
-                    document.getElementById("vEvaluatedDate").innerText = data.evaluatedDate || "—";                })
+                    document.getElementById("vEvaluatedDate").innerText = data.evaluatedDate || "—";
+                })
                 .catch(err => {
                     console.error(err);
                     document.getElementById("vRatings").innerHTML = `<tr><td colspan="2">Error loading evaluation.</td></tr>`;
@@ -941,7 +953,6 @@
                     document.getElementById("perfDepartment").innerText = data.department || "—";
                     document.getElementById("perfDateHired").innerText = data.dateHired || "—";
                     document.getElementById("perfOverallScore").innerText = data.overallScore || "—";
-
                 })
                 .catch(err => {
                     console.error(err);
@@ -998,9 +1009,39 @@
             document.getElementById("performancePanel").style.display = "block";
         }
 
-        function openEvaluationHistoryPanel() {
+        function openEvaluationHistoryPanel(userId, employeeName) {
+            document.getElementById("panelOverlay").style.display = "block";
             document.querySelectorAll(".profile-panel").forEach(p => p.style.display = "none");
             document.getElementById("evaluationHistoryPanel").style.display = "block";
+
+            document.getElementById("currentEvaluationHistoryUserId").value = userId;
+            document.getElementById("evaluationHistorySubtitle").innerText = employeeName || "";
+
+            const tbody = document.getElementById("evaluationHistoryBody");
+            tbody.innerHTML = `<tr><td colspan="2">Loading...</td></tr>`;
+
+            fetch(`?handler=EvaluationHistory&id=${userId}`)
+                .then(res => {
+                    if (!res.ok) throw new Error("Failed to load evaluation history");
+                    return res.json();
+                })
+                .then(data => {
+                    if (!data || !data.length) {
+                        tbody.innerHTML = `<tr><td colspan="2">No evaluation history found.</td></tr>`;
+                        return;
+                    }
+
+                    tbody.innerHTML = data.map(row => `
+                        <tr>
+                            <td>${row.period}</td>
+                            <td>${row.feedback}</td>
+                        </tr>
+                    `).join("");
+                })
+                .catch(err => {
+                    console.error(err);
+                    tbody.innerHTML = `<tr><td colspan="2">Error loading evaluation history.</td></tr>`;
+                });
         }
 
         function backToManagementPanel() {
@@ -1024,13 +1065,14 @@
             const dd = String(today.getDate()).padStart(2, "0");
 
             const dateInput = document.querySelector('#evaluatePanel [name="Input.EvaluationDate"]');
-            const yearInput = document.querySelector('#evaluatePanel [name="Input.EvaluationCUrrentYear"]');
+            const periodSelect = document.querySelector('#evaluatePanel select[name="Input.Period"]');
+            const yearInput = document.querySelector('#evaluatePanel [name="Input.EvaluationCurrentYear"]');
 
             if (periodSelect) {
-                periodSelect.value = "@Model.Input.Period"; // string literal
+                periodSelect.value = "@Model.Input.Period";
                 periodSelect.disabled = true;
             }
-            
+
             if (dateInput && !dateInput.value) {
                 dateInput.value = `${yyyy}-${mm}-${dd}`;
             }
@@ -1102,4 +1144,3 @@
         });
     </script>
 }
-

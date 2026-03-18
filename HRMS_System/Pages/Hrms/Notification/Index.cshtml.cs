@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace HRMS_System.Pages.Hrms.Notification
 {
@@ -129,6 +130,7 @@ namespace HRMS_System.Pages.Hrms.Notification
             public string StatusLabel =>
                 StatusKey switch
                 {
+                    "promotion_chance" => "Promotion Chance",
                     "predicted_yes" => "Predicted YES",
                     "predicted_no" => "Predicted NO",
                     "created" => "Record Created",
@@ -136,6 +138,16 @@ namespace HRMS_System.Pages.Hrms.Notification
                     "rejected" => "Rejected",
                     _ => "Update"
                 };
+
+            public string PromotionPercentText
+            {
+                get
+                {
+                    var source = $"{Title} {Message}";
+                    var match = Regex.Match(source, @"\b\d+(\.\d+)?%");
+                    return match.Success ? match.Value : "";
+                }
+            }
         }
     }
 }

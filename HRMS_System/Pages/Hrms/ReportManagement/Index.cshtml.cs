@@ -50,11 +50,13 @@ namespace HRMS_System.Pages.Hrms.ReportManagement
 
         private async Task LoadPerformanceAsync()
         {
-            IQueryable<EvaluationModel> q = _context.Set<EvaluationModel>();
+            IQueryable<EvaluationModel> q = _context.Set<EvaluationModel>()
+                .Include(x => x.User);
+
             if (!string.IsNullOrWhiteSpace(Filter.Period))
             {
-                string periodMonth = Filter.Period; // "March", "April", etc.
-                q = q.Where(x => x.Period.ToString() == periodMonth);
+                string periodMonth = Filter.Period.Trim();
+                q = q.Where(x => x.Period != null && x.Period.ToString() == periodMonth);
             }
 
             if (Filter.FromDate.HasValue)
@@ -62,6 +64,20 @@ namespace HRMS_System.Pages.Hrms.ReportManagement
 
             if (Filter.ToDate.HasValue)
                 q = q.Where(x => x.EvaluationDate <= Filter.ToDate.Value.Date);
+
+            if (!string.IsNullOrWhiteSpace(Filter.Search))
+            {
+                string search = Filter.Search.Trim();
+
+                q = q.Where(x =>
+                    x.User != null &&
+                    (
+                        (x.User.EmployeeNumber != null && x.User.EmployeeNumber.Contains(search)) ||
+                        (x.User.FirstName != null && x.User.FirstName.Contains(search)) ||
+                        (x.User.LastName != null && x.User.LastName.Contains(search)) ||
+                        (x.User.Email != null && x.User.Email.Contains(search))
+                    ));
+            }
 
             var rows = await q
                 .OrderByDescending(x => x.EvaluationDate)
@@ -74,8 +90,10 @@ namespace HRMS_System.Pages.Hrms.ReportManagement
                 return new PerformanceRowVM
                 {
                     EvaluationDate = x.EvaluationDate,
-                    EmployeeDisplay = $"User #{x.UserId}",
-                    Period = x.Period.ToString(),
+                    EmployeeDisplay = x.User == null
+                        ? $"User #{x.UserId}"
+                        : $"{x.User.FirstName} {x.User.LastName} ({x.User.EmployeeNumberDigits})",
+                    Period = string.IsNullOrWhiteSpace(x.Period.ToString()) ? "-" : x.Period.ToString(),
                     WorkQuality = x.WorkQuality,
                     Productivity = x.Productivity,
                     Teamwork = x.Teamwork,
@@ -94,7 +112,6 @@ namespace HRMS_System.Pages.Hrms.ReportManagement
                 .Select(g => g.Key)
                 .FirstOrDefault() ?? "-";
         }
-
         private async Task LoadAttendanceAsync()
         {
             IQueryable<AttendanceTrackingModel> q = _context.Set<AttendanceTrackingModel>()

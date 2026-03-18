@@ -7,7 +7,33 @@
 
 <link rel="stylesheet" href="~/css/dashboard-shared.css" /> 
  <link rel="stylesheet" href="~/css/promo-notification.css" />
+ <style>
+    .notif-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 10px;
+        min-width: 150px;
+    }
 
+    #pvPercent {
+        margin-top: 10px;
+        display: block;
+    }
+
+    #pvPercent {
+        margin-top: 10px;
+        display: inline-block;
+        padding: 7px 12px;
+        border-radius: 999px;
+        border: 1px solid #bfdbfe;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-weight: 900;
+        font-size: 12.5px;
+    }
+ </style>
 <div class="dashboard-page promo-notif-page">
 
     <!-- HEADER -->
@@ -53,8 +79,9 @@
                         <option value="read">Read</option>
                     </select>
 
-                    <select class="form-control small" id="filterStatus">
+                    <select class="form-control small" id="filterStatus" hidden>
                         <option value="">All Status</option>
+                        <option value="promotion_chance">Promotion Chance</option>
                         <option value="predicted_yes">Predicted: YES</option>
                         <option value="predicted_no">Predicted: NO</option>
                         <option value="created">Record Created</option>
@@ -69,7 +96,9 @@
                          data-id="@n.Id"
                          data-read="@(n.IsRead ? "read" : "unread")"
                          data-status="@n.StatusKey"
-                         data-search="@($"{n.EmployeeName} {n.Title} {n.Message} {n.StatusKey}".ToLower())">
+                         data-status-label="@n.StatusLabel"
+                         data-percent="@n.PromotionPercentText"
+                         data-search="@($"{n.EmployeeName} {n.Title} {n.Message} {n.StatusKey} {n.PromotionPercentText}".ToLower())">
 
                         <div class="notif-left">
                             <div class="badge badge-promo">Promotion</div>
@@ -92,6 +121,12 @@
                         </div>
 
                         <div class="notif-right">
+                            @if (!string.IsNullOrWhiteSpace(n.PromotionPercentText))
+                            {
+                                <span class="status-pill" style="background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;">
+                                    @n.PromotionPercentText
+                                </span>
+                            }
                             <span class="status-pill status-@n.StatusKey">@n.StatusLabel</span>
                         </div>
                     </div>
@@ -112,6 +147,7 @@
                 <div class="preview-title" id="pvTitle">Select a notification</div>
                 <div class="preview-meta" id="pvMeta">—</div>
                 <div class="preview-status" id="pvStatus">—</div>
+                <div class="preview-status" id="pvPercent">Promotion Chance: —</div>
 
                 <div class="preview-message" id="pvMessage">
                     Click a promotion notification on the left to view its details.
@@ -123,7 +159,7 @@
                         <button type="submit" class="btn btn-primary">Mark as Read</button>
                     </form>
 
-                    <form method="post" asp-page-handler="Archive" class="inline-form">
+                    <form method="post" asp-page-handler="Archive" class="inline-form" hidden>
                         <input type="hidden" name="SelectedId" id="pvId2" />
                         <button type="submit" class="btn btn-ghost">Archive</button>
                     </form>
@@ -148,24 +184,28 @@
         const pvMeta = document.getElementById("pvMeta");
         const pvMessage = document.getElementById("pvMessage");
         const pvStatus = document.getElementById("pvStatus");
+        const pvPercent = document.getElementById("pvPercent");
 
         document.querySelectorAll(".notif-item").forEach(item => {
             item.addEventListener("click", () => {
                 document.querySelectorAll(".notif-item").forEach(x => x.classList.remove("selected"));
                 item.classList.add("selected");
 
-                const id = item.getAttribute("data-id");
+                const id = item.getAttribute("data-id") || "";
+                const percent = item.getAttribute("data-percent") || "—";
+                const statusLabel = item.getAttribute("data-status-label") || "—";
+
                 const title = item.querySelector(".notif-title")?.childNodes?.[0]?.textContent?.trim() ?? "";
                 const msg = item.querySelector(".notif-snippet")?.textContent ?? "";
                 const meta = item.querySelector(".notif-meta")?.textContent ?? "";
-                const status = item.querySelector(".status-pill")?.textContent ?? "";
 
                 pvId.value = id;
                 pvId2.value = id;
                 pvTitle.textContent = title;
                 pvMessage.textContent = msg;
                 pvMeta.textContent = meta;
-                pvStatus.textContent = "Status: " + status;
+                pvStatus.textContent = "Status: " + statusLabel;
+                pvPercent.textContent = "Promotion Chance: " + percent;
             });
         });
 

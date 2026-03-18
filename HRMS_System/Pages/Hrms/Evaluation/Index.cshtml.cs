@@ -26,18 +26,11 @@ namespace HRMS_System.Pages.Hrms.Evaluation
         public List<PerformanceRecord> PerformanceRecords { get; set; } = new();
         public List<UserInformationModel> Employees { get; set; } = new();
 
-        // dropdown source
         public List<SelectListItem> EmployeeOptions { get; set; } = new();
-
-        // records tab
         public List<EvaluationModel> Records { get; set; } = new();
-
-        // next allowed evaluation date per employee
         public Dictionary<int, DateTime> NextEvaluationDates { get; set; } = new();
-
-        public List<ManagementSummaryRow> ManagementSummaries { get; set; } = new();
-
         public List<SelectListItem> MonthOptions { get; set; } = new();
+
         public async Task OnGetAsync()
         {
             if (Input.EvaluationDate == default)
@@ -136,8 +129,6 @@ namespace HRMS_System.Pages.Hrms.Evaluation
                 Input.EvaluatorRole = evaluatorRole;
             }
 
-
-            // Period is now stored as integer month (1-12)
             if (Input.Period < 1 || Input.Period > 12)
                 Input.Period = DateTime.Today.Month;
 
@@ -153,6 +144,7 @@ namespace HRMS_System.Pages.Hrms.Evaluation
             TempData["Success"] = "Employee evaluation saved successfully.";
             return RedirectToPage();
         }
+
         public async Task<IActionResult> OnGetPerformanceDetailsAsync(int id)
         {
             var employee = await _context.UserInformation
@@ -194,6 +186,7 @@ namespace HRMS_System.Pages.Hrms.Evaluation
                 overallScore = latestScore == 0 ? "-" : $"{latestScore:0.##}%"
             });
         }
+
         public async Task<IActionResult> OnGetPerformanceHistoryAsync(int id)
         {
             var evaluations = await _context.Evaluation
@@ -231,6 +224,7 @@ namespace HRMS_System.Pages.Hrms.Evaluation
 
             return new JsonResult(history);
         }
+
         private async Task LoadNextEvaluationDatesAsync()
         {
             var latestEvaluations = await _context.Evaluation
@@ -289,16 +283,36 @@ namespace HRMS_System.Pages.Hrms.Evaluation
             MonthOptions = Enumerable.Range(1, 12)
                 .Select(m => new SelectListItem
                 {
-                    Value = m.ToString(), // numeric month value for binding to int Period
+                    Value = m.ToString(),
                     Text = new DateTime(2000, m, 1).ToString("MMMM")
                 }).ToList();
         }
+
         private static string GetMonthName(int month)
         {
             return month >= 1 && month <= 12
                 ? new DateTime(2000, month, 1).ToString("MMMM")
                 : "-";
         }
+
+        public async Task<IActionResult> OnGetEvaluationHistoryAsync(int id)
+        {
+            var history = await _context.Evaluation
+                .AsNoTracking()
+                .Where(e => e.UserId == id)
+                .OrderByDescending(e => e.EvaluationCurrentYear)
+                .ThenByDescending(e => e.Period)
+                .ThenByDescending(e => e.EvaluationDate)
+                .Select(e => new
+                {
+                    period = $"{GetMonthName(e.Period)} {e.EvaluationCurrentYear}",
+                    feedback = string.IsNullOrWhiteSpace(e.Comments) ? "-" : e.Comments
+                })
+                .ToListAsync();
+
+            return new JsonResult(history);
+        }
+
         public async Task<IActionResult> OnGetEvalDetailsAsync(int id)
         {
             var eval = await _context.Evaluation
