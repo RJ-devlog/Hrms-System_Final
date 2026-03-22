@@ -134,6 +134,7 @@ namespace HRMS_System.Pages.Hrms.Notification
                     "predicted_yes" => "Predicted YES",
                     "predicted_no" => "Predicted NO",
                     "created" => "Record Created",
+                    "job_role_updated" => "New Job Role",
                     "approved" => "Approved",
                     "rejected" => "Rejected",
                     _ => "Update"

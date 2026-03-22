@@ -99,6 +99,7 @@ wwwroot\uploads\c6d78423-74c2-486a-96ea-f65a07d044c7.jpg
 wwwroot\uploads\dded5d45-33f9-4d35-b8a1-0aa4dc8f8d44.jpg
 wwwroot\uploads\e06c5249-017e-40ef-9647-931d345cc14d.jpg
 wwwroot\uploads\e2220b5e-ddd5-4850-9ea0-07577c43ead9.jpg
+wwwroot\uploads\e462dd99-982a-4dd5-9d6b-fe3e12183684.png
 wwwroot\uploads\eb03811f-2bf6-4e50-be7b-52772950be9d.png
 wwwroot\uploads\f8a231aa-f3c3-443a-9a41-e4b50db02d2f.jpg
 wwwroot\uploads\fbab066f-9680-45d7-bec6-d6c1f3e98ca6.png

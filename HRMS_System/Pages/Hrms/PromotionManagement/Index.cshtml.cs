@@ -329,10 +329,8 @@ namespace HRMS_System.Pages.Hrms.PromotionManagement
                 IsArchived = false,
                 CreatedAt = DateTime.Now
             });
-
             await _context.SaveChangesAsync();
             TempData["NewNotif"] = true;
-            TempData["Success"] = $"Promotion chance notification created for {employeeDisplay}: {promotionChance:F2}%";
             TempData["Success"] = $"Promotion chance notification created for {employeeDisplay}: {promotionChance:F2}%";
             return RedirectToPage(new { SelectedUserId = employee.Id });
         }

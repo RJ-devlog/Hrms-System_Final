@@ -58,10 +58,8 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
             DepartmentOptions = await _deptService.GetDepartmentOptionsAsync();
 
             Employee = await _context.UserInformation.FirstOrDefaultAsync(e => e.Id == id);
-
             if (Employee == null)
                 return NotFound();
-
             return Page();
         }
 
@@ -76,6 +74,8 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
 
             if (employeeInDb == null)
                 return NotFound();
+            var oldJobRole = employeeInDb.JobRole?.Trim();
+            var newJobRole = Employee.JobRole?.Trim();
 
             // Department handling
             if (Employee.DepartmentId == DepartmentSelectService.AddNewValue)
@@ -167,7 +167,7 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
                 employeeInDb.Gender = Employee.Gender;
                 employeeInDb.CivilStatus = Employee.CivilStatus;
                 employeeInDb.Address = Employee.Address;
-                employeeInDb.JobRole = Employee.JobRole;
+                employeeInDb.JobRole = newJobRole;
                 employeeInDb.Category = Employee.Category;
                 employeeInDb.Department = Employee.Department;
                 employeeInDb.DepartmentId = Employee.DepartmentId;
@@ -175,7 +175,24 @@ namespace HRMS_System.Pages.Hrms.EmployeeManagement
                 employeeInDb.Status = Employee.Status;
                 employeeInDb.StartDate = Employee.StartDate;
                 employeeInDb.TenureMonths = CalculateTenureMonths(employeeInDb.StartDate);
+                if (!string.Equals(oldJobRole, newJobRole, StringComparison.OrdinalIgnoreCase))
+                {
+                    var employeeDisplay = $"{Employee.EmployeeNumber} - {Employee.FirstName} {Employee.LastName}".Trim();
 
+                    _context.PromotionNotifications.Add(new PromotionNotificationModel
+                    {
+                        EmployeeId = Employee.Id,
+                        EmployeeName = employeeDisplay,
+                        Title = "New Job Role Assigned",
+                        Message = $"{employeeDisplay} has been updated to the job role: {newJobRole}. Previous job role: {oldJobRole ?? "—"}.",
+                        StatusKey = "job_role_updated",
+                        IsRead = false,
+                        IsArchived = false,
+                        CreatedAt = DateTime.Now
+                    });
+
+                    TempData["NewNotif"] = true;
+                }
                 await _context.SaveChangesAsync();
 
                 // Sync login table
